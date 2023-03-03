@@ -118,7 +118,10 @@ export default function NFTOriginVerifier() {
               const newParsedTokenAccount = await ethNFTToNFTParsedTokenAccount(
                 token,
                 lookupTokenId,
-                signerAddress
+                signerAddress,
+                "null",
+                "null",
+                "null"
               );
               const info = await getOriginalAssetEth(
                 getNFTBridgeAddressForChain(lookupChain),

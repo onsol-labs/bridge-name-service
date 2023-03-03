@@ -202,6 +202,9 @@ export default function TokenPicker({
   isValidAddress?: (address: string, chainId: ChainId) => boolean;
   getAddress?: (
     address: string,
+    name: string,
+    symbol: string,
+    uri: string,
     tokenId?: string
   ) => Promise<NFTParsedTokenAccount>;
   disabled: boolean;
@@ -236,23 +239,24 @@ export default function TokenPicker({
     async (option: NFTParsedTokenAccount) => {
       setSelectionError("");
       let newOption = null;
-      console.log('handleSelectOption')
+      // console.log('handleSelectOption')
       try {
         //Covalent balances tend to be stale, so we make an attempt to correct it at selection time.
-        // if (getAddress && !option.isNativeAsset) {
-        //   console.log('getting addy')
-        //   newOption = await getAddress(option.mintKey, option.tokenId);
-        //   newOption = {
-        //     ...option,
-        //     ...newOption,
-        //     // keep logo and uri from covalent / market list / etc (otherwise would be overwritten by undefined)
-        //     logo: option.logo || newOption.logo,
-        //     uri: option.uri || newOption.uri,
-        //   } as NFTParsedTokenAccount;
-        // } else {
-          
-        newOption = option;
-        // }
+        if (getAddress && !option.isNativeAsset) {
+          console.log('getting addy')
+          newOption = await getAddress(option.mintKey, option.nftName ?? "null", option.symbol ?? "null", option.uri ?? "null", option.tokenId, );
+          newOption = {
+            ...option,
+            ...newOption,
+            // keep logo and uri from covalent / market list / etc (otherwise would be overwritten by undefined)
+            logo: option.logo || newOption.logo,
+            uri: option.uri || newOption.uri,
+          } as NFTParsedTokenAccount;
+          console.log('newOption')
+          console.log(newOption)
+        } else {
+          newOption = option;
+        }
         await onChange(newOption);
         closeDialog();
       } catch (e: any) {
@@ -335,6 +339,7 @@ export default function TokenPicker({
       setLoadingError("");
       getAddress(
         holderString,
+        "null", "null", "null",
         useTokenId ? tokenIdHolderString : undefined
       ).then(
         (result) => {

@@ -54,7 +54,7 @@ export default function EvmTokenPicker(
       const selectedMintMatch =
         selectedTokenAccount &&
         selectedTokenAccount.mintKey.toLowerCase() ===
-          tokenAccount.mintKey.toLowerCase();
+        tokenAccount.mintKey.toLowerCase();
       //added just in case we start displaying NFT balances again.
       const selectedTokenIdMatch =
         selectedTokenAccount &&
@@ -69,9 +69,18 @@ export default function EvmTokenPicker(
 
   const getAddress: (
     address: string,
-    tokenId?: string
+    name: string,
+    symbol: string,
+    uri: string,
+    tokenId?: string,
   ) => Promise<NFTParsedTokenAccount> = useCallback(
-    async (address: string, tokenId?: string) => {
+    async (
+      address: string,
+      name: string,
+      symbol: string,
+      uri: string, 
+      tokenId?: string
+      ) => {
       if (provider && signerAddress && isReady) {
         try {
           const tokenAccount = await (nft
@@ -83,10 +92,18 @@ export default function EvmTokenPicker(
           if (nft && !tokenId) {
             return Promise.reject("Token ID is required.");
           } else if (nft && tokenId) {
+            console.log('getAddress')
+            console.log(tokenId)
+            console.log(nft)
+            console.log(tokenAccount)
+            console.log(signerAddress)
             return ethNFTToNFTParsedTokenAccount(
               tokenAccount as ethers_contracts.NFTImplementation,
               tokenId,
-              signerAddress
+              signerAddress,
+              name,
+              uri,
+              symbol,
             );
           } else {
             return ethTokenToParsedTokenAccount(

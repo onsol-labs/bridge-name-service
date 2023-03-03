@@ -63,13 +63,18 @@ export async function isNFT(token: ethers_contracts.NFTImplementation) {
 export async function ethNFTToNFTParsedTokenAccount(
   token: ethers_contracts.NFTImplementation,
   tokenId: string,
-  signerAddress: string
+  signerAddress: string,
+  name: string,
+  uri: string,
+  symbol: string,
 ) {
   const decimals = 0;
   const balance = (await token.ownerOf(tokenId)) === signerAddress ? 1 : 0;
-  const symbol = await token.symbol();
-  const name = await token.name();
-  const uri = await token.tokenURI(tokenId);
+  // does not exist in the contract
+  // https://goerli.etherscan.io/address/0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85#readContract
+  // const symbol = await token.symbol();
+  // const name = await token.name();
+  // const uri = await token.tokenURI(tokenId);
   return createNFTParsedTokenAccount(
     signerAddress,
     token.address,
