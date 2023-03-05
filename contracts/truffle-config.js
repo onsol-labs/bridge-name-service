@@ -6,6 +6,15 @@ const Caver = require("caver-js");
 module.exports = {
   contracts_directory: './BNS',
   networks: {
+    goerli: {
+      provider: () => {
+        return new HDWalletProvider(
+          process.env.PRIVATE_KEY,
+          "https://eth-goerli.g.alchemy.com/v2/KxuaYmRfUODW-qW72TQK7lopOSiGytZc"
+        );
+      },
+      network_id: "5",
+    },
     development: {
       host: "127.0.0.1",
       port: 8545,
@@ -19,25 +28,16 @@ module.exports = {
     },
     ethereum: {
       provider: () =>
-        new HDWalletProvider(process.env.MNEMONIC, "https://rpc.ankr.com/eth"),
+        new HDWalletProvider(process.env.PRIVATE_KEY, "https://rpc.ankr.com/eth"),
       network_id: 1,
       confirmations: 1,
       timeoutBlocks: 200,
       skipDryRun: false,
     },
-    ethereum_testnet: {
-      provider: () => {
-        return new HDWalletProvider(
-          process.env.MNEMONIC,
-          "https://rpc.ankr.com/eth_goerli"
-        );
-      },
-      network_id: "5",
-    },
     base_testnet: {
       provider: () => {
         return new HDWalletProvider(
-          process.env.MNEMONIC,
+          process.env.PRIVATE_KEY,
           "https://goerli.base.org"
         );
       },

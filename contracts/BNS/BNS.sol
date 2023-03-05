@@ -2,29 +2,34 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-// import "@ensdomains/ens-contracts/contracts/registry/ENS.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
+import "../node_modules/@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import "../node_modules/@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "../node_modules/@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
+import "../node_modules/@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 contract BNS is ERC721URIStorage, ERC721Holder {
-    // ENS public ens = ENS(0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85);
+    using SafeMath for uint256;
     mapping(bytes32 => bool) public wrappedTokens;
 
     constructor() ERC721("Bridge Name Service", "BNS") {}
 
-    function wrapNFT(address token, string memory name) public payable {
+    function wrapNFT(address token, string memory name) public {
         bytes32 tokenAddress = keccak256(
             abi.encodePacked(keccak256(bytes(name)))
         );
+
         require(
             token == 0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85,
             "This contract is specifically built for ENS NFTs"
         );
-
         require(!wrappedTokens[tokenAddress], "ENS domain is already wrapped");
 
         uint256 bnsTokenId = uint256(tokenAddress);
+        require(
+            IERC721(token).ownerOf(bnsTokenId) == msg.sender,
+            "You are not the owner of this NFT."
+        );
+
         IERC721(token).safeTransferFrom(msg.sender, address(this), bnsTokenId);
 
         wrappedTokens[tokenAddress] = true;
@@ -46,19 +51,6 @@ contract BNS is ERC721URIStorage, ERC721Holder {
         wrappedTokens[tokenAddress] = false;
         _burn(bnsTokenId);
     }
-
-    // function onERC721Received(
-    //     address operator,
-    //     address,
-    //     uint256,
-    //     bytes calldata
-    // ) external view returns (bytes4) {
-    //     require(
-    //         operator == address(this),
-    //         "can only transfer tokens via wrapNFT method"
-    //     );
-    //     return type(IERC721Receiver).interfaceId;
-    // }
 
     function tokenURI(uint256 bnsTokenId)
         public

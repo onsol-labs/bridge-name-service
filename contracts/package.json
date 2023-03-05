@@ -22,8 +22,8 @@
   "scripts": {
     "build": "truffle compile",
     "test": "mkdir -p build/contracts && cp node_modules/@openzeppelin/contracts/build/contracts/* build/contracts/ && truffle test --network test",
-    "migrate": "mkdir -p build/contracts && cp node_modules/@openzeppelin/contracts/build/contracts/* build/contracts/ && truffle migrate --to 4",
-    "deploy-batched-vaa-sender": "mkdir -p build/contracts && cp node_modules/@openzeppelin/contracts/build/contracts/* build/contracts/ && truffle migrate --f 10 --to 10",
+    "deploy": "truffle deploy --reset --network goerli",
+    "migrate": "mkdir -p build/contracts && cp node_modules/@openzeppelin/contracts/build/contracts/* build/contracts/ && truffle migrate --reset --network goerli",
     "abigen": "truffle run abigen"
   },
   "author": "",
