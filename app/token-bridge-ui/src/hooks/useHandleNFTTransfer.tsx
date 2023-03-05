@@ -1,7 +1,10 @@
 import {
   ChainId,
+  ChainName,
   CHAIN_ID_KLAYTN,
   CHAIN_ID_SOLANA,
+  coalesceChainId,
+  createNonce,
   getEmitterAddressEth,
   getEmitterAddressSolana,
   getSignedVAAWithRetry,
@@ -11,14 +14,15 @@ import {
   parseSequenceFromLogSolana,
   uint8ArrayToHex,
 } from "@certusone/wormhole-sdk";
+import { NFTImplementation__factory } from "@certusone/wormhole-sdk/lib/cjs/ethers-contracts";
+import { NFTBridge__factory } from "@certusone/wormhole-sdk/lib/esm/ethers-contracts";
 import {
-  transferFromEth,
   transferFromSolana,
 } from "@certusone/wormhole-sdk/lib/esm/nft_bridge";
 import { Alert } from "@material-ui/lab";
 import { WalletContextState } from "@solana/wallet-adapter-react";
 import { Connection } from "@solana/web3.js";
-import { BigNumber, Signer } from "ethers";
+import { BigNumber, BigNumberish, ContractReceipt, Overrides, Signer } from "ethers";
 import { arrayify, zeroPad } from "ethers/lib/utils";
 import { useSnackbar } from "notistack";
 import { useCallback, useMemo } from "react";
@@ -54,6 +58,32 @@ import parseError from "../utils/parseError";
 import { signSendAndConfirm } from "../utils/solana";
 import useNFTTargetAddressHex from "./useNFTTargetAddress";
 
+export async function transferFromEth(
+  nftBridgeAddress: string,
+  signer: Signer,
+  tokenAddress: string,
+  tokenID: BigNumberish,
+  recipientChain: ChainId | ChainName,
+  recipientAddress: Uint8Array,
+  overrides: Overrides & { from?: string | Promise<string> } = {}
+): Promise<ContractReceipt> {
+  const recipientChainId = coalesceChainId(recipientChain);
+  //TODO: should we check if token attestation exists on the target chain
+  const token = NFTImplementation__factory.connect(tokenAddress, signer);
+  await (await token.approve(nftBridgeAddress, tokenID, overrides)).wait();
+  const bridge = NFTBridge__factory.connect(nftBridgeAddress, signer);
+  const v = await bridge.transferNFT(
+    tokenAddress,
+    tokenID,
+    recipientChainId,
+    recipientAddress,
+    createNonce(),
+    overrides
+  );
+  const receipt = await v.wait();
+  return receipt;
+}
+
 async function evm(
   dispatch: any,
   enqueueSnackbar: any,
@@ -67,12 +97,14 @@ async function evm(
   dispatch(setIsSending(true));
   try {
     // Klaytn requires specifying gasPrice
-    const overrides ={ gasPrice: (await signer.getGasPrice()).toString() };
+    const overrides = { gasPrice: (await signer.getGasPrice()).toString() };
     console.log("tokenAddress: ", tokenAddress)
     // tokenId = BigNumber.from(tokenId).toString()
     console.log("tokenId: ", tokenId)
     // console.log("getGasPrice: ", (await signer.getGasPrice()).toString())
     // console.log("getNFTBridgeAddressForChain: ", getNFTBridgeAddressForChain(chainId))
+
+
     const receipt = await transferFromEth(
       getNFTBridgeAddressForChain(chainId),
       signer,
