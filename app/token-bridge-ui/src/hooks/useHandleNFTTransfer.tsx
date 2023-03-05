@@ -67,10 +67,12 @@ async function evm(
   dispatch(setIsSending(true));
   try {
     // Klaytn requires specifying gasPrice
-    const overrides =
-      chainId === CHAIN_ID_KLAYTN
-        ? { gasPrice: (await signer.getGasPrice()).toString() }
-        : {};
+    const overrides ={ gasPrice: (await signer.getGasPrice()).toString() };
+    console.log("tokenAddress: ", tokenAddress)
+    // tokenId = BigNumber.from(tokenId).toString()
+    console.log("tokenId: ", tokenId)
+    // console.log("getGasPrice: ", (await signer.getGasPrice()).toString())
+    // console.log("getNFTBridgeAddressForChain: ", getNFTBridgeAddressForChain(chainId))
     const receipt = await transferFromEth(
       getNFTBridgeAddressForChain(chainId),
       signer,

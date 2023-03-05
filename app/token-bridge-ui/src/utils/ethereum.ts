@@ -72,9 +72,13 @@ export async function ethNFTToNFTParsedTokenAccount(
   const balance = (await token.ownerOf(tokenId)) === signerAddress ? 1 : 0;
   // does not exist in the contract
   // https://goerli.etherscan.io/address/0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85#readContract
-  // const symbol = await token.symbol();
-  // const name = await token.name();
-  // const uri = await token.tokenURI(tokenId);
+  // const symbol2 = await token.symbol();
+  // console.log(symbol2);
+  // const name2 = await token.name();
+  // console.log(name2);
+  // const uri2 = await token.tokenURI(tokenId);
+  // console.log(uri2);
+  // console.log(token)
   return createNFTParsedTokenAccount(
     signerAddress,
     token.address,
