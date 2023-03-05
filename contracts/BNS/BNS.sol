@@ -14,7 +14,7 @@ contract BNS is ERC721URIStorage, ERC721Holder {
     constructor() ERC721("Bridge Name Service", "BNS") {}
 
     function wrapNFT(address token, string memory name) public payable {
-        bytes32 ensTokenId = keccak256(
+        bytes32 tokenAddress = keccak256(
             abi.encodePacked(keccak256(bytes(name)))
         );
         require(
@@ -22,14 +22,13 @@ contract BNS is ERC721URIStorage, ERC721Holder {
             "This contract is specifically built for ENS NFTs"
         );
 
-        require(!wrappedTokens[ensTokenId], "ENS domain is already wrapped");
+        require(!wrappedTokens[tokenAddress], "ENS domain is already wrapped");
 
-        wrappedTokens[ensTokenId] = true;
-
-        uint256 bnsTokenId = uint256(ensTokenId);
-        _mint(msg.sender, bnsTokenId);
-
+        uint256 bnsTokenId = uint256(tokenAddress);
         IERC721(token).safeTransferFrom(msg.sender, address(this), bnsTokenId);
+
+        wrappedTokens[tokenAddress] = true;
+        _mint(msg.sender, bnsTokenId);
     }
 
     function unwrapNFT(address token, uint256 bnsTokenId) public {
@@ -38,14 +37,13 @@ contract BNS is ERC721URIStorage, ERC721Holder {
             ownerOf(bnsTokenId) == msg.sender,
             "You must be the owner of the BNS token to unwrap it"
         );
-        // require(
-        //     ens.owner(bnsTokenId) == address(this),
-        //     "The ENS token is not currently held in the contract"
-        // );
-        wrappedTokens[tokenAddress] = false;
-
+        require(
+            wrappedTokens[tokenAddress],
+            "The ENS token is not currently held in the contract"
+        );
         IERC721(token).safeTransferFrom(address(this), msg.sender, bnsTokenId);
 
+        wrappedTokens[tokenAddress] = false;
         _burn(bnsTokenId);
     }
 

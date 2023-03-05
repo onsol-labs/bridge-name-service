@@ -2196,7 +2196,7 @@
   },
   "networks": {},
   "schemaVersion": "3.4.1",
-  "updatedAt": "2023-03-05T07:01:24.402Z",
+  "updatedAt": "2023-03-05T07:13:01.983Z",
   "devdoc": {
     "details": "Implementation of the {IERC721Receiver} interface. Accepts all token transfers. Make sure the contract is able to use its token with {IERC721-safeTransferFrom}, {IERC721-approve} or {IERC721-setApprovalForAll}.",
     "kind": "dev",
