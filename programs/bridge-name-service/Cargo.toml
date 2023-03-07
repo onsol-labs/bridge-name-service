@@ -16,5 +16,17 @@ cpi = ["no-entrypoint"]
 default = []
 
 [dependencies]
-anchor-lang = "0.26.0"
 nft-bridge-cpi = { version = "0.1.0", path = "../nft-bridge" }
+anchor-lang = { version = "0.26.0", features = ["init-if-needed"] }
+solana-program = "~1.13.6"
+anchor-spl = "~0.26.0"
+arrayref = "~0.3.6"
+spl-associated-token-account = { version = "1.0.5", features = ["no-entrypoint"] }
+spl-token = { version = "3.3.0", features = ["no-entrypoint"] }
+alt-name-service = { git = "https://github.com/onsol-labs/alternative-name-service.git", branch = "v0.5.0", features = [ "cpi", "no-entrypoint" ] }
+name-house = { git = "https://github.com/onsol-labs/name_house.git", branch = "v0.5.5", features = [ "cpi", "no-entrypoint" ] }
+tld_house = { git = "https://github.com/onsol-labs/tld-house.git", branch = "v0.5.5", features = [ "cpi", "no-entrypoint" ] }
+mpl-token-metadata = { version = "=1.4.3", features = ["no-entrypoint"] }
+thiserror = "1.0.29"
+unic-segment = "0.9.0"
+spl-name-service = { version = "0.2.0", features = ["no-entrypoint"] }
