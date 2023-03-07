@@ -1,0 +1,7 @@
+@ensdomains/=node_modules/@ensdomains/
+@openzeppelin/=node_modules/@openzeppelin/
+@solidity-parser/=node_modules/@solidity-parser/
+caver-js/=node_modules/caver-js/
+ds-test/=lib/forge-std/lib/ds-test/src/
+forge-std/=lib/forge-std/src/
+truffle/=node_modules/truffle/

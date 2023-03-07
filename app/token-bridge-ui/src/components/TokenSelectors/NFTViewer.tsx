@@ -35,10 +35,10 @@ const safeIPFS = (uri: string) =>
   uri.startsWith("ipfs://ipfs/")
     ? uri.replace("ipfs://", "https://ipfs.io/")
     : uri.startsWith("ipfs://")
-    ? uri.replace("ipfs://", "https://ipfs.io/ipfs/")
-    : uri.startsWith("https://cloudflare-ipfs.com/ipfs/") // no CORS support?
-    ? uri.replace("https://cloudflare-ipfs.com/ipfs/", "https://ipfs.io/ipfs/")
-    : uri;
+      ? uri.replace("ipfs://", "https://ipfs.io/ipfs/")
+      : uri.startsWith("https://cloudflare-ipfs.com/ipfs/") // no CORS support?
+        ? uri.replace("https://cloudflare-ipfs.com/ipfs/", "https://ipfs.io/ipfs/")
+        : uri;
 
 const LogoIcon = ({ chainId }: { chainId: ChainId }) =>
   chainId === CHAIN_ID_SOLANA ? (
@@ -249,13 +249,13 @@ export default function NFTViewer({
       m.uri === uri
         ? m
         : {
-            uri,
-            image: value.image,
-            animation_url: value.animation_url,
-            nftName: value.nftName,
-            description: value.description,
-            isLoading: !!uri,
-          }
+          uri,
+          image: value.image,
+          animation_url: value.animation_url,
+          nftName: value.nftName,
+          description: value.description,
+          isLoading: !!uri,
+        }
     );
   }, [value, uri]);
   useEffect(() => {
@@ -275,7 +275,7 @@ export default function NFTViewer({
                 data.big_image ||
                 data.small_image,
               animation_url: data.animation_url,
-              nftName: data.name,
+              nftName: data.nftName,
               description: data.description,
               isLoading: false,
             });

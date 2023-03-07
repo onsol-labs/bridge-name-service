@@ -79,6 +79,9 @@ export async function ethNFTToNFTParsedTokenAccount(
   // const uri2 = await token.tokenURI(tokenId);
   // console.log(uri2);
   // console.log(token)
+  // const uri2 = await token.tokenURI(tokenId);
+  // const symbol2 = await token.symbol();
+  // const name2 = await token.name();
   return createNFTParsedTokenAccount(
     signerAddress,
     token.address,

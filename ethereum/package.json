@@ -1,0 +1,40 @@
+{
+  "name": "@onsol/contracts-ethereum",
+  "description": "Onsol Bridge Name Service Etheruem contracts",
+  "license": "MIT",
+  "version": "0.0.1",
+  "main": "networks.js",
+  "devDependencies": {
+    "@chainsafe/truffle-plugin-abigen": "0.0.1",
+    "@ensdomains/ens-contracts": "^0.0.20",
+    "@openzeppelin/cli": "^2.8.2",
+    "@openzeppelin/contracts": "^4.3.1",
+    "@openzeppelin/test-environment": "^0.1.6",
+    "@openzeppelin/test-helpers": "^0.5.9",
+    "@truffle/hdwallet-provider": "^1.7.0",
+    "chai": "^4.2.0",
+    "mocha": "^8.2.1",
+    "truffle": "5.3.14",
+    "truffle-assertions": "^0.9.2",
+    "truffle-flattener": "^1.6.0",
+    "truffle-plugin-verify": "^0.5.11"
+  },
+  "scripts": {
+    "build": "truffle compile",
+    "test": "mkdir -p build/contracts && cp node_modules/@openzeppelin/contracts/build/contracts/* build/contracts/ && truffle test --network test",
+    "deploy": "truffle deploy --reset --network goerli",
+    "migrate": "mkdir -p build/contracts && cp node_modules/@openzeppelin/contracts/build/contracts/* build/contracts/ && truffle migrate --reset --network goerli",
+    "verify": "truffle run verify BNS@0xEefa53A14d3D8f5dA253F0E0CbCf6B66e07F03fD --network goerli",
+    "abigen": "truffle run abigen"
+  },
+  "author": "",
+  "dependencies": {
+    "caver-js": "^1.8.1",
+    "dotenv": "^10.0.0",
+    "elliptic": "^6.5.2",
+    "ganache-cli": "^6.12.1",
+    "jsonfile": "^4.0.0",
+    "solc": "^0.8.4",
+    "truffle-hdwallet-provider-klaytn": "^1.4.2"
+  }
+}

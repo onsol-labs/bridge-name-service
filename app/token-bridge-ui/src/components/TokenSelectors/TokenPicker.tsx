@@ -120,7 +120,8 @@ export const BasicAccountRender = (
   const uri = nft ? account.image_256 : account.logo || account.uri;
   const symbol = account.symbol || "Unknown";
   const name = account.name || "Unknown";
-  const tokenId = account.tokenId;
+  const nftName = account.nftName;
+  const tokenId = account.tokenId ? shortenAddress(account.tokenId) : account.tokenId;
   const shouldDisplayBalance = !displayBalance || displayBalance(account);
 
   const nftContent = (
@@ -130,7 +131,8 @@ export const BasicAccountRender = (
       </div>
       <div>
         <Typography>{symbol}</Typography>
-        <Typography>{name}</Typography>
+        {/* <Typography>{name}</Typography> */}
+        <Typography>{nftName}</Typography>
       </div>
       <div>
         <Typography>{mintPrettyString}</Typography>
@@ -244,7 +246,7 @@ export default function TokenPicker({
         //Covalent balances tend to be stale, so we make an attempt to correct it at selection time.
         if (getAddress && !option.isNativeAsset) {
           console.log('getting addy')
-          newOption = await getAddress(option.mintKey, option.nftName ?? "null", option.symbol ?? "null", option.uri ?? "null", option.tokenId, );
+          newOption = await getAddress(option.mintKey, option.nftName ?? "null", option.symbol ?? "null", option.uri ?? "null", option.tokenId,);
           newOption = {
             ...option,
             ...newOption,
@@ -252,8 +254,7 @@ export default function TokenPicker({
             logo: option.logo || newOption.logo,
             uri: option.uri || newOption.uri,
           } as NFTParsedTokenAccount;
-          console.log('newOption')
-          console.log(newOption)
+          console.log('newOption: ', newOption)
         } else {
           newOption = option;
         }

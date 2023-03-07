@@ -93,10 +93,10 @@ export default function EvmTokenPicker(
             return Promise.reject("Token ID is required.");
           } else if (nft && tokenId) {
             console.log('getAddress')
-            console.log(tokenId)
-            console.log(nft)
-            console.log(tokenAccount)
-            console.log(signerAddress)
+            // console.log(tokenId)
+            // console.log(nft)
+            // console.log(tokenAccount)
+            // console.log(signerAddress)
             return ethNFTToNFTParsedTokenAccount(
               tokenAccount as ethers_contracts.NFTImplementation,
               tokenId,

@@ -668,7 +668,7 @@ const getEthereumAccountsCovalent = async (
             : item.supports_erc?.includes("erc20"))
         ) {
           output.push({ 
-            contract_name: ".eth",
+            contract_name: item.contractMetadata.name ? item.contractMetadata.name : ".eth",
             contract_address: item.contract.address,
             logo_url: item.media[0].thumbnail,
             balance: item.balance,

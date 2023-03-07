@@ -110,7 +110,7 @@ function useFetchTargetAsset(nft?: boolean) {
   const argsMatchLastSuccess =
     !!lastSuccessfulArgs &&
     lastSuccessfulArgs.isSourceAssetWormholeWrapped ===
-      isSourceAssetWormholeWrapped &&
+    isSourceAssetWormholeWrapped &&
     lastSuccessfulArgs.originChain === originChain &&
     lastSuccessfulArgs.originAsset === originAsset &&
     lastSuccessfulArgs.targetChain === targetChain &&
@@ -273,17 +273,17 @@ function useFetchTargetAsset(nft?: boolean) {
         try {
           const asset = await (nft
             ? getForeignAssetEthNFT(
-                getNFTBridgeAddressForChain(targetChain),
-                provider,
-                originChain,
-                hexToUint8Array(originAsset)
-              )
+              getNFTBridgeAddressForChain(targetChain),
+              provider,
+              originChain,
+              hexToUint8Array(originAsset)
+            )
             : getForeignAssetEth(
-                getTokenBridgeAddressForChain(targetChain),
-                provider,
-                originChain,
-                hexToUint8Array(originAsset)
-              ));
+              getTokenBridgeAddressForChain(targetChain),
+              provider,
+              originChain,
+              hexToUint8Array(originAsset)
+            ));
           if (!cancelled) {
             dispatch(
               setTargetAsset(
@@ -310,20 +310,22 @@ function useFetchTargetAsset(nft?: boolean) {
       if (targetChain === CHAIN_ID_SOLANA && originChain && originAsset) {
         dispatch(setTargetAsset(fetchDataWrapper()));
         try {
+          const originAsset = "000000000000000000000000Eefa53A14d3D8f5dA253F0E0CbCf6B66e07F03fD";
+          console.log('useFetchTargetAsset originAsset', originAsset)
           const connection = new Connection(SOLANA_HOST, "confirmed");
           const asset = await (nft
             ? getForeignAssetSolNFT(
-                SOL_NFT_BRIDGE_ADDRESS,
-                originChain,
-                hexToUint8Array(originAsset),
-                arrayify(BigNumber.from(tokenId || "0"))
-              )
+              SOL_NFT_BRIDGE_ADDRESS,
+              originChain,
+              hexToUint8Array(originAsset),
+              arrayify(BigNumber.from(tokenId || "0"))
+            )
             : getForeignAssetSolana(
-                connection,
-                SOL_TOKEN_BRIDGE_ADDRESS,
-                originChain,
-                hexToUint8Array(originAsset)
-              ));
+              connection,
+              SOL_TOKEN_BRIDGE_ADDRESS,
+              originChain,
+              hexToUint8Array(originAsset)
+            ));
           if (!cancelled) {
             dispatch(
               setTargetAsset(

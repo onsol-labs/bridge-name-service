@@ -58,20 +58,21 @@ export const useTargetInfo = () => {
   const targetParsedTokenAccount = useSelector(
     selectTransferTargetParsedTokenAccount
   );
+  console.log('targetAsset useTargetInfo', targetAsset)
   const tokenName = targetParsedTokenAccount?.name;
   const symbol = targetParsedTokenAccount?.symbol;
   const logo = targetParsedTokenAccount?.logo;
   const readableTargetAddress =
     targetChain === CHAIN_ID_NEAR
       ? // Near uses a hashed address, which isn't very readable - check that the hash matches and show them their account id
-        nearAccountId &&
+      nearAccountId &&
         // this just happens to be the same hashing mechanism as emitters
         getEmitterAddressNear(nearAccountId) === targetAddressHex
         ? nearAccountId
         : targetAddressHex || ""
       : targetChain === CHAIN_ID_APTOS
-      ? `0x${targetAddressHex}` || ""
-      : hexToNativeString(targetAddressHex, targetChain) || "";
+        ? `0x${targetAddressHex}` || ""
+        : hexToNativeString(targetAddressHex, targetChain) || "";
   return useMemo(
     () => ({
       targetChain,

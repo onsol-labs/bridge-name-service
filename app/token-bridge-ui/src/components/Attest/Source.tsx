@@ -31,6 +31,7 @@ function Source() {
   const sourceAsset = useSelector(selectAttestSourceAsset);
   const isSourceComplete = useSelector(selectAttestIsSourceComplete);
   const shouldLockFields = useSelector(selectAttestShouldLockFields);
+  console.log('attest source: ', sourceAsset)
   const handleSourceChange = useCallback(
     (event) => {
       dispatch(setSourceChain(event.target.value));

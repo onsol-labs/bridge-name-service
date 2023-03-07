@@ -59,11 +59,11 @@ async function evm(
       chainId === CHAIN_ID_KARURA
         ? await getKaruraGasParams(KARURA_HOST)
         : chainId === CHAIN_ID_ACALA
-        ? await getKaruraGasParams(ACALA_HOST)
-        : // Klaytn requires specifying gasPrice
-        chainId === CHAIN_ID_KLAYTN
-        ? { gasPrice: (await signer.getGasPrice()).toString() }
-        : {};
+          ? await getKaruraGasParams(ACALA_HOST)
+          : // Klaytn requires specifying gasPrice
+          chainId === CHAIN_ID_KLAYTN
+            ? { gasPrice: (await signer.getGasPrice()).toString() }
+            : {};
     const receipt = await redeemOnEth(
       getNFTBridgeAddressForChain(chainId),
       signer,
@@ -102,6 +102,7 @@ async function solana(
       signedVAA
     );
     const claimInfo = await connection.getAccountInfo(claimAddress);
+    console.log(claimAddress.toBase58())
     let txid;
     if (!claimInfo) {
       await postVaaSolanaWithRetry(
@@ -129,6 +130,7 @@ async function solana(
       const { originChain, originAddress, tokenId } = parseNFTPayload(
         Buffer.from(new Uint8Array(parsedVAA.payload))
       );
+      console.log(originChain, originAddress, tokenId)
       const mintAddress = await getForeignAssetSol(
         SOL_NFT_BRIDGE_ADDRESS,
         originChain as ChainId,
@@ -168,6 +170,8 @@ export function useHandleNFTRedeem() {
   const solPK = solanaWallet?.publicKey;
   const { signer } = useEthereumProvider();
   const signedVAA = useNFTSignedVAA();
+  console.log(signedVAA?.toString())
+
   const isRedeeming = useSelector(selectNFTIsRedeeming);
   const handleRedeemClick = useCallback(() => {
     if (isEVMChain(targetChain) && !!signer && signedVAA) {

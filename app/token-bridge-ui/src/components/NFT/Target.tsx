@@ -60,9 +60,12 @@ function Target() {
   const targetAddressHex = useSelector(selectNFTTargetAddressHex);
   const targetAsset = useSelector(selectNFTTargetAsset);
   const originChain = useSelector(selectNFTOriginChain);
-  const originAsset = useSelector(selectNFTOriginAsset);
+  const originAsset = "000000000000000000000000Eefa53A14d3D8f5dA253F0E0CbCf6B66e07F03fD" // useSelector(selectNFTOriginAsset);
   const originTokenId = useSelector(selectNFTOriginTokenId);
   let tokenId;
+  console.log(originAsset)
+  console.log(originTokenId)
+  console.log(targetAddressHex)
   try {
     tokenId =
       originChain === CHAIN_ID_SOLANA && originAsset

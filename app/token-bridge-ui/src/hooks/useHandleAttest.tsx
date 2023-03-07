@@ -227,6 +227,8 @@ async function evm(
       chainId === CHAIN_ID_KLAYTN
         ? { gasPrice: (await signer.getGasPrice()).toString() }
         : {};
+    console.log("ATTESSTINGGG")
+    console.log(sourceAsset)
     const receipt = await attestFromEth(
       getTokenBridgeAddressForChain(chainId),
       signer,
@@ -281,18 +283,18 @@ async function near(
     const msgs =
       sourceAsset === NATIVE_NEAR_PLACEHOLDER
         ? [
-            await attestNearFromNear(
-              makeNearProvider(),
-              NEAR_CORE_BRIDGE_ACCOUNT,
-              NEAR_TOKEN_BRIDGE_ACCOUNT
-            ),
-          ]
-        : await attestTokenFromNear(
+          await attestNearFromNear(
             makeNearProvider(),
             NEAR_CORE_BRIDGE_ACCOUNT,
-            NEAR_TOKEN_BRIDGE_ACCOUNT,
-            sourceAsset
-          );
+            NEAR_TOKEN_BRIDGE_ACCOUNT
+          ),
+        ]
+        : await attestTokenFromNear(
+          makeNearProvider(),
+          NEAR_CORE_BRIDGE_ACCOUNT,
+          NEAR_TOKEN_BRIDGE_ACCOUNT,
+          sourceAsset
+        );
     const receipt = await signAndSendTransactions(account, wallet, msgs);
     const sequence = parseSequenceFromLogNear(receipt);
     if (sequence === null) {
@@ -340,6 +342,8 @@ async function solana(
   dispatch(setIsSending(true));
   try {
     const connection = new Connection(SOLANA_HOST, "confirmed");
+    console.log("ATTESTING")
+    console.log(sourceAsset)
     const transaction = await attestFromSolana(
       connection,
       SOL_BRIDGE_ADDRESS,

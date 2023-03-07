@@ -84,6 +84,7 @@ function useSyncTargetAddress(shouldFire: boolean, nft?: boolean) {
         targetTokenAccountPublicKey
       ) {
         // use the target's TokenAccount if it exists
+        console.log(targetTokenAccountPublicKey)
         dispatch(
           setTargetAddressHex(
             uint8ArrayToHex(
@@ -95,6 +96,7 @@ function useSyncTargetAddress(shouldFire: boolean, nft?: boolean) {
         // otherwise, use the associated token account (which we create in the case it doesn't exist)
         (async () => {
           try {
+            console.log('useSyncTargetAddress targetAsset: ', targetAsset)
             const associatedTokenAccount =
               await Token.getAssociatedTokenAddress(
                 ASSOCIATED_TOKEN_PROGRAM_ID,

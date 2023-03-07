@@ -17,7 +17,7 @@ export async function signSendAndConfirm(
     throw new Error("wallet.signTransaction is undefined");
   }
   const signed = await wallet.signTransaction(transaction);
-  const txid = await connection.sendRawTransaction(signed.serialize());
+  const txid = await connection.sendRawTransaction(signed.serialize(), {skipPreflight: true});
   await connection.confirmTransaction(txid);
   return txid;
 }

@@ -60,6 +60,7 @@ function useGetTargetParsedTokenAccounts() {
   const dispatch = useDispatch();
   const targetChain = useSelector(selectTransferTargetChain);
   const targetAsset = useSelector(selectTransferTargetAsset);
+  console.log('targetAsset: ', targetAsset)
   const targetAssetArrayed = useMemo(
     () => (targetAsset ? [targetAsset] : []),
     [targetAsset]
@@ -255,7 +256,7 @@ function useGetTargetParsedTokenAccounts() {
               (await client.getAccountResource(aptosAddress, coinStore))
                 .data as any
             ).coin.value;
-          } catch (e) {}
+          } catch (e) { }
           if (!cancelled) {
             dispatch(
               setTargetParsedTokenAccount(
@@ -367,6 +368,7 @@ function useGetTargetParsedTokenAccounts() {
     if (targetChain === CHAIN_ID_SOLANA && solPK) {
       let mint;
       try {
+        console.log('targetAsset', targetAsset)
         mint = new PublicKey(targetAsset);
       } catch (e) {
         return;
