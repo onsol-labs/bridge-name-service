@@ -28,5 +28,5 @@ name-house = { git = "https://github.com/onsol-labs/name_house.git", branch = "v
 tld_house = { git = "https://github.com/onsol-labs/tld-house.git", branch = "v0.5.5", features = [ "cpi", "no-entrypoint" ] }
 mpl-token-metadata = { version = "=1.4.3", features = ["no-entrypoint"] }
 thiserror = "1.0.29"
-unic-segment = "0.9.0"
 spl-name-service = { version = "0.2.0", features = ["no-entrypoint"] }
+uint = "=0.9.1"

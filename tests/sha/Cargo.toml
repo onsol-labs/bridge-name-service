@@ -6,5 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-primitive-types = "0.12.1"
+hex = "0.4.3"
 sha3 = "0.10.6"
+solana-program = "1.13.6"
+uint = "=0.9.1"
