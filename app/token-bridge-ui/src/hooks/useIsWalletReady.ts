@@ -1,8 +1,5 @@
 import {
   ChainId,
-  CHAIN_ID_ALGORAND,
-  CHAIN_ID_APTOS,
-  CHAIN_ID_INJECTIVE,
   CHAIN_ID_NEAR,
   CHAIN_ID_SOLANA,
   CHAIN_ID_XPLA,
@@ -11,20 +8,17 @@ import {
 import { hexlify, hexStripZeros } from "@ethersproject/bytes";
 import { useConnectedWallet as useXplaConnectedWallet } from "@xpla/wallet-provider";
 import { useCallback, useMemo } from "react";
-import { useAlgorandContext } from "../contexts/AlgorandWalletContext";
-import { useAptosContext } from "../contexts/AptosWalletContext";
 import {
   ConnectType,
   useEthereumProvider,
 } from "../contexts/EthereumProviderContext";
 import { useNearContext } from "../contexts/NearWalletContext";
 import { useSolanaWallet } from "../contexts/SolanaWalletContext";
-import { APTOS_NETWORK, CLUSTER, getEvmChainId } from "../utils/consts";
+import { CLUSTER, getEvmChainId } from "../utils/consts";
 import {
   EVM_RPC_MAP,
   METAMASK_CHAIN_PARAMETERS,
 } from "../utils/metaMaskChainParameters";
-import { useInjectiveContext } from "../contexts/InjectiveWalletContext";
 
 const createWalletStatus = (
   isReady: boolean,
@@ -60,23 +54,12 @@ function useIsWalletReady(
   const hasEthInfo = !!provider && !!signerAddress;
   const correctEvmNetwork = getEvmChainId(chainId);
   const hasCorrectEvmNetwork = evmChainId === correctEvmNetwork;
-  const { accounts: algorandAccounts } = useAlgorandContext();
-  const algoPK = algorandAccounts[0]?.address;
   const xplaWallet = useXplaConnectedWallet();
   const hasXplaWallet = !!xplaWallet;
-  const { account: aptosAccount, network: aptosNetwork } = useAptosContext();
-  const aptosAddress = aptosAccount?.address?.toString();
-  const hasAptosWallet = !!aptosAddress;
   // The wallets do not all match on network names and the adapter doesn't seem to normalize this yet.
   // Petra = "Testnet"
   // Martian = "Testnet"
-  // Pontam = "Aptos testnet"
   // Nightly = undefined... error on NightlyWallet.ts
-  const hasCorrectAptosNetwork = aptosNetwork?.name
-    ?.toLowerCase()
-    .includes(APTOS_NETWORK.toLowerCase());
-  const { address: injAddress } = useInjectiveContext();
-  const hasInjWallet = !!injAddress;
   const { accountId: nearPK } = useNearContext();
 
   const forceNetworkSwitch = useCallback(async () => {
@@ -126,9 +109,6 @@ function useIsWalletReady(
         solPK.toString()
       );
     }
-    if (chainId === CHAIN_ID_ALGORAND && algoPK) {
-      return createWalletStatus(true, undefined, forceNetworkSwitch, algoPK);
-    }
     if (
       chainId === CHAIN_ID_XPLA &&
       hasXplaWallet &&
@@ -139,31 +119,6 @@ function useIsWalletReady(
         undefined,
         forceNetworkSwitch,
         xplaWallet.walletAddress
-      );
-    }
-    if (chainId === CHAIN_ID_APTOS && hasAptosWallet && aptosAddress) {
-      if (hasCorrectAptosNetwork) {
-        return createWalletStatus(
-          true,
-          undefined,
-          forceNetworkSwitch,
-          aptosAddress
-        );
-      } else {
-        return createWalletStatus(
-          false,
-          `Wallet is not connected to ${APTOS_NETWORK}.`,
-          forceNetworkSwitch,
-          undefined
-        );
-      }
-    }
-    if (chainId === CHAIN_ID_INJECTIVE && hasInjWallet && injAddress) {
-      return createWalletStatus(
-        true,
-        undefined,
-        forceNetworkSwitch,
-        injAddress
       );
     }
     if (chainId === CHAIN_ID_NEAR && nearPK) {
@@ -206,14 +161,8 @@ function useIsWalletReady(
     hasCorrectEvmNetwork,
     provider,
     signerAddress,
-    algoPK,
     xplaWallet,
     hasXplaWallet,
-    hasAptosWallet,
-    aptosAddress,
-    hasCorrectAptosNetwork,
-    hasInjWallet,
-    injAddress,
     nearPK,
   ]);
 }

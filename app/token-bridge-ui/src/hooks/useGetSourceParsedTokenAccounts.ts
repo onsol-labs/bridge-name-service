@@ -1,15 +1,12 @@
 import {
   ChainId,
   CHAIN_ID_ACALA,
-  CHAIN_ID_ALGORAND,
-  CHAIN_ID_APTOS,
   CHAIN_ID_AURORA,
   CHAIN_ID_AVAX,
   CHAIN_ID_BSC,
   CHAIN_ID_CELO,
   CHAIN_ID_ETH,
   CHAIN_ID_FANTOM,
-  CHAIN_ID_INJECTIVE,
   CHAIN_ID_KARURA,
   CHAIN_ID_KLAYTN,
   CHAIN_ID_MOONBEAM,
@@ -32,13 +29,11 @@ import {
   ParsedAccountData,
   PublicKey,
 } from "@solana/web3.js";
-import { Algodv2 } from "algosdk";
 import axios from "axios";
 import { ethers } from "ethers";
 import { formatUnits } from "ethers/lib/utils";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useAlgorandContext } from "../contexts/AlgorandWalletContext";
 import {
   Provider,
   useEthereumProvider,
@@ -88,8 +83,6 @@ import {
 import {
   ACA_ADDRESS,
   ACA_DECIMALS,
-  ALGORAND_HOST,
-  ALGO_DECIMALS,
   COVALENT_GET_TOKENS_URL,
   BLOCKSCOUT_GET_TOKENS_URL,
   KAR_ADDRESS,
@@ -127,7 +120,6 @@ import {
   extractMintInfo,
   getMultipleAccountsRPC,
 } from "../utils/solana";
-import { fetchSingleMetadata } from "./useAlgoMetadata";
 
 export function createParsedTokenAccount(
   publicKey: string,
@@ -790,76 +782,6 @@ const getSolanaParsedTokenAccounts = async (
   }
 };
 
-const getAlgorandParsedTokenAccounts = async (
-  walletAddress: string,
-  dispatch: Dispatch,
-  nft: boolean
-) => {
-  dispatch(
-    nft ? fetchSourceParsedTokenAccountsNFT() : fetchSourceParsedTokenAccounts()
-  );
-  try {
-    const algodClient = new Algodv2(
-      ALGORAND_HOST.algodToken,
-      ALGORAND_HOST.algodServer,
-      ALGORAND_HOST.algodPort
-    );
-    const accountInfo = await algodClient
-      .accountInformation(walletAddress)
-      .do();
-    const parsedTokenAccounts: ParsedTokenAccount[] = [];
-    for (const asset of accountInfo.assets) {
-      const assetId = asset["asset-id"];
-      const amount = asset.amount;
-      const metadata = await fetchSingleMetadata(assetId, algodClient);
-      const isNFT: boolean = amount === 1 && metadata.decimals === 0;
-      if (((nft && isNFT) || (!nft && !isNFT)) && amount > 0) {
-        parsedTokenAccounts.push(
-          createParsedTokenAccount(
-            walletAddress,
-            assetId.toString(),
-            amount,
-            metadata.decimals,
-            parseFloat(formatUnits(amount, metadata.decimals)),
-            formatUnits(amount, metadata.decimals).toString(),
-            metadata.symbol,
-            metadata.tokenName,
-            undefined,
-            false
-          )
-        );
-      }
-    }
-    if (nft) {
-      dispatch(receiveSourceParsedTokenAccountsNFT(parsedTokenAccounts));
-      return;
-    }
-    // The ALGOs account is prepended for the non NFT case
-    parsedTokenAccounts.unshift(
-      createParsedTokenAccount(
-        walletAddress, //publicKey
-        "0", //asset ID
-        accountInfo.amount, //amount
-        ALGO_DECIMALS,
-        parseFloat(formatUnits(accountInfo.amount, ALGO_DECIMALS)),
-        formatUnits(accountInfo.amount, ALGO_DECIMALS).toString(),
-        "ALGO",
-        "Algo",
-        undefined, //TODO logo
-        true
-      )
-    );
-    dispatch(receiveSourceParsedTokenAccounts(parsedTokenAccounts));
-  } catch (e) {
-    console.error(e);
-    dispatch(
-      nft
-        ? errorSourceParsedTokenAccountsNFT("Failed to load NFT metadata")
-        : errorSourceParsedTokenAccounts("Failed to load token metadata.")
-    );
-  }
-};
-
 const getNearParsedTokenAccounts = async (
   walletAddress: string,
   dispatch: Dispatch,
@@ -917,7 +839,6 @@ function useGetAvailableTokens(nft: boolean = false) {
   const solanaWallet = useSolanaWallet();
   const solPK = solanaWallet?.publicKey;
   const { provider, signerAddress } = useEthereumProvider();
-  const { accounts: algoAccounts } = useAlgorandContext();
   const { accountId: nearAccountId } = useNearContext();
 
   const [covalent, setCovalent] = useState<any>(undefined);
@@ -948,8 +869,6 @@ function useGetAvailableTokens(nft: boolean = false) {
     ? signerAddress
     : lookupChain === CHAIN_ID_SOLANA
     ? solPK?.toString()
-    : lookupChain === CHAIN_ID_ALGORAND
-    ? algoAccounts[0]?.address
     : lookupChain === CHAIN_ID_NEAR
     ? nearAccountId || undefined
     : undefined;
@@ -1585,25 +1504,6 @@ function useGetAvailableTokens(nft: boolean = false) {
     }
   }, [lookupChain, provider, signerAddress, dispatch, nft, covalent]);
 
-  //Terra accounts load
-  //At present, we don't have any mechanism for doing this.
-  useEffect(() => {}, []);
-  //Algorand accounts load
-  useEffect(() => {
-    if (lookupChain === CHAIN_ID_ALGORAND && currentSourceWalletAddress) {
-      if (
-        !(tokenAccounts.data || tokenAccounts.isFetching || tokenAccounts.error)
-      ) {
-        getAlgorandParsedTokenAccounts(
-          currentSourceWalletAddress,
-          dispatch,
-          nft
-        );
-      }
-    }
-
-    return () => {};
-  }, [dispatch, lookupChain, currentSourceWalletAddress, tokenAccounts, nft]);
   //Near accounts load
   useEffect(() => {
     if (lookupChain === CHAIN_ID_NEAR && currentSourceWalletAddress) {
@@ -1654,19 +1554,6 @@ function useGetAvailableTokens(nft: boolean = false) {
         resetAccounts: resetSourceAccounts,
       }
     : lookupChain === CHAIN_ID_XPLA
-    ? {
-        resetAccounts: resetSourceAccounts,
-      }
-    : lookupChain === CHAIN_ID_APTOS
-    ? {
-        resetAccounts: resetSourceAccounts,
-      }
-    : lookupChain === CHAIN_ID_ALGORAND
-    ? {
-        tokenAccounts,
-        resetAccounts: resetSourceAccounts,
-      }
-    : lookupChain === CHAIN_ID_INJECTIVE
     ? {
         resetAccounts: resetSourceAccounts,
       }

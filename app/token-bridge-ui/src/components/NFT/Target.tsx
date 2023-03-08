@@ -16,7 +16,6 @@ import { GasEstimateSummary } from "../../hooks/useTransactionFees";
 import { incrementStep, setTargetChain } from "../../store/nftSlice";
 import {
   selectNFTIsTargetComplete,
-  selectNFTOriginAsset,
   selectNFTOriginChain,
   selectNFTOriginTokenId,
   selectNFTShouldLockFields,

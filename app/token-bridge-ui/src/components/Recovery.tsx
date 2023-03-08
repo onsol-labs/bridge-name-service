@@ -1,16 +1,11 @@
 import {
   ChainId,
   CHAIN_ID_ACALA,
-  CHAIN_ID_ALGORAND,
-  CHAIN_ID_APTOS,
-  CHAIN_ID_INJECTIVE,
   CHAIN_ID_KARURA,
   CHAIN_ID_NEAR,
   CHAIN_ID_SOLANA,
   CHAIN_ID_XPLA,
-  getEmitterAddressAlgorand,
   getEmitterAddressEth,
-  getEmitterAddressInjective,
   getEmitterAddressNear,
   getEmitterAddressSolana,
   getEmitterAddressXpla,
@@ -19,16 +14,13 @@ import {
   hexToUint8Array,
   isEVMChain,
   parseNFTPayload,
-  parseSequenceFromLogAlgorand,
   parseSequenceFromLogEth,
-  parseSequenceFromLogInjective,
   parseSequenceFromLogNear,
   parseSequenceFromLogSolana,
   parseSequenceFromLogXpla,
   parseTransferPayload,
   parseVaa,
   queryExternalId,
-  queryExternalIdInjective,
   tryHexToNativeStringNear,
   uint8ArrayToHex,
 } from "@certusone/wormhole-sdk";
@@ -50,8 +42,6 @@ import { ExpandMore } from "@material-ui/icons";
 import { Alert } from "@material-ui/lab";
 import { Connection } from "@solana/web3.js";
 import { LCDClient as XplaLCDClient } from "@xpla/xpla.js";
-import algosdk from "algosdk";
-import { Types } from "aptos";
 import axios from "axios";
 import { ethers } from "ethers";
 import { base58 } from "ethers/lib/utils";
@@ -67,12 +57,6 @@ import useRelayersAvailable, { Relayer } from "../hooks/useRelayersAvailable";
 import { setRecoveryVaa as setRecoveryNFTVaa } from "../store/nftSlice";
 import { setRecoveryVaa } from "../store/transferSlice";
 import {
-  getAptosClient,
-  getEmitterAddressAndSequenceFromResult,
-} from "../utils/aptos";
-import {
-  ALGORAND_HOST,
-  ALGORAND_TOKEN_BRIDGE_ID,
   CHAINS,
   CHAINS_BY_ID,
   CHAINS_WITH_NFT_SUPPORT,
@@ -95,10 +79,6 @@ import ChainSelect from "./ChainSelect";
 import KeyAndBalance from "./KeyAndBalance";
 import RelaySelector from "./RelaySelector";
 import PendingVAAWarning from "./Transfer/PendingVAAWarning";
-import {
-  getInjectiveTxClient,
-  getInjectiveWasmClient,
-} from "../utils/injective";
 
 const useStyles = makeStyles((theme) => ({
   mainCard: {
@@ -140,60 +120,6 @@ function handleError(e: any, enqueueSnackbar: any) {
     content: <Alert severity="error">{parseError(e)}</Alert>,
   });
   return { vaa: null, isPending: false, error: parseError(e) };
-}
-
-async function algo(tx: string, enqueueSnackbar: any) {
-  try {
-    const algodClient = new algosdk.Algodv2(
-      ALGORAND_HOST.algodToken,
-      ALGORAND_HOST.algodServer,
-      ALGORAND_HOST.algodPort
-    );
-    const pendingInfo = await algodClient
-      .pendingTransactionInformation(tx)
-      .do();
-    let confirmedTxInfo: Record<string, any> | undefined = undefined;
-    // This is the code from waitForConfirmation
-    if (pendingInfo !== undefined) {
-      if (
-        pendingInfo["confirmed-round"] !== null &&
-        pendingInfo["confirmed-round"] > 0
-      ) {
-        //Got the completed Transaction
-        confirmedTxInfo = pendingInfo;
-      }
-    }
-    if (!confirmedTxInfo) {
-      throw new Error("Transaction not found or not confirmed");
-    }
-    const sequence = parseSequenceFromLogAlgorand(confirmedTxInfo);
-    if (!sequence) {
-      throw new Error("Sequence not found");
-    }
-    const emitterAddress = getEmitterAddressAlgorand(ALGORAND_TOKEN_BRIDGE_ID);
-    return await fetchSignedVAA(CHAIN_ID_ALGORAND, emitterAddress, sequence);
-  } catch (e) {
-    return handleError(e, enqueueSnackbar);
-  }
-}
-
-async function aptos(tx: string, enqueueSnackbar: any) {
-  try {
-    const result = (await getAptosClient().waitForTransactionWithResult(
-      tx
-    )) as Types.UserTransaction;
-    if (!result) {
-      throw new Error("Transaction not found");
-    }
-    const { emitterAddress, sequence } =
-      getEmitterAddressAndSequenceFromResult(result);
-    if (!sequence) {
-      throw new Error("Sequence not found");
-    }
-    return await fetchSignedVAA(CHAIN_ID_APTOS, emitterAddress, sequence);
-  } catch (e) {
-    return handleError(e, enqueueSnackbar);
-  }
 }
 
 async function evm(
@@ -266,26 +192,6 @@ async function xpla(tx: string, enqueueSnackbar: any) {
       getTokenBridgeAddressForChain(CHAIN_ID_XPLA)
     );
     return await fetchSignedVAA(CHAIN_ID_XPLA, emitterAddress, sequence);
-  } catch (e) {
-    return handleError(e, enqueueSnackbar);
-  }
-}
-
-async function injective(txHash: string, enqueueSnackbar: any) {
-  try {
-    const client = getInjectiveTxClient();
-    const tx = await client.fetchTx(txHash);
-    if (!tx) {
-      throw new Error("Unable to fetch transaction");
-    }
-    const sequence = parseSequenceFromLogInjective(tx);
-    if (!sequence) {
-      throw new Error("Sequence not found");
-    }
-    const emitterAddress = await getEmitterAddressInjective(
-      getTokenBridgeAddressForChain(CHAIN_ID_INJECTIVE)
-    );
-    return await fetchSignedVAA(CHAIN_ID_INJECTIVE, emitterAddress, sequence);
   } catch (e) {
     return handleError(e, enqueueSnackbar);
   }
@@ -485,21 +391,6 @@ export default function Recovery() {
         }
       })();
     }
-    if (parsedPayload && parsedPayload.targetChain === CHAIN_ID_INJECTIVE) {
-      (async () => {
-        const client = getInjectiveWasmClient();
-        const tokenBridgeAddress =
-          getTokenBridgeAddressForChain(CHAIN_ID_INJECTIVE);
-        const tokenId = await queryExternalIdInjective(
-          client,
-          tokenBridgeAddress,
-          parsedPayload.originAddress
-        );
-        if (!cancelled) {
-          setTokenId(tokenId || "");
-        }
-      })();
-    }
     if (parsedPayload && parsedPayload.targetChain === CHAIN_ID_NEAR) {
       (async () => {
         const provider = makeNearProvider();
@@ -596,64 +487,6 @@ export default function Recovery() {
         setTokenId("");
         (async () => {
           const { vaa, isPending, error } = await xpla(
-            recoverySourceTx,
-            enqueueSnackbar
-          );
-          if (!cancelled) {
-            setRecoverySourceTxIsLoading(false);
-            if (vaa) {
-              setRecoverySignedVAA(vaa);
-            }
-            if (error) {
-              setRecoverySourceTxError(error);
-            }
-            setIsVAAPending(isPending);
-          }
-        })();
-      } else if (recoverySourceChain === CHAIN_ID_ALGORAND) {
-        setRecoverySourceTxError("");
-        setRecoverySourceTxIsLoading(true);
-        (async () => {
-          const { vaa, isPending, error } = await algo(
-            recoverySourceTx,
-            enqueueSnackbar
-          );
-          if (!cancelled) {
-            setRecoverySourceTxIsLoading(false);
-            if (vaa) {
-              setRecoverySignedVAA(vaa);
-            }
-            if (error) {
-              setRecoverySourceTxError(error);
-            }
-            setIsVAAPending(isPending);
-          }
-        })();
-      } else if (recoverySourceChain === CHAIN_ID_APTOS) {
-        setRecoverySourceTxError("");
-        setRecoverySourceTxIsLoading(true);
-        (async () => {
-          const { vaa, isPending, error } = await aptos(
-            recoverySourceTx,
-            enqueueSnackbar
-          );
-          if (!cancelled) {
-            setRecoverySourceTxIsLoading(false);
-            if (vaa) {
-              setRecoverySignedVAA(vaa);
-            }
-            if (error) {
-              setRecoverySourceTxError(error);
-            }
-            setIsVAAPending(isPending);
-          }
-        })();
-      } else if (recoverySourceChain === CHAIN_ID_INJECTIVE) {
-        setRecoverySourceTxError("");
-        setRecoverySourceTxIsLoading(true);
-        setTokenId("");
-        (async () => {
-          const { vaa, isPending, error } = await injective(
             recoverySourceTx,
             enqueueSnackbar
           );
@@ -982,7 +815,6 @@ export default function Recovery() {
                   value={
                     parsedPayload
                       ? parsedPayload.targetChain === CHAIN_ID_XPLA ||
-                        parsedPayload.targetChain === CHAIN_ID_INJECTIVE ||
                         parsedPayload.targetChain === CHAIN_ID_NEAR
                         ? tokenId
                         : hexToNativeAssetString(

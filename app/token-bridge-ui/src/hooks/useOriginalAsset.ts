@@ -1,23 +1,14 @@
 import {
   ChainId,
-  CHAIN_ID_ALGORAND,
-  CHAIN_ID_APTOS,
-  CHAIN_ID_INJECTIVE,
   CHAIN_ID_NEAR,
   CHAIN_ID_SOLANA,
   CHAIN_ID_XPLA,
-  getOriginalAssetAlgorand,
-  getOriginalAssetAptos,
-  getOriginalAssetCosmWasm,
   getOriginalAssetEth,
-  getOriginalAssetInjective,
   getOriginalAssetNear,
   getOriginalAssetSol,
-  getTypeFromExternalAddress,
   hexToNativeAssetString,
   isEVMChain,
   queryExternalId,
-  queryExternalIdInjective,
   uint8ArrayToHex,
   uint8ArrayToNative,
 } from "@certusone/wormhole-sdk";
@@ -29,7 +20,6 @@ import {
 import { Web3Provider } from "@ethersproject/providers";
 import { Connection } from "@solana/web3.js";
 import { LCDClient as XplaLCDClient } from "@xpla/xpla.js";
-import { Algodv2 } from "algosdk";
 import { ethers } from "ethers";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
@@ -38,10 +28,7 @@ import {
 } from "../contexts/EthereumProviderContext";
 import { useNearContext } from "../contexts/NearWalletContext";
 import { DataWrapper } from "../store/helpers";
-import { getAptosClient } from "../utils/aptos";
 import {
-  ALGORAND_HOST,
-  ALGORAND_TOKEN_BRIDGE_ID,
   getNFTBridgeAddressForChain,
   getTokenBridgeAddressForChain,
   NATIVE_NEAR_PLACEHOLDER,
@@ -53,7 +40,6 @@ import {
   SOL_TOKEN_BRIDGE_ADDRESS,
   XPLA_LCD_CLIENT_CONFIG,
 } from "../utils/consts";
-import { getInjectiveWasmClient } from "../utils/injective";
 import { lookupHash, makeNearAccount, makeNearProvider } from "../utils/near";
 import useIsWalletReady from "./useIsWalletReady";
 
@@ -84,28 +70,6 @@ export async function getOriginalAssetToken(
         connection,
         SOL_TOKEN_BRIDGE_ADDRESS,
         foreignNativeStringAddress
-      );
-    } else if (foreignChain === CHAIN_ID_ALGORAND) {
-      const algodClient = new Algodv2(
-        ALGORAND_HOST.algodToken,
-        ALGORAND_HOST.algodServer,
-        ALGORAND_HOST.algodPort
-      );
-      promise = await getOriginalAssetAlgorand(
-        algodClient,
-        ALGORAND_TOKEN_BRIDGE_ID,
-        BigInt(foreignNativeStringAddress)
-      );
-    } else if (foreignChain === CHAIN_ID_APTOS) {
-      promise = await getOriginalAssetAptos(
-        getAptosClient(),
-        getTokenBridgeAddressForChain(CHAIN_ID_APTOS),
-        foreignNativeStringAddress
-      );
-    } else if (foreignChain === CHAIN_ID_INJECTIVE) {
-      promise = await getOriginalAssetInjective(
-        foreignNativeStringAddress,
-        getInjectiveWasmClient()
       );
     } else if (foreignChain === CHAIN_ID_NEAR && nearAccountId) {
       const provider = makeNearProvider();
@@ -287,22 +251,6 @@ function useOriginalAsset(
               tokenBridgeAddress,
               uint8ArrayToHex(result.assetAddress)
             ).then((tokenId) => setOriginAddress(tokenId || null));
-          } else if (result.chainId === CHAIN_ID_APTOS) {
-            getTypeFromExternalAddress(
-              getAptosClient(),
-              getTokenBridgeAddressForChain(CHAIN_ID_APTOS),
-              uint8ArrayToHex(result.assetAddress)
-            ).then((tokenId) => setOriginAddress(tokenId || null));
-          } else if (result.chainId === CHAIN_ID_INJECTIVE) {
-            const client = getInjectiveWasmClient();
-            const tokenBridgeAddress = getTokenBridgeAddressForChain(
-              result.chainId
-            );
-            queryExternalIdInjective(
-              client,
-              tokenBridgeAddress,
-              uint8ArrayToHex(result.assetAddress)
-            ).then((tokenId) => setOriginAddress(tokenId));
           } else if (result.chainId === CHAIN_ID_NEAR) {
             if (
               uint8ArrayToHex(result.assetAddress) === NATIVE_NEAR_WH_ADDRESS

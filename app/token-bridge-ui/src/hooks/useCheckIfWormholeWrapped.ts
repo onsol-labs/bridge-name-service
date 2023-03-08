@@ -1,16 +1,10 @@
 import {
   ChainId,
-  CHAIN_ID_ALGORAND,
-  CHAIN_ID_APTOS,
-  CHAIN_ID_INJECTIVE,
   CHAIN_ID_NEAR,
   CHAIN_ID_SOLANA,
   CHAIN_ID_XPLA,
-  getOriginalAssetAlgorand,
-  getOriginalAssetAptos,
   getOriginalAssetCosmWasm,
   getOriginalAssetEth,
-  getOriginalAssetInjective,
   getOriginalAssetNear,
   getOriginalAssetSol,
   isEVMChain,
@@ -22,7 +16,6 @@ import {
   getOriginalAssetSol as getOriginalAssetSolNFT,
 } from "@certusone/wormhole-sdk/lib/esm/nft_bridge";
 import { Connection } from "@solana/web3.js";
-import { Algodv2 } from "algosdk";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useEthereumProvider } from "../contexts/EthereumProviderContext";
@@ -39,8 +32,6 @@ import {
 } from "../store/selectors";
 import { setSourceWormholeWrappedInfo as setTransferSourceWormholeWrappedInfo } from "../store/transferSlice";
 import {
-  ALGORAND_HOST,
-  ALGORAND_TOKEN_BRIDGE_ID,
   getNFTBridgeAddressForChain,
   getTokenBridgeAddressForChain,
   NATIVE_NEAR_PLACEHOLDER,
@@ -51,8 +42,6 @@ import {
   XPLA_LCD_CLIENT_CONFIG,
 } from "../utils/consts";
 import { LCDClient as XplaLCDClient } from "@xpla/xpla.js";
-import { getInjectiveWasmClient } from "../utils/injective";
-import { getAptosClient } from "../utils/aptos";
 import { makeNearProvider } from "../utils/near";
 
 export interface StateSafeWormholeWrappedInfo {
@@ -146,52 +135,6 @@ function useCheckIfWormholeWrapped(nft?: boolean) {
           const lcd = new XplaLCDClient(XPLA_LCD_CLIENT_CONFIG);
           const wrappedInfo = makeStateSafe(
             await getOriginalAssetCosmWasm(lcd, sourceAsset, sourceChain)
-          );
-          if (!cancelled) {
-            dispatch(setSourceWormholeWrappedInfo(wrappedInfo));
-          }
-        } catch (e) {}
-      }
-      if (sourceChain === CHAIN_ID_APTOS && sourceAsset) {
-        try {
-          const wrappedInfo = makeStateSafe(
-            await getOriginalAssetAptos(
-              getAptosClient(),
-              getTokenBridgeAddressForChain(CHAIN_ID_APTOS),
-              sourceAsset
-            )
-          );
-          if (!cancelled) {
-            dispatch(setSourceWormholeWrappedInfo(wrappedInfo));
-          }
-        } catch (e) {
-          console.error(e);
-        }
-      }
-      if (sourceChain === CHAIN_ID_ALGORAND && sourceAsset) {
-        try {
-          const algodClient = new Algodv2(
-            ALGORAND_HOST.algodToken,
-            ALGORAND_HOST.algodServer,
-            ALGORAND_HOST.algodPort
-          );
-          const wrappedInfo = makeStateSafe(
-            await getOriginalAssetAlgorand(
-              algodClient,
-              ALGORAND_TOKEN_BRIDGE_ID,
-              BigInt(sourceAsset)
-            )
-          );
-          if (!cancelled) {
-            dispatch(setSourceWormholeWrappedInfo(wrappedInfo));
-          }
-        } catch (e) {}
-      }
-      if (sourceChain === CHAIN_ID_INJECTIVE && sourceAsset) {
-        try {
-          const client = getInjectiveWasmClient();
-          const wrappedInfo = makeStateSafe(
-            await getOriginalAssetInjective(sourceAsset, client)
           );
           if (!cancelled) {
             dispatch(setSourceWormholeWrappedInfo(wrappedInfo));

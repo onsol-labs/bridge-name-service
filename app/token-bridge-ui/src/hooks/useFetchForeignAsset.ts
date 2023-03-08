@@ -1,16 +1,10 @@
 import {
   ChainId,
-  CHAIN_ID_ALGORAND,
-  CHAIN_ID_APTOS,
-  CHAIN_ID_INJECTIVE,
   CHAIN_ID_NEAR,
   CHAIN_ID_SOLANA,
   CHAIN_ID_XPLA,
   getEmitterAddressNear,
-  getForeignAssetAlgorand,
-  getForeignAssetAptos,
   getForeignAssetEth,
-  getForeignAssetInjective,
   getForeignAssetNear,
   getForeignAssetSolana,
   getForeignAssetXpla,
@@ -24,8 +18,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useEthereumProvider } from "../contexts/EthereumProviderContext";
 import { DataWrapper } from "../store/helpers";
 import {
-  ALGORAND_HOST,
-  ALGORAND_TOKEN_BRIDGE_ID,
   getEvmChainId,
   getTokenBridgeAddressForChain,
   SOLANA_HOST,
@@ -36,13 +28,9 @@ import {
   NATIVE_NEAR_WH_ADDRESS,
 } from "../utils/consts";
 import useIsWalletReady from "./useIsWalletReady";
-import { Algodv2 } from "algosdk";
 import { LCDClient as XplaLCDClient } from "@xpla/xpla.js";
-import { getAptosClient } from "../utils/aptos";
-import { getInjectiveWasmClient } from "../utils/injective";
 import { makeNearProvider } from "../utils/near";
 import { useNearContext } from "../contexts/NearWalletContext";
-import { buildTokenId } from "@certusone/wormhole-sdk/lib/esm/cosmwasm/address";
 
 export type ForeignAssetInfo = {
   doesExist: boolean;
@@ -146,63 +134,30 @@ function useFetchForeignAsset(
               hexToUint8Array(originAssetHex)
             );
           }
-          : foreignChain === CHAIN_ID_APTOS
+          : foreignChain === CHAIN_ID_SOLANA
             ? () => {
-              return getForeignAssetAptos(
-                getAptosClient(),
-                getTokenBridgeAddressForChain(foreignChain),
+              const connection = new Connection(SOLANA_HOST, "confirmed");
+              return getForeignAssetSolana(
+                connection,
+                SOL_TOKEN_BRIDGE_ADDRESS,
                 originChain,
-                originAssetHex
+                hexToUint8Array(originAssetHex)
               );
             }
-            : foreignChain === CHAIN_ID_SOLANA
-              ? () => {
-                const connection = new Connection(SOLANA_HOST, "confirmed");
-                return getForeignAssetSolana(
-                  connection,
-                  SOL_TOKEN_BRIDGE_ADDRESS,
-                  originChain,
-                  hexToUint8Array(originAssetHex)
-                );
-              }
-              : foreignChain === CHAIN_ID_ALGORAND
-                ? () => {
-                  const algodClient = new Algodv2(
-                    ALGORAND_HOST.algodToken,
-                    ALGORAND_HOST.algodServer,
-                    ALGORAND_HOST.algodPort
-                  );
-                  return getForeignAssetAlgorand(
-                    algodClient,
-                    ALGORAND_TOKEN_BRIDGE_ID,
+            : foreignChain === CHAIN_ID_NEAR
+              ? async () => {
+                try {
+                  return await getForeignAssetNear(
+                    makeNearProvider(),
+                    NEAR_TOKEN_BRIDGE_ACCOUNT,
                     originChain,
                     originAssetHex
                   );
+                } catch {
+                  return await Promise.reject("Failed to make Near account");
                 }
-                : foreignChain === CHAIN_ID_INJECTIVE
-                  ? () => {
-                    const client = getInjectiveWasmClient();
-                    return getForeignAssetInjective(
-                      getTokenBridgeAddressForChain(foreignChain),
-                      client,
-                      originChain,
-                      hexToUint8Array(originAssetHex)
-                    );
-                  }
-                  : foreignChain === CHAIN_ID_NEAR
-                    ? async () => {
-                      try {
-                        return await getForeignAssetNear(
-                          makeNearProvider(),
-                          NEAR_TOKEN_BRIDGE_ACCOUNT,
-                          originChain,
-                          originAssetHex
-                        );
-                      } catch {
-                        return await Promise.reject("Failed to make Near account");
-                      }
-                    }
-                    : () => Promise.resolve(null);
+              }
+              : () => Promise.resolve(null);
 
       getterFunc()
         .then((result) => {

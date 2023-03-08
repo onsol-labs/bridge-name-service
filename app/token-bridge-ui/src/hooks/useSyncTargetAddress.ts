@@ -1,13 +1,10 @@
 import {
   cosmos,
-  CHAIN_ID_ALGORAND,
-  CHAIN_ID_APTOS,
   CHAIN_ID_NEAR,
   CHAIN_ID_SOLANA,
   CHAIN_ID_XPLA,
   isEVMChain,
   uint8ArrayToHex,
-  CHAIN_ID_INJECTIVE,
 } from "@certusone/wormhole-sdk";
 import { arrayify, zeroPad } from "@ethersproject/bytes";
 import {
@@ -18,7 +15,6 @@ import {
 import { PublicKey } from "@solana/web3.js";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useAlgorandContext } from "../contexts/AlgorandWalletContext";
 import { useEthereumProvider } from "../contexts/EthereumProviderContext";
 import { useSolanaWallet } from "../contexts/SolanaWalletContext";
 import { setTargetAddressHex as setNFTTargetAddressHex } from "../store/nftSlice";
@@ -30,10 +26,7 @@ import {
   selectTransferTargetParsedTokenAccount,
 } from "../store/selectors";
 import { setTargetAddressHex as setTransferTargetAddressHex } from "../store/transferSlice";
-import { decodeAddress } from "algosdk";
 import { useConnectedWallet as useXplaConnectedWallet } from "@xpla/wallet-provider";
-import { useAptosContext } from "../contexts/AptosWalletContext";
-import { useInjectiveContext } from "../contexts/InjectiveWalletContext";
 import { useNearContext } from "../contexts/NearWalletContext";
 import { makeNearAccount, signAndSendTransactions } from "../utils/near";
 import { NEAR_TOKEN_BRIDGE_ACCOUNT } from "../utils/consts";
@@ -56,10 +49,6 @@ function useSyncTargetAddress(shouldFire: boolean, nft?: boolean) {
   );
   const targetTokenAccountPublicKey = targetParsedTokenAccount?.publicKey;
   const xplaWallet = useXplaConnectedWallet();
-  const { accounts: algoAccounts } = useAlgorandContext();
-  const { account: aptosAccount } = useAptosContext();
-  const aptosAddress = aptosAccount?.address?.toString();
-  const { address: injAddress } = useInjectiveContext();
   const { accountId: nearAccountId, wallet } = useNearContext();
   const setTargetAddressHex = nft
     ? setNFTTargetAddressHex
@@ -124,22 +113,6 @@ function useSyncTargetAddress(shouldFire: boolean, nft?: boolean) {
             uint8ArrayToHex(
               zeroPad(cosmos.canonicalAddress(xplaWallet.walletAddress), 32)
             )
-          )
-        );
-      } else if (targetChain === CHAIN_ID_APTOS && aptosAddress) {
-        dispatch(
-          setTargetAddressHex(uint8ArrayToHex(zeroPad(aptosAddress, 32)))
-        );
-      } else if (targetChain === CHAIN_ID_ALGORAND && algoAccounts[0]) {
-        dispatch(
-          setTargetAddressHex(
-            uint8ArrayToHex(decodeAddress(algoAccounts[0].address).publicKey)
-          )
-        );
-      } else if (targetChain === CHAIN_ID_INJECTIVE && injAddress) {
-        dispatch(
-          setTargetAddressHex(
-            uint8ArrayToHex(zeroPad(cosmos.canonicalAddress(injAddress), 32))
           )
         );
       } else if (targetChain === CHAIN_ID_NEAR && nearAccountId && wallet) {
@@ -208,10 +181,7 @@ function useSyncTargetAddress(shouldFire: boolean, nft?: boolean) {
     targetTokenAccountPublicKey,
     nft,
     setTargetAddressHex,
-    algoAccounts,
     xplaWallet,
-    aptosAddress,
-    injAddress,
     nearAccountId,
     wallet,
   ]);

@@ -1,6 +1,5 @@
 import {
   ChainId,
-  CHAIN_ID_ALGORAND,
   CHAIN_ID_AURORA,
   CHAIN_ID_AVAX,
   CHAIN_ID_BSC,
@@ -15,10 +14,7 @@ import {
   CHAIN_ID_SOLANA,
   CHAIN_ID_ACALA,
   CHAIN_ID_XPLA,
-  CHAIN_ID_APTOS,
-  isValidAptosType,
   CHAIN_ID_ARBITRUM,
-  CHAIN_ID_INJECTIVE,
   CHAIN_ID_NEAR,
   CHAIN_ID_BASE,
 } from "@certusone/wormhole-sdk";
@@ -171,10 +167,6 @@ export default function SmartAddress({
           ? "?cluster=custom&customUrl=http%3A%2F%2Flocalhost%3A8899"
           : ""
       }`
-    : chainId === CHAIN_ID_ALGORAND
-    ? `https://${CLUSTER === "testnet" ? "testnet." : ""}algoexplorer.io/${
-        isAsset ? "asset" : "address"
-      }/${useableAddress}`
     : chainId === CHAIN_ID_XPLA
     ? `https://explorer.xpla.io/${
         CLUSTER === "testnet" ? "testnet/" : ""
@@ -183,20 +175,6 @@ export default function SmartAddress({
     ? `https://${CLUSTER === "testnet" ? "goerli." : ""}arbiscan.io/${
         isAsset ? "token" : "address"
       }/${useableAddress}`
-    : chainId === CHAIN_ID_APTOS
-    ? `https://explorer.aptoslabs.com/account/${
-        isValidAptosType(useableAddress)
-          ? useableAddress.split("::")[0]
-          : useableAddress
-      }${
-        CLUSTER === "testnet"
-          ? "?network=testnet"
-          : CLUSTER === "devnet"
-          ? "?network=local"
-          : ""
-      }`
-    : chainId === CHAIN_ID_INJECTIVE
-    ? `https://testnet.explorer.injective.network/account/${useableAddress}`
     : chainId === CHAIN_ID_NEAR && CLUSTER === "testnet"
     ? `https://explorer.testnetnear.org/accounts/${useableAddress}`
     : undefined;

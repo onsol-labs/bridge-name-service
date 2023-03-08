@@ -3,12 +3,12 @@ import { useEffect, useMemo, useState } from "react";
 import { useNearContext } from "../contexts/NearWalletContext";
 import { DataWrapper } from "../store/helpers";
 import { makeNearAccount } from "../utils/near";
-import { AlgoMetadata } from "./useAlgoMetadata";
+import { BaseMetadata } from "./useBaseMetadata";
 
 export const fetchSingleMetadata = async (
   address: string,
   account: Account
-): Promise<AlgoMetadata> => {
+): Promise<BaseMetadata> => {
   const assetInfo = await account.viewFunction(address, "ft_metadata");
   return {
     tokenName: assetInfo.name,
@@ -22,12 +22,12 @@ const fetchNearMetadata = async (
   nearAccountId: string
 ) => {
   const account = await makeNearAccount(nearAccountId);
-  const promises: Promise<AlgoMetadata>[] = [];
+  const promises: Promise<BaseMetadata>[] = [];
   addresses.forEach((address) => {
     promises.push(fetchSingleMetadata(address, account));
   });
   const resultsArray = await Promise.all(promises);
-  const output = new Map<string, AlgoMetadata>();
+  const output = new Map<string, BaseMetadata>();
   addresses.forEach((address, index) => {
     output.set(address, resultsArray[index]);
   });
@@ -37,11 +37,11 @@ const fetchNearMetadata = async (
 
 function useNearMetadata(
   addresses: string[]
-): DataWrapper<Map<string, AlgoMetadata>> {
+): DataWrapper<Map<string, BaseMetadata>> {
   const { accountId: nearAccountId } = useNearContext();
   const [isFetching, setIsFetching] = useState(false);
   const [error, setError] = useState("");
-  const [data, setData] = useState<Map<string, AlgoMetadata> | null>(null);
+  const [data, setData] = useState<Map<string, BaseMetadata> | null>(null);
 
   useEffect(() => {
     let cancelled = false;

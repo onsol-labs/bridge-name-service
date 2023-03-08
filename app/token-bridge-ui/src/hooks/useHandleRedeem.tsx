@@ -1,8 +1,5 @@
 import {
   ChainId,
-  CHAIN_ID_ALGORAND,
-  CHAIN_ID_APTOS,
-  CHAIN_ID_INJECTIVE,
   CHAIN_ID_KLAYTN,
   CHAIN_ID_NEAR,
   CHAIN_ID_SOLANA,
@@ -10,17 +7,13 @@ import {
   isEVMChain,
   postVaaSolanaWithRetry,
   redeemAndUnwrapOnSolana,
-  redeemOnAlgorand,
   redeemOnEth,
   redeemOnEthNative,
-  redeemOnInjective,
   redeemOnNear,
   redeemOnSolana,
   redeemOnXpla,
   uint8ArrayToHex,
 } from "@certusone/wormhole-sdk";
-import { completeTransferAndRegister } from "@certusone/wormhole-sdk/lib/esm/aptos/api/tokenBridge";
-import { WalletStrategy } from "@injectivelabs/wallet-ts";
 import { Alert } from "@material-ui/lab";
 import { Wallet } from "@near-wallet-selector/core";
 import { WalletContextState } from "@solana/wallet-adapter-react";
@@ -29,17 +22,12 @@ import {
   ConnectedWallet as XplaConnectedWallet,
   useConnectedWallet as useXplaConnectedWallet,
 } from "@xpla/wallet-provider";
-import algosdk from "algosdk";
-import { Types } from "aptos";
 import axios from "axios";
 import { Signer } from "ethers";
 import { useSnackbar } from "notistack";
 import { useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useAlgorandContext } from "../contexts/AlgorandWalletContext";
-import { useAptosContext } from "../contexts/AptosWalletContext";
 import { useEthereumProvider } from "../contexts/EthereumProviderContext";
-import { useInjectiveContext } from "../contexts/InjectiveWalletContext";
 import { useNearContext } from "../contexts/NearWalletContext";
 import { useSolanaWallet } from "../contexts/SolanaWalletContext";
 import {
@@ -47,16 +35,8 @@ import {
   selectTransferTargetChain,
 } from "../store/selectors";
 import { setIsRedeeming, setRedeemTx } from "../store/transferSlice";
-import { signSendAndConfirmAlgorand } from "../utils/algorand";
-import {
-  getAptosClient,
-  waitForSignAndSubmitTransaction,
-} from "../utils/aptos";
 import {
   ACALA_RELAY_URL,
-  ALGORAND_BRIDGE_ID,
-  ALGORAND_HOST,
-  ALGORAND_TOKEN_BRIDGE_ID,
   getTokenBridgeAddressForChain,
   MAX_VAA_UPLOAD_RETRIES_SOLANA,
   NEAR_TOKEN_BRIDGE_ACCOUNT,
@@ -64,7 +44,6 @@ import {
   SOL_BRIDGE_ADDRESS,
   SOL_TOKEN_BRIDGE_ADDRESS,
 } from "../utils/consts";
-import { broadcastInjectiveTx } from "../utils/injective";
 import {
   makeNearAccount,
   makeNearProvider,
@@ -74,80 +53,6 @@ import parseError from "../utils/parseError";
 import { signSendAndConfirm } from "../utils/solana";
 import { postWithFeesXpla } from "../utils/xpla";
 import useTransferSignedVAA from "./useTransferSignedVAA";
-
-async function algo(
-  dispatch: any,
-  enqueueSnackbar: any,
-  senderAddr: string,
-  signedVAA: Uint8Array
-) {
-  dispatch(setIsRedeeming(true));
-  try {
-    const algodClient = new algosdk.Algodv2(
-      ALGORAND_HOST.algodToken,
-      ALGORAND_HOST.algodServer,
-      ALGORAND_HOST.algodPort
-    );
-    const txs = await redeemOnAlgorand(
-      algodClient,
-      ALGORAND_TOKEN_BRIDGE_ID,
-      ALGORAND_BRIDGE_ID,
-      signedVAA,
-      senderAddr
-    );
-    const result = await signSendAndConfirmAlgorand(algodClient, txs);
-    // TODO: fill these out correctly
-    dispatch(
-      setRedeemTx({
-        id: txs[txs.length - 1].tx.txID(),
-        block: result["confirmed-round"],
-      })
-    );
-    enqueueSnackbar(null, {
-      content: <Alert severity="success">Transaction confirmed</Alert>,
-    });
-  } catch (e) {
-    enqueueSnackbar(null, {
-      content: <Alert severity="error">{parseError(e)}</Alert>,
-    });
-    dispatch(setIsRedeeming(false));
-  }
-}
-
-async function aptos(
-  dispatch: any,
-  enqueueSnackbar: any,
-  signedVAA: Uint8Array,
-  signAndSubmitTransaction: (
-    transaction: Types.TransactionPayload,
-    options?: any
-  ) => Promise<{
-    hash: string;
-  }>
-) {
-  dispatch(setIsRedeeming(true));
-  const tokenBridgeAddress = getTokenBridgeAddressForChain(CHAIN_ID_APTOS);
-  try {
-    const msg = await completeTransferAndRegister(
-      getAptosClient(),
-      tokenBridgeAddress,
-      signedVAA
-    );
-    const result = await waitForSignAndSubmitTransaction(
-      msg,
-      signAndSubmitTransaction
-    );
-    dispatch(setRedeemTx({ id: result, block: 1 }));
-    enqueueSnackbar(null, {
-      content: <Alert severity="success">Transaction confirmed</Alert>,
-    });
-  } catch (e) {
-    enqueueSnackbar(null, {
-      content: <Alert severity="error">{parseError(e)}</Alert>,
-    });
-    dispatch(setIsRedeeming(false));
-  }
-}
 
 async function evm(
   dispatch: any,
@@ -309,38 +214,6 @@ async function xpla(
   }
 }
 
-async function injective(
-  dispatch: any,
-  enqueueSnackbar: any,
-  wallet: WalletStrategy,
-  walletAddress: string,
-  signedVAA: Uint8Array
-) {
-  dispatch(setIsRedeeming(true));
-  try {
-    const msg = await redeemOnInjective(
-      getTokenBridgeAddressForChain(CHAIN_ID_INJECTIVE),
-      walletAddress,
-      signedVAA
-    );
-    const tx = await broadcastInjectiveTx(
-      wallet,
-      walletAddress,
-      msg,
-      "Wormhole - Complete Transfer"
-    );
-    dispatch(setRedeemTx({ id: tx.txHash, block: tx.height }));
-    enqueueSnackbar(null, {
-      content: <Alert severity="success">Transaction confirmed</Alert>,
-    });
-  } catch (e) {
-    enqueueSnackbar(null, {
-      content: <Alert severity="error">{parseError(e)}</Alert>,
-    });
-    dispatch(setIsRedeeming(false));
-  }
-}
-
 export function useHandleRedeem() {
   const dispatch = useDispatch();
   const { enqueueSnackbar } = useSnackbar();
@@ -349,10 +222,6 @@ export function useHandleRedeem() {
   const solPK = solanaWallet?.publicKey;
   const { signer } = useEthereumProvider();
   const xplaWallet = useXplaConnectedWallet();
-  const { accounts: algoAccounts } = useAlgorandContext();
-  const { account: aptosAccount, signAndSubmitTransaction } = useAptosContext();
-  const aptosAddress = aptosAccount?.address?.toString();
-  const { wallet: injWallet, address: injAddress } = useInjectiveContext();
   const { accountId: nearAccountId, wallet } = useNearContext();
   const signedVAA = useTransferSignedVAA();
   const isRedeeming = useSelector(selectTransferIsRedeeming);
@@ -375,21 +244,6 @@ export function useHandleRedeem() {
       );
     } else if (targetChain === CHAIN_ID_XPLA && !!xplaWallet && signedVAA) {
       xpla(dispatch, enqueueSnackbar, xplaWallet, signedVAA);
-    } else if (targetChain === CHAIN_ID_APTOS && !!aptosAddress && signedVAA) {
-      aptos(dispatch, enqueueSnackbar, signedVAA, signAndSubmitTransaction);
-    } else if (
-      targetChain === CHAIN_ID_ALGORAND &&
-      algoAccounts[0] &&
-      !!signedVAA
-    ) {
-      algo(dispatch, enqueueSnackbar, algoAccounts[0]?.address, signedVAA);
-    } else if (
-      targetChain === CHAIN_ID_INJECTIVE &&
-      injWallet &&
-      injAddress &&
-      signedVAA
-    ) {
-      injective(dispatch, enqueueSnackbar, injWallet, injAddress, signedVAA);
     } else if (
       targetChain === CHAIN_ID_NEAR &&
       nearAccountId &&
@@ -407,12 +261,7 @@ export function useHandleRedeem() {
     signedVAA,
     solanaWallet,
     solPK,
-    algoAccounts,
     xplaWallet,
-    aptosAddress,
-    signAndSubmitTransaction,
-    injWallet,
-    injAddress,
     nearAccountId,
     wallet,
   ]);
@@ -434,19 +283,6 @@ export function useHandleRedeem() {
         signedVAA,
         true
       );
-    } else if (
-      targetChain === CHAIN_ID_ALGORAND &&
-      algoAccounts[0] &&
-      !!signedVAA
-    ) {
-      algo(dispatch, enqueueSnackbar, algoAccounts[0]?.address, signedVAA);
-    } else if (
-      targetChain === CHAIN_ID_INJECTIVE &&
-      injWallet &&
-      injAddress &&
-      signedVAA
-    ) {
-      injective(dispatch, enqueueSnackbar, injWallet, injAddress, signedVAA);
     }
   }, [
     dispatch,
@@ -456,9 +292,6 @@ export function useHandleRedeem() {
     signedVAA,
     solanaWallet,
     solPK,
-    algoAccounts,
-    injWallet,
-    injAddress,
   ]);
 
   const handleAcalaRelayerRedeemClick = useCallback(async () => {

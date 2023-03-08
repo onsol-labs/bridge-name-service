@@ -1,25 +1,16 @@
 import {
   ChainId,
-  CHAIN_ID_ALGORAND,
-  CHAIN_ID_APTOS,
-  CHAIN_ID_INJECTIVE,
   CHAIN_ID_NEAR,
   CHAIN_ID_SOLANA,
   CHAIN_ID_XPLA,
-  ensureHexPrefix,
-  getForeignAssetAlgorand,
-  getForeignAssetAptos,
   getForeignAssetEth,
-  getForeignAssetInjective,
   getForeignAssetNear,
   getForeignAssetSolana,
   getForeignAssetXpla,
-  getTypeFromExternalAddress,
   hexToNativeAssetString,
   hexToUint8Array,
   isEVMChain,
   queryExternalId,
-  queryExternalIdInjective,
 } from "@certusone/wormhole-sdk";
 import {
   getForeignAssetEth as getForeignAssetEthNFT,
@@ -28,7 +19,6 @@ import {
 import { BigNumber } from "@ethersproject/bignumber";
 import { arrayify } from "@ethersproject/bytes";
 import { Connection } from "@solana/web3.js";
-import algosdk from "algosdk";
 import { ethers } from "ethers";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -53,8 +43,6 @@ import {
 } from "../store/selectors";
 import { setTargetAsset as setTransferTargetAsset } from "../store/transferSlice";
 import {
-  ALGORAND_HOST,
-  ALGORAND_TOKEN_BRIDGE_ID,
   getEvmChainId,
   getNFTBridgeAddressForChain,
   getTokenBridgeAddressForChain,
@@ -67,8 +55,6 @@ import {
   NATIVE_NEAR_PLACEHOLDER,
 } from "../utils/consts";
 import { LCDClient as XplaLCDClient } from "@xpla/xpla.js";
-import { getAptosClient } from "../utils/aptos";
-import { getInjectiveWasmClient } from "../utils/injective";
 import { lookupHash, makeNearAccount, makeNearProvider } from "../utils/near";
 
 function useFetchTargetAsset(nft?: boolean) {
@@ -145,41 +131,6 @@ function useFetchTargetAsset(nft?: boolean) {
           const tokenId = await queryExternalId(
             lcd,
             tokenBridgeAddress,
-            originAsset || ""
-          );
-          if (!cancelled) {
-            dispatch(
-              setTargetAsset(
-                receiveDataWrapper({
-                  doesExist: true,
-                  address: tokenId || null,
-                })
-              )
-            );
-          }
-        } else if (originChain === CHAIN_ID_INJECTIVE) {
-          const client = getInjectiveWasmClient();
-          const tokenBridgeAddress =
-            getTokenBridgeAddressForChain(CHAIN_ID_INJECTIVE);
-          const tokenId = await queryExternalIdInjective(
-            client,
-            tokenBridgeAddress,
-            originAsset || ""
-          );
-          if (!cancelled) {
-            dispatch(
-              setTargetAsset(
-                receiveDataWrapper({
-                  doesExist: true,
-                  address: tokenId,
-                })
-              )
-            );
-          }
-        } else if (originChain === CHAIN_ID_APTOS) {
-          const tokenId = await getTypeFromExternalAddress(
-            getAptosClient(),
-            getTokenBridgeAddressForChain(CHAIN_ID_APTOS),
             originAsset || ""
           );
           if (!cancelled) {
@@ -330,107 +281,6 @@ function useFetchTargetAsset(nft?: boolean) {
           const asset = await getForeignAssetXpla(
             getTokenBridgeAddressForChain(targetChain),
             lcd,
-            originChain,
-            hexToUint8Array(originAsset)
-          );
-          if (!cancelled) {
-            dispatch(
-              setTargetAsset(
-                receiveDataWrapper({ doesExist: !!asset, address: asset })
-              )
-            );
-            setArgs();
-          }
-        } catch (e) {
-          if (!cancelled) {
-            dispatch(
-              setTargetAsset(
-                errorDataWrapper(
-                  "Unable to determine existence of wrapped asset"
-                )
-              )
-            );
-          }
-        }
-      }
-      if (targetChain === CHAIN_ID_APTOS && originChain && originAsset) {
-        dispatch(setTargetAsset(fetchDataWrapper()));
-        try {
-          const asset = await getForeignAssetAptos(
-            getAptosClient(),
-            getTokenBridgeAddressForChain(targetChain),
-            originChain,
-            originAsset
-          );
-          if (!cancelled) {
-            dispatch(
-              setTargetAsset(
-                receiveDataWrapper({
-                  doesExist: !!asset,
-                  address: asset ? `${ensureHexPrefix(asset)}::coin::T` : null,
-                })
-              )
-            );
-            setArgs();
-          }
-        } catch (e) {
-          console.error(e);
-          if (!cancelled) {
-            dispatch(
-              setTargetAsset(
-                errorDataWrapper(
-                  "Unable to determine existence of wrapped asset"
-                )
-              )
-            );
-          }
-        }
-      }
-      if (targetChain === CHAIN_ID_ALGORAND && originChain && originAsset) {
-        dispatch(setTargetAsset(fetchDataWrapper()));
-        try {
-          const algodClient = new algosdk.Algodv2(
-            ALGORAND_HOST.algodToken,
-            ALGORAND_HOST.algodServer,
-            ALGORAND_HOST.algodPort
-          );
-          const asset = await getForeignAssetAlgorand(
-            algodClient,
-            ALGORAND_TOKEN_BRIDGE_ID,
-            originChain,
-            originAsset
-          );
-          if (!cancelled) {
-            dispatch(
-              setTargetAsset(
-                receiveDataWrapper({
-                  doesExist: !!asset,
-                  address: asset === null ? asset : asset.toString(),
-                })
-              )
-            );
-            setArgs();
-          }
-        } catch (e) {
-          console.error(e);
-          if (!cancelled) {
-            dispatch(
-              setTargetAsset(
-                errorDataWrapper(
-                  "Unable to determine existence of wrapped asset"
-                )
-              )
-            );
-          }
-        }
-      }
-      if (targetChain === CHAIN_ID_INJECTIVE && originChain && originAsset) {
-        dispatch(setTargetAsset(fetchDataWrapper()));
-        try {
-          const client = getInjectiveWasmClient();
-          const asset = await getForeignAssetInjective(
-            getTokenBridgeAddressForChain(targetChain),
-            client,
             originChain,
             hexToUint8Array(originAsset)
           );

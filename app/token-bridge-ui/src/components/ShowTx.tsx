@@ -1,6 +1,5 @@
 import {
   ChainId,
-  CHAIN_ID_ALGORAND,
   CHAIN_ID_AURORA,
   CHAIN_ID_AVAX,
   CHAIN_ID_BSC,
@@ -15,11 +14,8 @@ import {
   CHAIN_ID_POLYGON,
   CHAIN_ID_SOLANA,
   CHAIN_ID_ACALA,
-
   CHAIN_ID_XPLA,
-  CHAIN_ID_APTOS,
   CHAIN_ID_ARBITRUM,
-  CHAIN_ID_INJECTIVE,
   CHAIN_ID_BASE,
 } from "@certusone/wormhole-sdk";
 import { Button, makeStyles, Typography } from "@material-ui/core";
@@ -93,33 +89,21 @@ export default function ShowTx({
                                 ? "?cluster=custom&customUrl=http%3A%2F%2Flocalhost%3A8899"
                                 : ""
                             }`
-                            : chainId === CHAIN_ID_ALGORAND
-                              ? `https://${CLUSTER === "testnet" ? "testnet." : ""}algoexplorer.io/tx/${tx?.id
+                            : chainId === CHAIN_ID_MOONBEAM
+                              ? `https://${CLUSTER === "testnet" ? "moonbase." : ""}moonscan.io/tx/${tx?.id
                               }`
-                              : chainId === CHAIN_ID_MOONBEAM
-                                ? `https://${CLUSTER === "testnet" ? "moonbase." : ""}moonscan.io/tx/${tx?.id
+                              : chainId === CHAIN_ID_BASE
+                                ? `https://${CLUSTER === "testnet" ? "goerli." : ""}basescan.org/tx/${tx?.id
                                 }`
-                                : chainId === CHAIN_ID_BASE
-                                  ? `https://${CLUSTER === "testnet" ? "goerli." : ""}basescan.org/tx/${tx?.id
-                                  }`
-                                  : chainId === CHAIN_ID_XPLA
-                                    ? `https://explorer.xpla.io/${CLUSTER === "testnet" ? "testnet/" : ""
-                                    }tx/${tx?.id}`
-                                    : chainId === CHAIN_ID_ARBITRUM
-                                      ? `https://${CLUSTER === "testnet" ? "goerli." : ""}arbiscan.io/tx/${tx?.id
-                                      }`
-                                      : chainId === CHAIN_ID_APTOS
-                                        ? `https://explorer.aptoslabs.com/txn/${tx?.id}${CLUSTER === "testnet"
-                                          ? "?network=testnet"
-                                          : CLUSTER === "devnet"
-                                            ? "?network=local"
-                                            : ""
-                                        }`
-                                        : chainId === CHAIN_ID_INJECTIVE
-                                          ? `https://testnet.explorer.injective.network/transaction/${tx.id}`
-                                          : chainId === CHAIN_ID_NEAR && CLUSTER === "testnet"
-                                            ? `https://explorer.testnet.near.org/transactions/${tx?.id}`
-                                            : undefined;
+                                : chainId === CHAIN_ID_XPLA
+                                  ? `https://explorer.xpla.io/${CLUSTER === "testnet" ? "testnet/" : ""
+                                  }tx/${tx?.id}`
+                                  : chainId === CHAIN_ID_ARBITRUM
+                                    ? `https://${CLUSTER === "testnet" ? "goerli." : ""}arbiscan.io/tx/${tx?.id
+                                    }`
+                                    : chainId === CHAIN_ID_NEAR && CLUSTER === "testnet"
+                                      ? `https://explorer.testnet.near.org/transactions/${tx?.id}`
+                                      : undefined;
   const explorerName = getExplorerName(chainId);
 
   return (

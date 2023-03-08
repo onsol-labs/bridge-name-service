@@ -1,8 +1,6 @@
 import {
   ChainId,
   CHAIN_ID_ACALA,
-  CHAIN_ID_ALGORAND,
-  CHAIN_ID_APTOS,
   CHAIN_ID_ARBITRUM,
   CHAIN_ID_AURORA,
   CHAIN_ID_AVAX,
@@ -11,7 +9,6 @@ import {
   CHAIN_ID_CELO,
   CHAIN_ID_ETH,
   CHAIN_ID_FANTOM,
-  CHAIN_ID_INJECTIVE,
   CHAIN_ID_KARURA,
   CHAIN_ID_KLAYTN,
   CHAIN_ID_MOONBEAM,
@@ -29,8 +26,6 @@ import { clusterApiUrl } from "@solana/web3.js";
 import { getAddress } from "ethers/lib/utils";
 import { CHAIN_CONFIG_MAP } from "../config";
 import acalaIcon from "../icons/acala.svg";
-import algorandIcon from "../icons/algorand.svg";
-import aptosIcon from "../icons/aptos.svg";
 import arbitrumIcon from "../icons/arbitrum.svg";
 import auroraIcon from "../icons/aurora.svg";
 import avaxIcon from "../icons/avax.svg";
@@ -47,9 +42,6 @@ import oasisIcon from "../icons/oasis-network-rose-logo.svg";
 import polygonIcon from "../icons/polygon.svg";
 import solanaIcon from "../icons/solana.svg";
 import xplaIcon from "../icons/xpla.svg";
-import injectiveIcon from "../icons/injective.svg";
-import { AptosNetwork } from "./aptos";
-import { getNetworkInfo, Network } from "@injectivelabs/networks";
 import nearIcon from "../icons/near.svg";
 import { ConnectConfig, keyStores } from "near-api-js";
 
@@ -70,16 +62,6 @@ export const CHAINS: ChainInfo[] =
         id: CHAIN_ID_ACALA,
         name: "Acala",
         logo: acalaIcon,
-      },
-      {
-        id: CHAIN_ID_ALGORAND,
-        name: "Algorand",
-        logo: algorandIcon,
-      },
-      {
-        id: CHAIN_ID_APTOS,
-        name: "Aptos",
-        logo: aptosIcon,
       },
       {
         id: CHAIN_ID_ARBITRUM,
@@ -120,11 +102,6 @@ export const CHAINS: ChainInfo[] =
         id: CHAIN_ID_FANTOM,
         name: "Fantom",
         logo: fantomIcon,
-      },
-      {
-        id: CHAIN_ID_INJECTIVE,
-        name: "Injective",
-        logo: injectiveIcon,
       },
       {
         id: CHAIN_ID_KARURA,
@@ -173,16 +150,6 @@ export const CHAINS: ChainInfo[] =
       },
     ]
     : [
-      {
-        id: CHAIN_ID_ALGORAND,
-        name: "Algorand",
-        logo: algorandIcon,
-      },
-      {
-        id: CHAIN_ID_APTOS,
-        name: "Aptos",
-        logo: aptosIcon,
-      },
       {
         id: CHAIN_ID_BSC,
         name: "Binance Smart Chain",
@@ -243,33 +210,29 @@ export const getDefaultNativeCurrencySymbol = (chainId: ChainId) =>
             ? "AVAX"
             : chainId === CHAIN_ID_OASIS
               ? "ROSE"
-              : chainId === CHAIN_ID_ALGORAND
-                ? "ALGO"
-                : chainId === CHAIN_ID_AURORA
-                  ? "ETH"
-                  : chainId === CHAIN_ID_FANTOM
-                    ? "FTM"
-                    : chainId === CHAIN_ID_KARURA
-                      ? "KAR"
-                      : chainId === CHAIN_ID_ACALA
-                        ? "ACA"
-                        : chainId === CHAIN_ID_KLAYTN
-                          ? "KLAY"
-                          : chainId === CHAIN_ID_CELO
-                            ? "CELO"
-                            : chainId === CHAIN_ID_NEON
-                              ? "NEON"
-                              : chainId === CHAIN_ID_XPLA
-                                ? "XPLA"
-                                : chainId === CHAIN_ID_APTOS
-                                  ? "APTOS"
-                                  : chainId === CHAIN_ID_ARBITRUM
+              : chainId === CHAIN_ID_AURORA
+                ? "ETH"
+                : chainId === CHAIN_ID_FANTOM
+                  ? "FTM"
+                  : chainId === CHAIN_ID_KARURA
+                    ? "KAR"
+                    : chainId === CHAIN_ID_ACALA
+                      ? "ACA"
+                      : chainId === CHAIN_ID_KLAYTN
+                        ? "KLAY"
+                        : chainId === CHAIN_ID_CELO
+                          ? "CELO"
+                          : chainId === CHAIN_ID_NEON
+                            ? "NEON"
+                            : chainId === CHAIN_ID_XPLA
+                              ? "XPLA"
+                              : chainId === CHAIN_ID_ARBITRUM
+                                ? "ETH"
+                                : chainId === CHAIN_ID_MOONBEAM
+                                  ? "GLMR"
+                                  : chainId === CHAIN_ID_BASE
                                     ? "ETH"
-                                    : chainId === CHAIN_ID_MOONBEAM
-                                      ? "GLMR"
-                                      : chainId === CHAIN_ID_BASE
-                                        ? "ETH"
-                                        : "";
+                                    : "";
 
 export const getDefaultNativeCurrencyAddressEvm = (chainId: ChainId) => {
   return chainId === CHAIN_ID_ETH
@@ -310,23 +273,21 @@ export const getExplorerName = (chainId: ChainId) =>
         ? "Polygonscan"
         : chainId === CHAIN_ID_AVAX
           ? "Snowtrace"
-          : chainId === CHAIN_ID_ALGORAND
-            ? "AlgoExplorer"
-            : chainId === CHAIN_ID_FANTOM
-              ? "FTMScan"
-              : chainId === CHAIN_ID_KLAYTN
-                ? "Klaytnscope"
-                : chainId === CHAIN_ID_SOLANA
-                  ? "Solscan"
-                  : chainId === CHAIN_ID_XPLA
-                    ? "XPLA Explorer"
-                    : chainId === CHAIN_ID_ARBITRUM
-                      ? "Arbiscan"
-                      : chainId === CHAIN_ID_MOONBEAM
-                        ? "Moonscan"
-                        : chainId === CHAIN_ID_BASE
-                          ? "BaseScan"
-                          : "Explorer";
+          : chainId === CHAIN_ID_FANTOM
+            ? "FTMScan"
+            : chainId === CHAIN_ID_KLAYTN
+              ? "Klaytnscope"
+              : chainId === CHAIN_ID_SOLANA
+                ? "Solscan"
+                : chainId === CHAIN_ID_XPLA
+                  ? "XPLA Explorer"
+                  : chainId === CHAIN_ID_ARBITRUM
+                    ? "Arbiscan"
+                    : chainId === CHAIN_ID_MOONBEAM
+                      ? "Moonscan"
+                      : chainId === CHAIN_ID_BASE
+                        ? "BaseScan"
+                        : "Explorer";
 export const WORMHOLE_RPC_HOSTS =
   CLUSTER === "testnet"
     ? ["https://wormhole-v2-testnet-api.certus.one"]
@@ -393,33 +354,6 @@ export const XPLA_LCD_CLIENT_CONFIG = {
 export const XPLA_GAS_PRICES_URL =
   "https://cube-fcd.xpla.dev/v1/txs/gas_prices";
 
-export const APTOS_URL =
-  CLUSTER === "testnet"
-    ? "https://testnet.aptoslabs.com"
-    : "http://localhost:8080";
-
-export const APTOS_NETWORK =
-  CLUSTER === "testnet" ? AptosNetwork.Testnet : AptosNetwork.Localhost;
-
-export const APTOS_NATIVE_DECIMALS = 8;
-export const APTOS_NATIVE_TOKEN_KEY = "0x1::aptos_coin::AptosCoin";
-
-export const INJECTIVE_NETWORK = Network.TestnetK8s;
-export const INJECTIVE_NETWORK_INFO = getNetworkInfo(Network.TestnetK8s);
-
-export const ALGORAND_HOST =
-  CLUSTER === "testnet"
-    ? {
-      algodToken: "",
-      algodServer: "https://testnet-api.algonode.cloud",
-      algodPort: "",
-    }
-    : {
-      algodToken:
-        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-      algodServer: "http://localhost",
-      algodPort: "4001",
-    };
 export const KARURA_HOST =
   CLUSTER === "testnet" ? "https://karura-dev.aca-dev.network/eth/http" : "";
 export const ACALA_HOST =
@@ -430,8 +364,6 @@ export const SOL_CUSTODY_ADDRESS =
 export const SOL_NFT_CUSTODY_ADDRESS =
   "D63bhHo634eXSj4Jq3xgu2fjB5XKc8DFHzDY9iZk7fv1";
 
-export const ALGORAND_WAIT_FOR_CONFIRMATIONS = CLUSTER === "testnet" ? 4 : 1;
-
 export const SOL_BRIDGE_ADDRESS =
   CONTRACTS[CLUSTER === "testnet" ? "TESTNET" : "DEVNET"].solana.core;
 
@@ -439,13 +371,6 @@ export const SOL_NFT_BRIDGE_ADDRESS =
   CONTRACTS[CLUSTER === "testnet" ? "TESTNET" : "DEVNET"].solana.nft_bridge;
 export const SOL_TOKEN_BRIDGE_ADDRESS =
   CONTRACTS[CLUSTER === "testnet" ? "TESTNET" : "DEVNET"].solana.token_bridge;
-
-export const ALGORAND_BRIDGE_ID = BigInt(
-  CONTRACTS[CLUSTER === "testnet" ? "TESTNET" : "DEVNET"].algorand.core
-);
-export const ALGORAND_TOKEN_BRIDGE_ID = BigInt(
-  CONTRACTS[CLUSTER === "testnet" ? "TESTNET" : "DEVNET"].algorand.token_bridge
-);
 
 export const NEAR_CORE_BRIDGE_ACCOUNT =
   CLUSTER === "testnet" ? "wormhole.wormhole.testnet" : "wormhole.test.near";
@@ -633,8 +558,6 @@ export const WGLMR_ADDRESS =
     ? "0xD909178CC99d318e4D46e7E66a972955859670E1"
     : "0xDDb64fE46a91D46ee29420539FC25FD07c5FEa3E";
 export const WGLMR_DECIMALS = 18;
-
-export const ALGO_DECIMALS = 6;
 
 // hardcoded addresses for warnings
 export const SOLANA_TOKENS_THAT_EXIST_ELSEWHERE = [

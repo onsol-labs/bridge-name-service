@@ -1,7 +1,6 @@
 import {
   ChainId,
   ChainName,
-  CHAIN_ID_KLAYTN,
   CHAIN_ID_SOLANA,
   coalesceChainId,
   createNonce,
