@@ -15,17 +15,13 @@ import {
   createWrappedOnInjective,
   createWrappedOnNear,
   createWrappedOnSolana,
-  createWrappedOnTerra,
   createWrappedOnXpla,
   createWrappedTypeOnAptos,
   isEVMChain,
-  isTerraChain,
   postVaaSolanaWithRetry,
-  TerraChainId,
   updateWrappedOnEth,
   updateWrappedOnInjective,
   updateWrappedOnSolana,
-  updateWrappedOnTerra,
   updateWrappedOnXpla,
 } from "@certusone/wormhole-sdk";
 import { WalletStrategy } from "@injectivelabs/wallet-ts";
@@ -33,10 +29,6 @@ import { Alert } from "@material-ui/lab";
 import { Wallet } from "@near-wallet-selector/core";
 import { WalletContextState } from "@solana/wallet-adapter-react";
 import { Connection } from "@solana/web3.js";
-import {
-  ConnectedWallet,
-  useConnectedWallet,
-} from "@terra-money/wallet-provider";
 import {
   ConnectedWallet as XplaConnectedWallet,
   useConnectedWallet as useXplaConnectedWallet,
@@ -57,7 +49,6 @@ import { setCreateTx, setIsCreating } from "../store/attestSlice";
 import {
   selectAttestIsCreating,
   selectAttestTargetChain,
-  selectTerraFeeDenom,
 } from "../store/selectors";
 import { signSendAndConfirmAlgorand } from "../utils/algorand";
 import { waitForSignAndSubmitTransaction } from "../utils/aptos";
@@ -83,7 +74,6 @@ import {
 } from "../utils/near";
 import parseError from "../utils/parseError";
 import { signSendAndConfirm } from "../utils/solana";
-import { postWithFees } from "../utils/terra";
 import { postWithFeesXpla } from "../utils/xpla";
 import useAttestSignedVAA from "./useAttestSignedVAA";
 
@@ -306,50 +296,6 @@ async function solana(
   }
 }
 
-async function terra(
-  dispatch: any,
-  enqueueSnackbar: any,
-  wallet: ConnectedWallet,
-  signedVAA: Uint8Array,
-  shouldUpdate: boolean,
-  feeDenom: string,
-  chainId: TerraChainId
-) {
-  dispatch(setIsCreating(true));
-  const tokenBridgeAddress = getTokenBridgeAddressForChain(chainId);
-  try {
-    const msg = shouldUpdate
-      ? await updateWrappedOnTerra(
-          tokenBridgeAddress,
-          wallet.terraAddress,
-          signedVAA
-        )
-      : await createWrappedOnTerra(
-          tokenBridgeAddress,
-          wallet.terraAddress,
-          signedVAA
-        );
-    const result = await postWithFees(
-      wallet,
-      [msg],
-      "Wormhole - Create Wrapped",
-      [feeDenom],
-      chainId
-    );
-    dispatch(
-      setCreateTx({ id: result.result.txhash, block: result.result.height })
-    );
-    enqueueSnackbar(null, {
-      content: <Alert severity="success">Transaction confirmed</Alert>,
-    });
-  } catch (e) {
-    enqueueSnackbar(null, {
-      content: <Alert severity="error">{parseError(e)}</Alert>,
-    });
-    dispatch(setIsCreating(false));
-  }
-}
-
 async function xpla(
   dispatch: any,
   enqueueSnackbar: any,
@@ -439,8 +385,6 @@ export function useHandleCreateWrapped(shouldUpdate: boolean) {
   const signedVAA = useAttestSignedVAA();
   const isCreating = useSelector(selectAttestIsCreating);
   const { signer } = useEthereumProvider();
-  const terraWallet = useConnectedWallet();
-  const terraFeeDenom = useSelector(selectTerraFeeDenom);
   const xplaWallet = useXplaConnectedWallet();
   const { accounts: algoAccounts } = useAlgorandContext();
   const { account: aptosAccount, signAndSubmitTransaction } = useAptosContext();
@@ -470,16 +414,6 @@ export function useHandleCreateWrapped(shouldUpdate: boolean) {
         solPK.toString(),
         signedVAA,
         shouldUpdate
-      );
-    } else if (isTerraChain(targetChain) && !!terraWallet && !!signedVAA) {
-      terra(
-        dispatch,
-        enqueueSnackbar,
-        terraWallet,
-        signedVAA,
-        shouldUpdate,
-        terraFeeDenom,
-        targetChain
       );
     } else if (targetChain === CHAIN_ID_XPLA && !!xplaWallet && !!signedVAA) {
       xpla(dispatch, enqueueSnackbar, xplaWallet, signedVAA, shouldUpdate);
@@ -537,11 +471,9 @@ export function useHandleCreateWrapped(shouldUpdate: boolean) {
     targetChain,
     solanaWallet,
     solPK,
-    terraWallet,
     signedVAA,
     signer,
     shouldUpdate,
-    terraFeeDenom,
     algoAccounts,
     xplaWallet,
     aptosAddress,

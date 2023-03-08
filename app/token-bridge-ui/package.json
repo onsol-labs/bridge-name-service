@@ -31,7 +31,6 @@
     "@solana/wallet-adapter-react-ui": "^0.9.5",
     "@solana/wallet-adapter-wallets": "^0.19.5",
     "@solana/web3.js": "^1.35.1",
-    "@terra-money/wallet-provider": "^3.9.4",
     "@walletconnect/web3-provider": "^1.7.8",
     "@xpla/wallet-provider": "^0.3.4",
     "@xpla/xpla.js": "^0.2.1",
@@ -124,9 +123,9 @@
     "truffle": "^5.4.1",
     "tty-browserify": "^0.0.1",
     "typechain": "^5.0.0",
+    "typescript": "^4.9.5",
     "url": "^0.11.0",
     "util": "^0.12.4",
-    "typescript": "^4.9.5",
     "vm-browserify": "^1.1.2"
   }
 }

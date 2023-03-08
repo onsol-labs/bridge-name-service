@@ -4,7 +4,6 @@ import {
   attestFromEth,
   attestFromInjective,
   attestFromSolana,
-  attestFromTerra,
   attestFromXpla,
   attestNearFromNear,
   attestTokenFromNear,
@@ -21,19 +20,15 @@ import {
   getEmitterAddressInjective,
   getEmitterAddressNear,
   getEmitterAddressSolana,
-  getEmitterAddressTerra,
   getEmitterAddressXpla,
   getSignedVAAWithRetry,
   isEVMChain,
-  isTerraChain,
   parseSequenceFromLogAlgorand,
   parseSequenceFromLogEth,
   parseSequenceFromLogInjective,
   parseSequenceFromLogNear,
   parseSequenceFromLogSolana,
-  parseSequenceFromLogTerra,
   parseSequenceFromLogXpla,
-  TerraChainId,
   uint8ArrayToHex,
 } from "@certusone/wormhole-sdk";
 import { WalletStrategy } from "@injectivelabs/wallet-ts";
@@ -41,10 +36,6 @@ import { Alert } from "@material-ui/lab";
 import { Wallet } from "@near-wallet-selector/core";
 import { WalletContextState } from "@solana/wallet-adapter-react";
 import { Connection, PublicKey } from "@solana/web3.js";
-import {
-  ConnectedWallet,
-  useConnectedWallet,
-} from "@terra-money/wallet-provider";
 import {
   ConnectedWallet as XplaConnectedWallet,
   useConnectedWallet as useXplaConnectedWallet,
@@ -72,7 +63,6 @@ import {
   selectAttestIsTargetComplete,
   selectAttestSourceAsset,
   selectAttestSourceChain,
-  selectTerraFeeDenom,
 } from "../store/selectors";
 import { signSendAndConfirmAlgorand } from "../utils/algorand";
 import {
@@ -101,7 +91,6 @@ import {
 } from "../utils/near";
 import parseError from "../utils/parseError";
 import { signSendAndConfirm } from "../utils/solana";
-import { postWithFees, waitForTerraExecution } from "../utils/terra";
 import { postWithFeesXpla, waitForXplaExecution } from "../utils/xpla";
 import { broadcastInjectiveTx } from "../utils/injective";
 
@@ -387,61 +376,6 @@ async function solana(
   }
 }
 
-async function terra(
-  dispatch: any,
-  enqueueSnackbar: any,
-  wallet: ConnectedWallet,
-  asset: string,
-  feeDenom: string,
-  chainId: TerraChainId
-) {
-  dispatch(setIsSending(true));
-  try {
-    const tokenBridgeAddress = getTokenBridgeAddressForChain(chainId);
-    const msg = await attestFromTerra(
-      tokenBridgeAddress,
-      wallet.terraAddress,
-      asset
-    );
-    const result = await postWithFees(
-      wallet,
-      [msg],
-      "Create Wrapped",
-      [feeDenom],
-      chainId
-    );
-    const info = await waitForTerraExecution(result, chainId);
-    dispatch(setAttestTx({ id: info.txhash, block: info.height }));
-    enqueueSnackbar(null, {
-      content: <Alert severity="success">Transaction confirmed</Alert>,
-    });
-    const sequence = parseSequenceFromLogTerra(info);
-    if (!sequence) {
-      throw new Error("Sequence not found");
-    }
-    const emitterAddress = await getEmitterAddressTerra(tokenBridgeAddress);
-    enqueueSnackbar(null, {
-      content: <Alert severity="info">Fetching VAA</Alert>,
-    });
-    const { vaaBytes } = await getSignedVAAWithRetry(
-      WORMHOLE_RPC_HOSTS,
-      chainId,
-      emitterAddress,
-      sequence
-    );
-    dispatch(setSignedVAAHex(uint8ArrayToHex(vaaBytes)));
-    enqueueSnackbar(null, {
-      content: <Alert severity="success">Fetched Signed VAA</Alert>,
-    });
-  } catch (e) {
-    console.error(e);
-    enqueueSnackbar(null, {
-      content: <Alert severity="error">{parseError(e)}</Alert>,
-    });
-    dispatch(setIsSending(false));
-  }
-}
-
 async function xpla(
   dispatch: any,
   enqueueSnackbar: any,
@@ -549,9 +483,7 @@ export function useHandleAttest() {
   const { signer } = useEthereumProvider();
   const solanaWallet = useSolanaWallet();
   const solPK = solanaWallet?.publicKey;
-  const terraWallet = useConnectedWallet();
   const xplaWallet = useXplaConnectedWallet();
-  const terraFeeDenom = useSelector(selectTerraFeeDenom);
   const { accounts: algoAccounts } = useAlgorandContext();
   const { account: aptosAccount, signAndSubmitTransaction } = useAptosContext();
   const aptosAddress = aptosAccount?.address?.toString();
@@ -563,15 +495,6 @@ export function useHandleAttest() {
       evm(dispatch, enqueueSnackbar, signer, sourceAsset, sourceChain);
     } else if (sourceChain === CHAIN_ID_SOLANA && !!solanaWallet && !!solPK) {
       solana(dispatch, enqueueSnackbar, solPK, sourceAsset, solanaWallet);
-    } else if (isTerraChain(sourceChain) && !!terraWallet) {
-      terra(
-        dispatch,
-        enqueueSnackbar,
-        terraWallet,
-        sourceAsset,
-        terraFeeDenom,
-        sourceChain
-      );
     } else if (sourceChain === CHAIN_ID_XPLA && !!xplaWallet) {
       xpla(dispatch, enqueueSnackbar, xplaWallet, sourceAsset);
     } else if (sourceChain === CHAIN_ID_ALGORAND && algoAccounts[0]) {
@@ -591,9 +514,7 @@ export function useHandleAttest() {
     signer,
     solanaWallet,
     solPK,
-    terraWallet,
     sourceAsset,
-    terraFeeDenom,
     algoAccounts,
     xplaWallet,
     aptosAddress,

@@ -22,7 +22,6 @@ import TokenOriginVerifier from "./components/TokenOriginVerifier";
 import Transfer from "./components/Transfer";
 import UnwrapNative from "./components/UnwrapNative";
 import USDC from "./components/USDC";
-import WithdrawTokensTerra from "./components/WithdrawTokensTerra";
 import { CLUSTER } from "./utils/consts";
 
 const useStyles = makeStyles((theme) => ({
@@ -147,9 +146,6 @@ function App() {
         </Route>
         <Route exact path="/register">
           <Attest />
-        </Route>
-        <Route exact path="/withdraw-tokens-terra">
-          <WithdrawTokensTerra />
         </Route>
         <Route exact path="/unwrap-native">
           <UnwrapNative />

@@ -5,7 +5,6 @@ import {
   CHAIN_ID_INJECTIVE,
   CHAIN_ID_NEAR,
   CHAIN_ID_SOLANA,
-  CHAIN_ID_TERRA2,
   CHAIN_ID_XPLA,
   getOriginalAssetAlgorand,
   getOriginalAssetAptos,
@@ -17,7 +16,6 @@ import {
   getTypeFromExternalAddress,
   hexToNativeAssetString,
   isEVMChain,
-  isTerraChain,
   queryExternalId,
   queryExternalIdInjective,
   uint8ArrayToHex,
@@ -30,7 +28,6 @@ import {
 } from "@certusone/wormhole-sdk/lib/esm/nft_bridge";
 import { Web3Provider } from "@ethersproject/providers";
 import { Connection } from "@solana/web3.js";
-import { LCDClient } from "@terra-money/terra.js";
 import { LCDClient as XplaLCDClient } from "@xpla/xpla.js";
 import { Algodv2 } from "algosdk";
 import { ethers } from "ethers";
@@ -46,7 +43,6 @@ import {
   ALGORAND_HOST,
   ALGORAND_TOKEN_BRIDGE_ID,
   getNFTBridgeAddressForChain,
-  getTerraConfig,
   getTokenBridgeAddressForChain,
   NATIVE_NEAR_PLACEHOLDER,
   NATIVE_NEAR_WH_ADDRESS,
@@ -88,13 +84,6 @@ export async function getOriginalAssetToken(
         connection,
         SOL_TOKEN_BRIDGE_ADDRESS,
         foreignNativeStringAddress
-      );
-    } else if (isTerraChain(foreignChain)) {
-      const lcd = new LCDClient(getTerraConfig(foreignChain));
-      promise = await getOriginalAssetCosmWasm(
-        lcd,
-        foreignNativeStringAddress,
-        foreignChain
       );
     } else if (foreignChain === CHAIN_ID_ALGORAND) {
       const algodClient = new Algodv2(
@@ -179,29 +168,29 @@ export async function getOriginalAsset(
 ): Promise<WormholeWrappedNFTInfo> {
   const result = nft
     ? await getOriginalAssetNFT(
-        foreignChain,
-        foreignNativeStringAddress,
-        tokenId,
-        provider
-      )
+      foreignChain,
+      foreignNativeStringAddress,
+      tokenId,
+      provider
+    )
     : await getOriginalAssetToken(
-        foreignChain,
-        foreignNativeStringAddress,
-        provider,
-        nearAccountId
-      );
+      foreignChain,
+      foreignNativeStringAddress,
+      provider,
+      nearAccountId
+    );
 
   if (
     isEVMChain(result.chainId) &&
     uint8ArrayToNative(result.assetAddress, result.chainId) ===
-      ethers.constants.AddressZero
+    ethers.constants.AddressZero
   ) {
     throw new Error("Unable to find address.");
   }
   if (
     result.chainId === CHAIN_ID_SOLANA &&
     uint8ArrayToNative(result.assetAddress, result.chainId) ===
-      SOLANA_SYSTEM_PROGRAM_ADDRESS
+    SOLANA_SYSTEM_PROGRAM_ADDRESS
   ) {
     throw new Error("Unable to find address.");
   }
@@ -287,13 +276,9 @@ function useOriginalAsset(
           setIsLoading(false);
           setArgs();
           if (
-            result.chainId === CHAIN_ID_TERRA2 ||
             result.chainId === CHAIN_ID_XPLA
           ) {
-            const lcd =
-              result.chainId === CHAIN_ID_TERRA2
-                ? new LCDClient(getTerraConfig(CHAIN_ID_TERRA2))
-                : new XplaLCDClient(XPLA_LCD_CLIENT_CONFIG);
+            const lcd = new XplaLCDClient(XPLA_LCD_CLIENT_CONFIG);
             const tokenBridgeAddress = getTokenBridgeAddressForChain(
               result.chainId
             );

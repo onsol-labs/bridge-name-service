@@ -11,13 +11,10 @@ import {
   getIsTransferCompletedInjective,
   getIsTransferCompletedNear,
   getIsTransferCompletedSolana,
-  getIsTransferCompletedTerra,
   getIsTransferCompletedXpla,
   isEVMChain,
-  isTerraChain,
 } from "@certusone/wormhole-sdk";
 import { Connection } from "@solana/web3.js";
-import { LCDClient } from "@terra-money/terra.js";
 import algosdk from "algosdk";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
@@ -34,8 +31,6 @@ import {
   getEvmChainId,
   getTokenBridgeAddressForChain,
   SOLANA_HOST,
-  getTerraGasPricesUrl,
-  getTerraConfig,
   XPLA_LCD_CLIENT_CONFIG,
   NEAR_TOKEN_BRIDGE_ACCOUNT,
 } from "../utils/consts";
@@ -120,25 +115,6 @@ export default function useGetIsTransferCompleted(
               getTokenBridgeAddressForChain(targetChain),
               signedVAA,
               connection
-            );
-          } catch (error) {
-            console.error(error);
-          }
-          if (!cancelled) {
-            setIsTransferCompleted(transferCompleted);
-            setIsLoading(false);
-          }
-        })();
-      } else if (isTerraChain(targetChain)) {
-        setIsLoading(true);
-        (async () => {
-          try {
-            const lcdClient = new LCDClient(getTerraConfig(targetChain));
-            transferCompleted = await getIsTransferCompletedTerra(
-              getTokenBridgeAddressForChain(targetChain),
-              signedVAA,
-              lcdClient,
-              getTerraGasPricesUrl(targetChain)
             );
           } catch (error) {
             console.error(error);

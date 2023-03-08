@@ -5,7 +5,6 @@ import {
   CHAIN_ID_INJECTIVE,
   CHAIN_ID_NEAR,
   CHAIN_ID_SOLANA,
-  CHAIN_ID_TERRA2,
   CHAIN_ID_XPLA,
   ensureHexPrefix,
   getForeignAssetAlgorand,
@@ -14,13 +13,11 @@ import {
   getForeignAssetInjective,
   getForeignAssetNear,
   getForeignAssetSolana,
-  getForeignAssetTerra,
   getForeignAssetXpla,
   getTypeFromExternalAddress,
   hexToNativeAssetString,
   hexToUint8Array,
   isEVMChain,
-  isTerraChain,
   queryExternalId,
   queryExternalIdInjective,
 } from "@certusone/wormhole-sdk";
@@ -31,7 +28,6 @@ import {
 import { BigNumber } from "@ethersproject/bignumber";
 import { arrayify } from "@ethersproject/bytes";
 import { Connection } from "@solana/web3.js";
-import { LCDClient } from "@terra-money/terra.js";
 import algosdk from "algosdk";
 import { ethers } from "ethers";
 import { useCallback, useEffect, useState } from "react";
@@ -65,7 +61,6 @@ import {
   SOLANA_HOST,
   SOL_NFT_BRIDGE_ADDRESS,
   SOL_TOKEN_BRIDGE_ADDRESS,
-  getTerraConfig,
   XPLA_LCD_CLIENT_CONFIG,
   NEAR_TOKEN_BRIDGE_ACCOUNT,
   NATIVE_NEAR_WH_ADDRESS,
@@ -143,26 +138,7 @@ function useFetchTargetAsset(nft?: boolean) {
     let cancelled = false;
     (async () => {
       if (isSourceAssetWormholeWrapped && originChain === targetChain) {
-        if (originChain === CHAIN_ID_TERRA2) {
-          const lcd = new LCDClient(getTerraConfig(CHAIN_ID_TERRA2));
-          const tokenBridgeAddress =
-            getTokenBridgeAddressForChain(CHAIN_ID_TERRA2);
-          const tokenId = await queryExternalId(
-            lcd,
-            tokenBridgeAddress,
-            originAsset || ""
-          );
-          if (!cancelled) {
-            dispatch(
-              setTargetAsset(
-                receiveDataWrapper({
-                  doesExist: true,
-                  address: tokenId || null,
-                })
-              )
-            );
-          }
-        } else if (originChain === CHAIN_ID_XPLA) {
+        if (originChain === CHAIN_ID_XPLA) {
           const lcd = new XplaLCDClient(XPLA_LCD_CLIENT_CONFIG);
           const tokenBridgeAddress =
             getTokenBridgeAddressForChain(CHAIN_ID_XPLA);
@@ -337,36 +313,6 @@ function useFetchTargetAsset(nft?: boolean) {
         } catch (e) {
           if (!cancelled) {
             console.error("error getting foreign asset", e);
-            dispatch(
-              setTargetAsset(
-                errorDataWrapper(
-                  "Unable to determine existence of wrapped asset"
-                )
-              )
-            );
-          }
-        }
-      }
-      if (isTerraChain(targetChain) && originChain && originAsset) {
-        dispatch(setTargetAsset(fetchDataWrapper()));
-        try {
-          const lcd = new LCDClient(getTerraConfig(targetChain));
-          const asset = await getForeignAssetTerra(
-            getTokenBridgeAddressForChain(targetChain),
-            lcd,
-            originChain,
-            hexToUint8Array(originAsset)
-          );
-          if (!cancelled) {
-            dispatch(
-              setTargetAsset(
-                receiveDataWrapper({ doesExist: !!asset, address: asset })
-              )
-            );
-            setArgs();
-          }
-        } catch (e) {
-          if (!cancelled) {
             dispatch(
               setTargetAsset(
                 errorDataWrapper(

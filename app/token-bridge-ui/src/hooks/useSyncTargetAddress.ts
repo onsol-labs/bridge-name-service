@@ -6,7 +6,6 @@ import {
   CHAIN_ID_SOLANA,
   CHAIN_ID_XPLA,
   isEVMChain,
-  isTerraChain,
   uint8ArrayToHex,
   CHAIN_ID_INJECTIVE,
 } from "@certusone/wormhole-sdk";
@@ -17,7 +16,6 @@ import {
   TOKEN_PROGRAM_ID,
 } from "@solana/spl-token";
 import { PublicKey } from "@solana/web3.js";
-import { useConnectedWallet } from "@terra-money/wallet-provider";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useAlgorandContext } from "../contexts/AlgorandWalletContext";
@@ -57,7 +55,6 @@ function useSyncTargetAddress(shouldFire: boolean, nft?: boolean) {
     selectTransferTargetParsedTokenAccount
   );
   const targetTokenAccountPublicKey = targetParsedTokenAccount?.publicKey;
-  const terraWallet = useConnectedWallet();
   const xplaWallet = useXplaConnectedWallet();
   const { accounts: algoAccounts } = useAlgorandContext();
   const { account: aptosAccount } = useAptosContext();
@@ -117,18 +114,6 @@ function useSyncTargetAddress(shouldFire: boolean, nft?: boolean) {
             }
           }
         })();
-      } else if (
-        isTerraChain(targetChain) &&
-        terraWallet &&
-        terraWallet.walletAddress
-      ) {
-        dispatch(
-          setTargetAddressHex(
-            uint8ArrayToHex(
-              zeroPad(cosmos.canonicalAddress(terraWallet.walletAddress), 32)
-            )
-          )
-        );
       } else if (
         targetChain === CHAIN_ID_XPLA &&
         xplaWallet &&
@@ -221,7 +206,6 @@ function useSyncTargetAddress(shouldFire: boolean, nft?: boolean) {
     solPK,
     targetAsset,
     targetTokenAccountPublicKey,
-    terraWallet,
     nft,
     setTargetAddressHex,
     algoAccounts,

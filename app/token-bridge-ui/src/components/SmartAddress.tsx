@@ -14,15 +14,11 @@ import {
   CHAIN_ID_POLYGON,
   CHAIN_ID_SOLANA,
   CHAIN_ID_ACALA,
-  isTerraChain,
-  CHAIN_ID_TERRA2,
-  TerraChainId,
   CHAIN_ID_XPLA,
   CHAIN_ID_APTOS,
   isValidAptosType,
   CHAIN_ID_ARBITRUM,
   CHAIN_ID_INJECTIVE,
-  terra,
   CHAIN_ID_NEAR,
   CHAIN_ID_BASE,
 } from "@certusone/wormhole-sdk";
@@ -35,7 +31,6 @@ import useCopyToClipboard from "../hooks/useCopyToClipboard";
 import { ParsedTokenAccount } from "../store/transferSlice";
 import { CLUSTER, getExplorerName } from "../utils/consts";
 import { shortenAddress } from "../utils/solana";
-import { formatNativeDenom } from "../utils/terra";
 
 const useStyles = makeStyles((theme) => ({
   mainTypog: {
@@ -96,13 +91,9 @@ export default function SmartAddress({
   isAsset?: boolean;
 }) {
   const classes = useStyles();
-  const isNativeTerra = isTerraChain(chainId) && terra.isNativeDenom(address);
   const useableAddress = parsedTokenAccount?.mintKey || address || "";
-  const useableSymbol = isNativeTerra
-    ? formatNativeDenom(address || "", chainId as TerraChainId)
-    : parsedTokenAccount?.symbol || symbol || "";
-  // const useableLogo = logo || isNativeTerra ? getNativeTerraIcon(useableSymbol) : null
-  const isNative = parsedTokenAccount?.isNativeAsset || isNativeTerra || false;
+  const useableSymbol = parsedTokenAccount?.symbol || symbol || "";
+  const isNative = parsedTokenAccount?.isNativeAsset || false;
   const addressShort = shortenAddress(useableAddress) || "";
 
   const useableName = isNative
@@ -180,14 +171,6 @@ export default function SmartAddress({
           ? "?cluster=custom&customUrl=http%3A%2F%2Flocalhost%3A8899"
           : ""
       }`
-    : chainId === CHAIN_ID_TERRA2
-    ? `https://finder.terra.money/${
-        CLUSTER === "devnet"
-          ? "localterra"
-          : CLUSTER === "testnet"
-          ? "pisco-1"
-          : "phoenix-1"
-      }/address/${useableAddress}`
     : chainId === CHAIN_ID_ALGORAND
     ? `https://${CLUSTER === "testnet" ? "testnet." : ""}algoexplorer.io/${
         isAsset ? "asset" : "address"

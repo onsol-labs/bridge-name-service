@@ -361,14 +361,6 @@ export const selectSolanaTokenMap = (state: RootState) => {
   return state.tokens.solanaTokenMap;
 };
 
-export const selectTerraTokenMap = (state: RootState) => {
-  return state.tokens.terraTokenMap;
-};
-
-export const selectTerraFeeDenom = (state: RootState) => {
-  return state.fee.terraFeeDenom;
-};
-
 export const selectRelayerTokenInfo = (state: RootState) => {
   return state.tokens.relayerTokenInfo;
 };

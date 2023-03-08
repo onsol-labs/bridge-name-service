@@ -20,14 +20,10 @@ import {
   CHAIN_ID_OASIS,
   CHAIN_ID_POLYGON,
   CHAIN_ID_SOLANA,
-  CHAIN_ID_TERRA,
-  CHAIN_ID_TERRA2,
   CHAIN_ID_XPLA,
   coalesceChainName,
   CONTRACTS,
   isEVMChain,
-  isTerraChain,
-  TerraChainId,
 } from "@certusone/wormhole-sdk";
 import { clusterApiUrl } from "@solana/web3.js";
 import { getAddress } from "ethers/lib/utils";
@@ -50,8 +46,6 @@ import neonIcon from "../icons/neon.svg";
 import oasisIcon from "../icons/oasis-network-rose-logo.svg";
 import polygonIcon from "../icons/polygon.svg";
 import solanaIcon from "../icons/solana.svg";
-import terraIcon from "../icons/terra.svg";
-import terra2Icon from "../icons/terra2.svg";
 import xplaIcon from "../icons/xpla.svg";
 import injectiveIcon from "../icons/injective.svg";
 import { AptosNetwork } from "./aptos";
@@ -173,16 +167,6 @@ export const CHAINS: ChainInfo[] =
         logo: solanaIcon,
       },
       {
-        id: CHAIN_ID_TERRA,
-        name: "Terra Classic",
-        logo: terraIcon,
-      },
-      {
-        id: CHAIN_ID_TERRA2,
-        name: "Terra",
-        logo: terra2Icon,
-      },
-      {
         id: CHAIN_ID_XPLA,
         name: "XPLA",
         logo: xplaIcon,
@@ -218,17 +202,7 @@ export const CHAINS: ChainInfo[] =
         id: CHAIN_ID_SOLANA,
         name: "Solana",
         logo: solanaIcon,
-      },
-      {
-        id: CHAIN_ID_TERRA,
-        name: "Terra Classic",
-        logo: terraIcon,
-      },
-      {
-        id: CHAIN_ID_TERRA2,
-        name: "Terra",
-        logo: terra2Icon,
-      },
+      }
     ];
 export const CHAINS_WITH_NFT_SUPPORT = CHAINS.filter(
   ({ id }) =>
@@ -263,43 +237,39 @@ export const getDefaultNativeCurrencySymbol = (chainId: ChainId) =>
       ? "ETH"
       : chainId === CHAIN_ID_BSC
         ? "BNB"
-        : chainId === CHAIN_ID_TERRA
-          ? "LUNC"
-          : chainId === CHAIN_ID_TERRA2
-            ? "LUNA"
-            : chainId === CHAIN_ID_POLYGON
-              ? "MATIC"
-              : chainId === CHAIN_ID_AVAX
-                ? "AVAX"
-                : chainId === CHAIN_ID_OASIS
-                  ? "ROSE"
-                  : chainId === CHAIN_ID_ALGORAND
-                    ? "ALGO"
-                    : chainId === CHAIN_ID_AURORA
-                      ? "ETH"
-                      : chainId === CHAIN_ID_FANTOM
-                        ? "FTM"
-                        : chainId === CHAIN_ID_KARURA
-                          ? "KAR"
-                          : chainId === CHAIN_ID_ACALA
-                            ? "ACA"
-                            : chainId === CHAIN_ID_KLAYTN
-                              ? "KLAY"
-                              : chainId === CHAIN_ID_CELO
-                                ? "CELO"
-                                : chainId === CHAIN_ID_NEON
-                                  ? "NEON"
-                                  : chainId === CHAIN_ID_XPLA
-                                    ? "XPLA"
-                                    : chainId === CHAIN_ID_APTOS
-                                      ? "APTOS"
-                                      : chainId === CHAIN_ID_ARBITRUM
+        : chainId === CHAIN_ID_POLYGON
+          ? "MATIC"
+          : chainId === CHAIN_ID_AVAX
+            ? "AVAX"
+            : chainId === CHAIN_ID_OASIS
+              ? "ROSE"
+              : chainId === CHAIN_ID_ALGORAND
+                ? "ALGO"
+                : chainId === CHAIN_ID_AURORA
+                  ? "ETH"
+                  : chainId === CHAIN_ID_FANTOM
+                    ? "FTM"
+                    : chainId === CHAIN_ID_KARURA
+                      ? "KAR"
+                      : chainId === CHAIN_ID_ACALA
+                        ? "ACA"
+                        : chainId === CHAIN_ID_KLAYTN
+                          ? "KLAY"
+                          : chainId === CHAIN_ID_CELO
+                            ? "CELO"
+                            : chainId === CHAIN_ID_NEON
+                              ? "NEON"
+                              : chainId === CHAIN_ID_XPLA
+                                ? "XPLA"
+                                : chainId === CHAIN_ID_APTOS
+                                  ? "APTOS"
+                                  : chainId === CHAIN_ID_ARBITRUM
+                                    ? "ETH"
+                                    : chainId === CHAIN_ID_MOONBEAM
+                                      ? "GLMR"
+                                      : chainId === CHAIN_ID_BASE
                                         ? "ETH"
-                                        : chainId === CHAIN_ID_MOONBEAM
-                                          ? "GLMR"
-                                          : chainId === CHAIN_ID_BASE
-                                            ? "ETH"
-                                            : "";
+                                        : "";
 
 export const getDefaultNativeCurrencyAddressEvm = (chainId: ChainId) => {
   return chainId === CHAIN_ID_ETH
@@ -336,29 +306,27 @@ export const getExplorerName = (chainId: ChainId) =>
     ? "Etherscan"
     : chainId === CHAIN_ID_BSC
       ? "BscScan"
-      : isTerraChain(chainId)
-        ? "Finder"
-        : chainId === CHAIN_ID_POLYGON
-          ? "Polygonscan"
-          : chainId === CHAIN_ID_AVAX
-            ? "Snowtrace"
-            : chainId === CHAIN_ID_ALGORAND
-              ? "AlgoExplorer"
-              : chainId === CHAIN_ID_FANTOM
-                ? "FTMScan"
-                : chainId === CHAIN_ID_KLAYTN
-                  ? "Klaytnscope"
-                  : chainId === CHAIN_ID_SOLANA
-                    ? "Solscan"
-                    : chainId === CHAIN_ID_XPLA
-                      ? "XPLA Explorer"
-                      : chainId === CHAIN_ID_ARBITRUM
-                        ? "Arbiscan"
-                        : chainId === CHAIN_ID_MOONBEAM
-                          ? "Moonscan"
-                          : chainId === CHAIN_ID_BASE
-                            ? "BaseScan"
-                            : "Explorer";
+      : chainId === CHAIN_ID_POLYGON
+        ? "Polygonscan"
+        : chainId === CHAIN_ID_AVAX
+          ? "Snowtrace"
+          : chainId === CHAIN_ID_ALGORAND
+            ? "AlgoExplorer"
+            : chainId === CHAIN_ID_FANTOM
+              ? "FTMScan"
+              : chainId === CHAIN_ID_KLAYTN
+                ? "Klaytnscope"
+                : chainId === CHAIN_ID_SOLANA
+                  ? "Solscan"
+                  : chainId === CHAIN_ID_XPLA
+                    ? "XPLA Explorer"
+                    : chainId === CHAIN_ID_ARBITRUM
+                      ? "Arbiscan"
+                      : chainId === CHAIN_ID_MOONBEAM
+                        ? "Moonscan"
+                        : chainId === CHAIN_ID_BASE
+                          ? "BaseScan"
+                          : "Explorer";
 export const WORMHOLE_RPC_HOSTS =
   CLUSTER === "testnet"
     ? ["https://wormhole-v2-testnet-api.certus.one"]
@@ -417,29 +385,6 @@ export const SOLANA_HOST = process.env.REACT_APP_SOLANA_API_URL
     ? clusterApiUrl("devnet")
     : "http://localhost:8899";
 
-export const getTerraConfig = (chainId: TerraChainId) => {
-  const isClassic = chainId === CHAIN_ID_TERRA;
-  return CLUSTER === "testnet"
-    ? {
-      URL:
-        chainId === CHAIN_ID_TERRA2
-          ? "https://pisco-lcd.terra.dev"
-          : "https://bombay-lcd.terra.dev",
-      chainID: chainId === CHAIN_ID_TERRA2 ? "pisco-1" : "bombay-12",
-      name: "testnet",
-      isClassic,
-    }
-    : {
-      URL:
-        chainId === CHAIN_ID_TERRA2
-          ? "http://localhost:1318"
-          : "http://localhost:1317",
-      chainID: chainId === CHAIN_ID_TERRA2 ? "phoenix-1" : "columbus-5",
-      name: "localterra",
-      isClassic,
-    };
-};
-
 export const XPLA_LCD_CLIENT_CONFIG = {
   URL: "https://cube-lcd.xpla.dev",
   chainID: "cube_47-5",
@@ -484,8 +429,6 @@ export const SOL_CUSTODY_ADDRESS =
   "GugU1tP7doLeTw9hQP51xRJyS8Da1fWxuiy2rVrnMD2m";
 export const SOL_NFT_CUSTODY_ADDRESS =
   "D63bhHo634eXSj4Jq3xgu2fjB5XKc8DFHzDY9iZk7fv1";
-export const TERRA_TEST_TOKEN_ADDRESS =
-  "terra13nkgqrfymug724h8pprpexqj9h629sa3ncw7sh";
 
 export const ALGORAND_WAIT_FOR_CONFIRMATIONS = CLUSTER === "testnet" ? 4 : 1;
 
@@ -613,9 +556,6 @@ export const BLOCKSCOUT_GET_TOKENS_URL = (
     : "";
 };
 
-export const TERRA_SWAPRATE_URL =
-  "https://fcd.terra.dev/v1/market/swaprate/uusd";
-
 export const WETH_ADDRESS =
   CLUSTER === "testnet"
     ? "0xb4fbf271143f4fbf7b91a5ded31805e42b2208d6"
@@ -696,9 +636,6 @@ export const WGLMR_DECIMALS = 18;
 
 export const ALGO_DECIMALS = 6;
 
-export const TERRA_TOKEN_METADATA_URL =
-  "https://assets.terra.money/cw20/tokens.json";
-
 // hardcoded addresses for warnings
 export const SOLANA_TOKENS_THAT_EXIST_ELSEWHERE = [
   "SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt", //  SRM
@@ -738,22 +675,7 @@ export const BSC_MARKET_WARNINGS = [
 export const MIGRATION_PROGRAM_ADDRESS =
   CLUSTER === "testnet" ? "" : "Ex9bCdVMSfx7EzB3pgSi2R4UHwJAXvTw18rBQm5YQ8gK";
 
-export const SUPPORTED_TERRA_TOKENS = ["uluna", "uusd"];
-export const TERRA_DEFAULT_FEE_DENOM = SUPPORTED_TERRA_TOKENS[0];
-
 export const XPLA_NATIVE_DENOM = "axpla";
-
-export const getTerraFCDBaseUrl = (chainId: TerraChainId) =>
-  CLUSTER === "testnet"
-    ? chainId === CHAIN_ID_TERRA2
-      ? "https://pisco-fcd.terra.dev"
-      : "https://bombay-fcd.terra.dev"
-    : chainId === CHAIN_ID_TERRA2
-      ? "http://localhost:3061"
-      : "http://localhost:3060";
-
-export const getTerraGasPricesUrl = (chainId: TerraChainId) =>
-  `${getTerraFCDBaseUrl(chainId)}/v1/txs/gas_prices`;
 
 export const nearKeyStore = new keyStores.BrowserLocalStorageKeyStore();
 
@@ -787,8 +709,6 @@ export const SOLANA_SYSTEM_PROGRAM_ADDRESS = "11111111111111111111111111111111";
 export const getHowToAddTokensToWalletUrl = (chainId: ChainId) => {
   if (isEVMChain(chainId)) {
     return "https://docs.wormhole.com/wormhole/video-tutorial-how-to-manually-add-tokens-to-your-wallet#metamask";
-  } else if (isTerraChain(chainId)) {
-    return "https://docs.wormhole.com/wormhole/video-tutorial-how-to-manually-add-tokens-to-your-wallet#terra-station";
   }
   return "";
 };
@@ -796,8 +716,6 @@ export const getHowToAddTokensToWalletUrl = (chainId: ChainId) => {
 export const getHowToAddToTokenListUrl = (chainId: ChainId) => {
   if (chainId === CHAIN_ID_SOLANA) {
     return "https://github.com/solana-labs/token-list";
-  } else if (isTerraChain(chainId)) {
-    return "https://github.com/terra-money/assets";
   }
   return "";
 };
@@ -823,16 +741,12 @@ export const getIsTransferDisabled = (
       : !!disableTransfers;
 };
 
-export const LUNA_ADDRESS = "uluna";
-export const UST_ADDRESS = "uusd";
-
 export type RelayerCompareAsset = {
   [key in ChainId]: string;
 };
 export const RELAYER_COMPARE_ASSET: RelayerCompareAsset = {
   [CHAIN_ID_SOLANA]: "solana",
   [CHAIN_ID_ETH]: "ethereum",
-  [CHAIN_ID_TERRA]: "terra-luna",
   [CHAIN_ID_BSC]: "binancecoin",
   [CHAIN_ID_POLYGON]: "matic-network",
   [CHAIN_ID_AVAX]: "avalanche-2",

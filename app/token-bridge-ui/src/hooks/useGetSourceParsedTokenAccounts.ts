@@ -21,7 +21,6 @@ import {
   CHAIN_ID_XPLA,
   ethers_contracts,
   isEVMChain,
-  isTerraChain,
   WSOL_ADDRESS,
   WSOL_DECIMALS,
 } from "@certusone/wormhole-sdk";
@@ -1652,10 +1651,6 @@ function useGetAvailableTokens(nft: boolean = false) {
           error: covalentError,
           receivedAt: null, //TODO
         },
-        resetAccounts: resetSourceAccounts,
-      }
-    : isTerraChain(lookupChain)
-    ? {
         resetAccounts: resetSourceAccounts,
       }
     : lookupChain === CHAIN_ID_XPLA

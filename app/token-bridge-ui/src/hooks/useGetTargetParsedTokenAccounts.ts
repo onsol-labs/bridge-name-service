@@ -10,13 +10,9 @@ import {
   isEVMChain,
   isNativeDenomInjective,
   isNativeDenomXpla,
-  isTerraChain,
   parseSmartContractStateResponse,
-  terra,
 } from "@certusone/wormhole-sdk";
 import { Connection, PublicKey } from "@solana/web3.js";
-import { LCDClient } from "@terra-money/terra.js";
-import { useConnectedWallet } from "@terra-money/wallet-provider";
 import { useConnectedWallet as useXplaConnectedWallet } from "@xpla/wallet-provider";
 import { LCDClient as XplaLCDClient } from "@xpla/xpla.js";
 import { Algodv2 } from "algosdk";
@@ -37,7 +33,6 @@ import { getAptosClient } from "../utils/aptos";
 import {
   ALGORAND_HOST,
   getEvmChainId,
-  getTerraConfig,
   SOLANA_HOST,
   XPLA_LCD_CLIENT_CONFIG,
   NATIVE_NEAR_PLACEHOLDER,
@@ -48,7 +43,6 @@ import {
   getInjectiveWasmClient,
   NATIVE_INJECTIVE_DECIMALS,
 } from "../utils/injective";
-import { NATIVE_TERRA_DECIMALS } from "../utils/terra";
 import { NATIVE_XPLA_DECIMALS } from "../utils/xpla";
 import { createParsedTokenAccount } from "./useGetSourceParsedTokenAccounts";
 import useMetadata from "./useMetadata";
@@ -76,7 +70,6 @@ function useGetTargetParsedTokenAccounts() {
     (targetAsset && metadata.data?.get(targetAsset)?.decimals) || undefined;
   const solanaWallet = useSolanaWallet();
   const solPK = solanaWallet?.publicKey;
-  const terraWallet = useConnectedWallet();
   const {
     provider,
     signerAddress,
@@ -97,76 +90,6 @@ function useGetTargetParsedTokenAccounts() {
       return;
     }
     let cancelled = false;
-
-    if (isTerraChain(targetChain) && terraWallet) {
-      const lcd = new LCDClient(getTerraConfig(targetChain));
-      if (terra.isNativeDenom(targetAsset)) {
-        lcd.bank
-          .balance(terraWallet.walletAddress)
-          .then(([coins]) => {
-            const balance = coins.get(targetAsset)?.amount?.toString();
-            if (balance && !cancelled) {
-              dispatch(
-                setTargetParsedTokenAccount(
-                  createParsedTokenAccount(
-                    "",
-                    "",
-                    balance,
-                    NATIVE_TERRA_DECIMALS,
-                    Number(formatUnits(balance, NATIVE_TERRA_DECIMALS)),
-                    formatUnits(balance, NATIVE_TERRA_DECIMALS),
-                    symbol,
-                    tokenName,
-                    logo
-                  )
-                )
-              );
-            }
-          })
-          .catch(() => {
-            if (!cancelled) {
-              // TODO: error state
-            }
-          });
-      } else {
-        lcd.wasm
-          .contractQuery(targetAsset, {
-            token_info: {},
-          })
-          .then((info: any) =>
-            lcd.wasm
-              .contractQuery(targetAsset, {
-                balance: {
-                  address: terraWallet.walletAddress,
-                },
-              })
-              .then((balance: any) => {
-                if (balance && info && !cancelled) {
-                  dispatch(
-                    setTargetParsedTokenAccount(
-                      createParsedTokenAccount(
-                        "",
-                        "",
-                        balance.balance.toString(),
-                        info.decimals,
-                        Number(formatUnits(balance.balance, info.decimals)),
-                        formatUnits(balance.balance, info.decimals),
-                        symbol,
-                        tokenName,
-                        logo
-                      )
-                    )
-                  );
-                }
-              })
-          )
-          .catch(() => {
-            if (!cancelled) {
-              // TODO: error state
-            }
-          });
-      }
-    }
 
     if (targetChain === CHAIN_ID_XPLA && xplaWallet) {
       const lcd = new XplaLCDClient(XPLA_LCD_CLIENT_CONFIG);
@@ -601,7 +524,6 @@ function useGetTargetParsedTokenAccounts() {
     signerAddress,
     solanaWallet,
     solPK,
-    terraWallet,
     hasCorrectEvmNetwork,
     hasResolvedMetadata,
     symbol,

@@ -11,7 +11,6 @@ import { EthereumProviderProvider } from "./contexts/EthereumProviderContext";
 import InjectiveWalletProvider from "./contexts/InjectiveWalletContext";
 import { NearContextProvider } from "./contexts/NearWalletContext";
 import { SolanaWalletProvider } from "./contexts/SolanaWalletContext.tsx";
-import { TerraWalletProvider } from "./contexts/TerraWalletContext.tsx";
 import XplaWalletProvider from "./contexts/XplaWalletContext";
 import ErrorBoundary from "./ErrorBoundary";
 import { theme } from "./muiTheme";
@@ -26,21 +25,19 @@ ReactDOM.render(
           <SnackbarProvider maxSnack={3}>
             <SolanaWalletProvider>
               <EthereumProviderProvider>
-                <TerraWalletProvider>
-                  <AlgorandContextProvider>
-                    <XplaWalletProvider>
-                      <AptosWalletProvider>
-                        <InjectiveWalletProvider>
-                          <NearContextProvider>
-                            <HashRouter>
-                              <App />
-                            </HashRouter>
-                          </NearContextProvider>
-                        </InjectiveWalletProvider>
-                      </AptosWalletProvider>
-                    </XplaWalletProvider>
-                  </AlgorandContextProvider>
-                </TerraWalletProvider>
+                <AlgorandContextProvider>
+                  <XplaWalletProvider>
+                    <AptosWalletProvider>
+                      <InjectiveWalletProvider>
+                        <NearContextProvider>
+                          <HashRouter>
+                            <App />
+                          </HashRouter>
+                        </NearContextProvider>
+                      </InjectiveWalletProvider>
+                    </AptosWalletProvider>
+                  </XplaWalletProvider>
+                </AlgorandContextProvider>
               </EthereumProviderProvider>
             </SolanaWalletProvider>
           </SnackbarProvider>

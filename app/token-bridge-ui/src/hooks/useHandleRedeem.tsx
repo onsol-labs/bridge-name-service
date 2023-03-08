@@ -8,7 +8,6 @@ import {
   CHAIN_ID_SOLANA,
   CHAIN_ID_XPLA,
   isEVMChain,
-  isTerraChain,
   postVaaSolanaWithRetry,
   redeemAndUnwrapOnSolana,
   redeemOnAlgorand,
@@ -17,9 +16,7 @@ import {
   redeemOnInjective,
   redeemOnNear,
   redeemOnSolana,
-  redeemOnTerra,
   redeemOnXpla,
-  TerraChainId,
   uint8ArrayToHex,
 } from "@certusone/wormhole-sdk";
 import { completeTransferAndRegister } from "@certusone/wormhole-sdk/lib/esm/aptos/api/tokenBridge";
@@ -28,10 +25,6 @@ import { Alert } from "@material-ui/lab";
 import { Wallet } from "@near-wallet-selector/core";
 import { WalletContextState } from "@solana/wallet-adapter-react";
 import { Connection } from "@solana/web3.js";
-import {
-  ConnectedWallet,
-  useConnectedWallet,
-} from "@terra-money/wallet-provider";
 import {
   ConnectedWallet as XplaConnectedWallet,
   useConnectedWallet as useXplaConnectedWallet,
@@ -50,7 +43,6 @@ import { useInjectiveContext } from "../contexts/InjectiveWalletContext";
 import { useNearContext } from "../contexts/NearWalletContext";
 import { useSolanaWallet } from "../contexts/SolanaWalletContext";
 import {
-  selectTerraFeeDenom,
   selectTransferIsRedeeming,
   selectTransferTargetChain,
 } from "../store/selectors";
@@ -80,7 +72,6 @@ import {
 } from "../utils/near";
 import parseError from "../utils/parseError";
 import { signSendAndConfirm } from "../utils/solana";
-import { postWithFees } from "../utils/terra";
 import { postWithFeesXpla } from "../utils/xpla";
 import useTransferSignedVAA from "./useTransferSignedVAA";
 
@@ -175,17 +166,17 @@ async function evm(
         : {};
     const receipt = isNative
       ? await redeemOnEthNative(
-          getTokenBridgeAddressForChain(chainId),
-          signer,
-          signedVAA,
-          overrides
-        )
+        getTokenBridgeAddressForChain(chainId),
+        signer,
+        signedVAA,
+        overrides
+      )
       : await redeemOnEth(
-          getTokenBridgeAddressForChain(chainId),
-          signer,
-          signedVAA,
-          overrides
-        );
+        getTokenBridgeAddressForChain(chainId),
+        signer,
+        signedVAA,
+        overrides
+      );
     dispatch(
       setRedeemTx({ id: receipt.transactionHash, block: receipt.blockNumber })
     );
@@ -259,58 +250,22 @@ async function solana(
     // TODO: how do we retry in between these steps
     const transaction = isNative
       ? await redeemAndUnwrapOnSolana(
-          connection,
-          SOL_BRIDGE_ADDRESS,
-          SOL_TOKEN_BRIDGE_ADDRESS,
-          payerAddress,
-          signedVAA
-        )
+        connection,
+        SOL_BRIDGE_ADDRESS,
+        SOL_TOKEN_BRIDGE_ADDRESS,
+        payerAddress,
+        signedVAA
+      )
       : await redeemOnSolana(
-          connection,
-          SOL_BRIDGE_ADDRESS,
-          SOL_TOKEN_BRIDGE_ADDRESS,
-          payerAddress,
-          signedVAA
-        );
+        connection,
+        SOL_BRIDGE_ADDRESS,
+        SOL_TOKEN_BRIDGE_ADDRESS,
+        payerAddress,
+        signedVAA
+      );
     const txid = await signSendAndConfirm(wallet, connection, transaction);
     // TODO: didn't want to make an info call we didn't need, can we get the block without it by modifying the above call?
     dispatch(setRedeemTx({ id: txid, block: 1 }));
-    enqueueSnackbar(null, {
-      content: <Alert severity="success">Transaction confirmed</Alert>,
-    });
-  } catch (e) {
-    enqueueSnackbar(null, {
-      content: <Alert severity="error">{parseError(e)}</Alert>,
-    });
-    dispatch(setIsRedeeming(false));
-  }
-}
-
-async function terra(
-  dispatch: any,
-  enqueueSnackbar: any,
-  wallet: ConnectedWallet,
-  signedVAA: Uint8Array,
-  feeDenom: string,
-  chainId: TerraChainId
-) {
-  dispatch(setIsRedeeming(true));
-  try {
-    const msg = await redeemOnTerra(
-      getTokenBridgeAddressForChain(chainId),
-      wallet.terraAddress,
-      signedVAA
-    );
-    const result = await postWithFees(
-      wallet,
-      [msg],
-      "Wormhole - Complete Transfer",
-      [feeDenom],
-      chainId
-    );
-    dispatch(
-      setRedeemTx({ id: result.result.txhash, block: result.result.height })
-    );
     enqueueSnackbar(null, {
       content: <Alert severity="success">Transaction confirmed</Alert>,
     });
@@ -393,8 +348,6 @@ export function useHandleRedeem() {
   const solanaWallet = useSolanaWallet();
   const solPK = solanaWallet?.publicKey;
   const { signer } = useEthereumProvider();
-  const terraWallet = useConnectedWallet();
-  const terraFeeDenom = useSelector(selectTerraFeeDenom);
   const xplaWallet = useXplaConnectedWallet();
   const { accounts: algoAccounts } = useAlgorandContext();
   const { account: aptosAccount, signAndSubmitTransaction } = useAptosContext();
@@ -419,15 +372,6 @@ export function useHandleRedeem() {
         solPK.toString(),
         signedVAA,
         false
-      );
-    } else if (isTerraChain(targetChain) && !!terraWallet && signedVAA) {
-      terra(
-        dispatch,
-        enqueueSnackbar,
-        terraWallet,
-        signedVAA,
-        terraFeeDenom,
-        targetChain
       );
     } else if (targetChain === CHAIN_ID_XPLA && !!xplaWallet && signedVAA) {
       xpla(dispatch, enqueueSnackbar, xplaWallet, signedVAA);
@@ -463,8 +407,6 @@ export function useHandleRedeem() {
     signedVAA,
     solanaWallet,
     solPK,
-    terraWallet,
-    terraFeeDenom,
     algoAccounts,
     xplaWallet,
     aptosAddress,
@@ -492,15 +434,6 @@ export function useHandleRedeem() {
         signedVAA,
         true
       );
-    } else if (isTerraChain(targetChain) && !!terraWallet && signedVAA) {
-      terra(
-        dispatch,
-        enqueueSnackbar,
-        terraWallet,
-        signedVAA,
-        terraFeeDenom,
-        targetChain
-      ); //TODO isNative = true
     } else if (
       targetChain === CHAIN_ID_ALGORAND &&
       algoAccounts[0] &&
@@ -523,8 +456,6 @@ export function useHandleRedeem() {
     signedVAA,
     solanaWallet,
     solPK,
-    terraWallet,
-    terraFeeDenom,
     algoAccounts,
     injWallet,
     injAddress,

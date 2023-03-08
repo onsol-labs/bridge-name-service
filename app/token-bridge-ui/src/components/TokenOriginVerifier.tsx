@@ -3,7 +3,6 @@ import {
   CHAIN_ID_ETH,
   CHAIN_ID_NEAR,
   CHAIN_ID_SOLANA,
-  CHAIN_ID_TERRA2,
   isEVMChain,
   nativeToHexString,
 } from "@certusone/wormhole-sdk";
@@ -151,7 +150,6 @@ function SecondaryAssetInformation({
         originChain={originAssetInfo?.originChain || undefined}
         originAsset={
           // use pre-image for these
-          originAssetInfo?.originChain === CHAIN_ID_TERRA2 ||
           originAssetInfo?.originChain === CHAIN_ID_NEAR
             ? originAssetInfo?.originAddress || undefined
             : nativeToHexString(
@@ -161,7 +159,6 @@ function SecondaryAssetInformation({
         }
         forceAsset={
           // use pre-image for these
-          originAssetInfo?.originChain === CHAIN_ID_TERRA2 ||
           originAssetInfo?.originChain === CHAIN_ID_NEAR
             ? originAssetInfo?.originAddress || undefined
             : undefined

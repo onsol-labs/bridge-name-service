@@ -7,33 +7,28 @@ import {
   CHAIN_ID_KARURA,
   CHAIN_ID_NEAR,
   CHAIN_ID_SOLANA,
-  CHAIN_ID_TERRA2,
   CHAIN_ID_XPLA,
   getEmitterAddressAlgorand,
   getEmitterAddressEth,
   getEmitterAddressInjective,
   getEmitterAddressNear,
   getEmitterAddressSolana,
-  getEmitterAddressTerra,
   getEmitterAddressXpla,
   hexToNativeAssetString,
   hexToNativeString,
   hexToUint8Array,
   isEVMChain,
-  isTerraChain,
   parseNFTPayload,
   parseSequenceFromLogAlgorand,
   parseSequenceFromLogEth,
   parseSequenceFromLogInjective,
   parseSequenceFromLogNear,
   parseSequenceFromLogSolana,
-  parseSequenceFromLogTerra,
   parseSequenceFromLogXpla,
   parseTransferPayload,
   parseVaa,
   queryExternalId,
   queryExternalIdInjective,
-  TerraChainId,
   tryHexToNativeStringNear,
   uint8ArrayToHex,
 } from "@certusone/wormhole-sdk";
@@ -54,7 +49,6 @@ import {
 import { ExpandMore } from "@material-ui/icons";
 import { Alert } from "@material-ui/lab";
 import { Connection } from "@solana/web3.js";
-import { LCDClient } from "@terra-money/terra.js";
 import { LCDClient as XplaLCDClient } from "@xpla/xpla.js";
 import algosdk from "algosdk";
 import { Types } from "aptos";
@@ -84,7 +78,6 @@ import {
   CHAINS_WITH_NFT_SUPPORT,
   getBridgeAddressForChain,
   getNFTBridgeAddressForChain,
-  getTerraConfig,
   getTokenBridgeAddressForChain,
   RELAY_URL_EXTENSION,
   SOLANA_HOST,
@@ -261,23 +254,6 @@ async function solana(tx: string, enqueueSnackbar: any, nft: boolean) {
   }
 }
 
-async function terra(tx: string, enqueueSnackbar: any, chainId: TerraChainId) {
-  try {
-    const lcd = new LCDClient(getTerraConfig(chainId));
-    const info = await lcd.tx.txInfo(tx);
-    const sequence = parseSequenceFromLogTerra(info);
-    if (!sequence) {
-      throw new Error("Sequence not found");
-    }
-    const emitterAddress = await getEmitterAddressTerra(
-      getTokenBridgeAddressForChain(chainId)
-    );
-    return await fetchSignedVAA(chainId, emitterAddress, sequence);
-  } catch (e) {
-    return handleError(e, enqueueSnackbar);
-  }
-}
-
 async function xpla(tx: string, enqueueSnackbar: any) {
   try {
     const lcd = new XplaLCDClient(XPLA_LCD_CLIENT_CONFIG);
@@ -358,10 +334,10 @@ function RelayerRecovery({
     axios
       .get(
         selectedRelayer.url +
-          RELAY_URL_EXTENSION +
-          encodeURIComponent(
-            Buffer.from(hexToUint8Array(signedVaa)).toString("base64")
-          )
+        RELAY_URL_EXTENSION +
+        encodeURIComponent(
+          Buffer.from(hexToUint8Array(signedVaa)).toString("base64")
+        )
       )
       .then(
         () => {
@@ -476,11 +452,11 @@ export default function Recovery() {
       return recoveryParsedVAA?.payload
         ? isNFT
           ? parseNFTPayload(
-              Buffer.from(new Uint8Array(recoveryParsedVAA.payload))
-            )
+            Buffer.from(new Uint8Array(recoveryParsedVAA.payload))
+          )
           : parseTransferPayload(
-              Buffer.from(new Uint8Array(recoveryParsedVAA.payload))
-            )
+            Buffer.from(new Uint8Array(recoveryParsedVAA.payload))
+          )
         : null;
     } catch (e) {
       console.error(e);
@@ -492,14 +468,10 @@ export default function Recovery() {
     let cancelled = false;
     if (
       parsedPayload &&
-      (parsedPayload.targetChain === CHAIN_ID_TERRA2 ||
-        parsedPayload.targetChain === CHAIN_ID_XPLA)
+      ( parsedPayload.targetChain === CHAIN_ID_XPLA)
     ) {
       (async () => {
-        const lcd =
-          parsedPayload.targetChain === CHAIN_ID_TERRA2
-            ? new LCDClient(getTerraConfig(CHAIN_ID_TERRA2))
-            : new XplaLCDClient(XPLA_LCD_CLIENT_CONFIG);
+        const lcd = new XplaLCDClient(XPLA_LCD_CLIENT_CONFIG);
         const tokenBridgeAddress = getTokenBridgeAddressForChain(
           parsedPayload.targetChain as ChainId
         );
@@ -606,27 +578,6 @@ export default function Recovery() {
             recoverySourceTx,
             enqueueSnackbar,
             isNFT
-          );
-          if (!cancelled) {
-            setRecoverySourceTxIsLoading(false);
-            if (vaa) {
-              setRecoverySignedVAA(vaa);
-            }
-            if (error) {
-              setRecoverySourceTxError(error);
-            }
-            setIsVAAPending(isPending);
-          }
-        })();
-      } else if (isTerraChain(recoverySourceChain)) {
-        setRecoverySourceTxError("");
-        setRecoverySourceTxIsLoading(true);
-        setTokenId("");
-        (async () => {
-          const { vaa, isPending, error } = await terra(
-            recoverySourceTx,
-            enqueueSnackbar,
-            recoverySourceChain
           );
           if (!cancelled) {
             setRecoverySourceTxIsLoading(false);
@@ -755,7 +706,7 @@ export default function Recovery() {
   const handleTypeChange = useCallback((event) => {
     setRecoverySourceChain((prevChain) =>
       event.target.value === "NFT" &&
-      !CHAINS_WITH_NFT_SUPPORT.find((chain) => chain.id === prevChain)
+        !CHAINS_WITH_NFT_SUPPORT.find((chain) => chain.id === prevChain)
         ? CHAIN_ID_SOLANA
         : prevChain
     );
@@ -1030,15 +981,14 @@ export default function Recovery() {
                   disabled
                   value={
                     parsedPayload
-                      ? parsedPayload.targetChain === CHAIN_ID_TERRA2 ||
-                        parsedPayload.targetChain === CHAIN_ID_XPLA ||
+                      ? parsedPayload.targetChain === CHAIN_ID_XPLA ||
                         parsedPayload.targetChain === CHAIN_ID_INJECTIVE ||
                         parsedPayload.targetChain === CHAIN_ID_NEAR
                         ? tokenId
                         : hexToNativeAssetString(
-                            parsedPayload.originAddress,
-                            parsedPayload.originChain as ChainId
-                          ) || ""
+                          parsedPayload.originAddress,
+                          parsedPayload.originChain as ChainId
+                        ) || ""
                       : ""
                   }
                   fullWidth

@@ -5,11 +5,8 @@ import {
   CHAIN_ID_INJECTIVE,
   CHAIN_ID_NEAR,
   CHAIN_ID_SOLANA,
-  CHAIN_ID_TERRA2,
   CHAIN_ID_XPLA,
   isEVMChain,
-  isTerraChain,
-  TerraChainId,
 } from "@certusone/wormhole-sdk";
 import { TokenInfo } from "@solana/spl-token-registry";
 import { useMemo } from "react";
@@ -24,8 +21,6 @@ import useInjectiveMetadata, {
 import useMetaplexData from "./useMetaplexData";
 import useNearMetadata from "./useNearMetadata";
 import useSolanaTokenMap from "./useSolanaTokenMap";
-import useTerraMetadata, { TerraMetadata } from "./useTerraMetadata";
-import useTerraTokenMap, { TerraTokenMap } from "./useTerraTokenMap";
 import useXplaMetadata, { XplaMetadata } from "./useXplaMetadata";
 
 export type GenericMetadata = {
@@ -56,39 +51,6 @@ const constructSolanaMetadata = (
       tokenName: metaplex?.data?.name || tokenInfo?.name || undefined,
       decimals: tokenInfo?.decimals || undefined, //TODO decimals are actually on the mint, not the metaplex account.
       raw: metaplex,
-    };
-    data.set(address, obj);
-  });
-
-  return {
-    isFetching,
-    error,
-    receivedAt,
-    data,
-  };
-};
-
-const constructTerraMetadata = (
-  addresses: string[],
-  tokenMap: DataWrapper<TerraTokenMap>,
-  terraMetadata: DataWrapper<Map<string, TerraMetadata>>,
-  chainId: TerraChainId
-) => {
-  const isFetching = tokenMap.isFetching || terraMetadata.isFetching;
-  const error = tokenMap.error || terraMetadata.error;
-  const receivedAt = tokenMap.receivedAt && terraMetadata.receivedAt;
-  const data = new Map<string, GenericMetadata>();
-  addresses.forEach((address) => {
-    const metadata = terraMetadata.data?.get(address);
-    const tokenInfo =
-      chainId === CHAIN_ID_TERRA2
-        ? tokenMap.data?.mainnet[address]
-        : tokenMap.data?.classic[address];
-    const obj = {
-      symbol: tokenInfo?.symbol || metadata?.symbol || undefined,
-      logo: tokenInfo?.icon || metadata?.logo || undefined,
-      tokenName: tokenInfo?.name || metadata?.tokenName || undefined,
-      decimals: metadata?.decimals || undefined,
     };
     data.set(address, obj);
   });
@@ -240,14 +202,10 @@ export default function useMetadata(
   chainId: ChainId,
   addresses: string[]
 ): DataWrapper<Map<string, GenericMetadata>> {
-  const terraTokenMap = useTerraTokenMap(isTerraChain(chainId));
   const solanaTokenMap = useSolanaTokenMap();
 
   const solanaAddresses = useMemo(() => {
     return chainId === CHAIN_ID_SOLANA ? addresses : [];
-  }, [chainId, addresses]);
-  const terraAddresses = useMemo(() => {
-    return isTerraChain(chainId) ? addresses : [];
   }, [chainId, addresses]);
   const xplaAddresses = useMemo(() => {
     return chainId === CHAIN_ID_XPLA ? addresses : [];
@@ -269,10 +227,6 @@ export default function useMetadata(
   }, [chainId, addresses]);
 
   const metaplexData = useMetaplexData(solanaAddresses);
-  const terraMetadata = useTerraMetadata(
-    terraAddresses,
-    chainId as TerraChainId
-  );
   const xplaMetadata = useXplaMetadata(xplaAddresses);
   const ethMetadata = useEvmMetadata(ethereumAddresses, chainId);
   const algoMetadata = useAlgoMetadata(algoAddresses);
@@ -286,13 +240,6 @@ export default function useMetadata(
         ? constructSolanaMetadata(solanaAddresses, solanaTokenMap, metaplexData)
         : isEVMChain(chainId)
         ? constructEthMetadata(ethereumAddresses, ethMetadata)
-        : isTerraChain(chainId)
-        ? constructTerraMetadata(
-            terraAddresses,
-            terraTokenMap,
-            terraMetadata,
-            chainId
-          )
         : chainId === CHAIN_ID_XPLA
         ? constructXplaMetadata(xplaAddresses, xplaMetadata)
         : chainId === CHAIN_ID_APTOS
@@ -311,9 +258,6 @@ export default function useMetadata(
       metaplexData,
       ethereumAddresses,
       ethMetadata,
-      terraAddresses,
-      terraTokenMap,
-      terraMetadata,
       xplaAddresses,
       xplaMetadata,
       algoAddresses,

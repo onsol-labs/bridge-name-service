@@ -7,10 +7,8 @@ import {
   CHAIN_ID_SOLANA,
   CHAIN_ID_XPLA,
   isEVMChain,
-  isTerraChain,
 } from "@certusone/wormhole-sdk";
 import { hexlify, hexStripZeros } from "@ethersproject/bytes";
-import { useConnectedWallet } from "@terra-money/wallet-provider";
 import { useConnectedWallet as useXplaConnectedWallet } from "@xpla/wallet-provider";
 import { useCallback, useMemo } from "react";
 import { useAlgorandContext } from "../contexts/AlgorandWalletContext";
@@ -52,8 +50,6 @@ function useIsWalletReady(
   const autoSwitch = enableNetworkAutoswitch;
   const solanaWallet = useSolanaWallet();
   const solPK = solanaWallet?.publicKey;
-  const terraWallet = useConnectedWallet();
-  const hasTerraWallet = !!terraWallet;
   const {
     provider,
     signerAddress,
@@ -122,15 +118,6 @@ function useIsWalletReady(
   }, [provider, correctEvmNetwork, chainId, connectType, disconnect]);
 
   return useMemo(() => {
-    if (isTerraChain(chainId) && hasTerraWallet && terraWallet?.walletAddress) {
-      // TODO: terraWallet does not update on wallet changes
-      return createWalletStatus(
-        true,
-        undefined,
-        forceNetworkSwitch,
-        terraWallet.walletAddress
-      );
-    }
     if (chainId === CHAIN_ID_SOLANA && solPK) {
       return createWalletStatus(
         true,
@@ -213,14 +200,12 @@ function useIsWalletReady(
     chainId,
     autoSwitch,
     forceNetworkSwitch,
-    hasTerraWallet,
     solPK,
     hasEthInfo,
     correctEvmNetwork,
     hasCorrectEvmNetwork,
     provider,
     signerAddress,
-    terraWallet,
     algoPK,
     xplaWallet,
     hasXplaWallet,

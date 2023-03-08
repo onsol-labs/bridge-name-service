@@ -14,7 +14,6 @@ import {
   getOriginalAssetNear,
   getOriginalAssetSol,
   isEVMChain,
-  isTerraChain,
   uint8ArrayToHex,
   WormholeWrappedInfo,
 } from "@certusone/wormhole-sdk";
@@ -23,7 +22,6 @@ import {
   getOriginalAssetSol as getOriginalAssetSolNFT,
 } from "@certusone/wormhole-sdk/lib/esm/nft_bridge";
 import { Connection } from "@solana/web3.js";
-import { LCDClient } from "@terra-money/terra.js";
 import { Algodv2 } from "algosdk";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -44,7 +42,6 @@ import {
   ALGORAND_HOST,
   ALGORAND_TOKEN_BRIDGE_ID,
   getNFTBridgeAddressForChain,
-  getTerraConfig,
   getTokenBridgeAddressForChain,
   NATIVE_NEAR_PLACEHOLDER,
   NEAR_TOKEN_BRIDGE_ACCOUNT,
@@ -138,17 +135,6 @@ function useCheckIfWormholeWrapped(nft?: boolean) {
                   SOL_TOKEN_BRIDGE_ADDRESS,
                   sourceAsset
                 ))
-          );
-          if (!cancelled) {
-            dispatch(setSourceWormholeWrappedInfo(wrappedInfo));
-          }
-        } catch (e) {}
-      }
-      if (isTerraChain(sourceChain) && sourceAsset) {
-        try {
-          const lcd = new LCDClient(getTerraConfig(sourceChain));
-          const wrappedInfo = makeStateSafe(
-            await getOriginalAssetCosmWasm(lcd, sourceAsset, sourceChain)
           );
           if (!cancelled) {
             dispatch(setSourceWormholeWrappedInfo(wrappedInfo));
