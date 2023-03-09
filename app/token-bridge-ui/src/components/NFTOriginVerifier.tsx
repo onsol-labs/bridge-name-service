@@ -1,7 +1,6 @@
 import {
   ChainId,
   CHAIN_ID_ETH,
-  CHAIN_ID_FANTOM,
   CHAIN_ID_OASIS,
   CHAIN_ID_POLYGON,
   CHAIN_ID_SOLANA,
@@ -314,17 +313,6 @@ export default function NFTOriginVerifier() {
                     variant="outlined"
                   >
                     View on OpenSea
-                  </Button>
-                ) : originInfo.chainId === CHAIN_ID_FANTOM ? (
-                  <Button
-                    href={`https://ftmscan.com/token/${readableAddress}?a=${originInfo.tokenId}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    startIcon={<Launch />}
-                    className={classes.viewButton}
-                    variant="outlined"
-                  >
-                    View on FTMScan
                   </Button>
                 ) : originInfo.chainId === CHAIN_ID_OASIS ? null : (
                   <Button

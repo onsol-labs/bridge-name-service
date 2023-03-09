@@ -1,6 +1,5 @@
 import {
   CHAIN_ID_ETH,
-  CHAIN_ID_FANTOM,
   CHAIN_ID_NEON,
   CHAIN_ID_OASIS,
   CHAIN_ID_POLYGON,
@@ -21,7 +20,6 @@ import { useCallback, useEffect, useState } from "react";
 import { useEthereumProvider } from "../contexts/EthereumProviderContext";
 import useIsWalletReady from "../hooks/useIsWalletReady";
 import ethIcon from "../icons/eth.svg";
-import fantomIcon from "../icons/fantom.svg";
 import neonIcon from "../icons/neon.svg";
 import oasisIcon from "../icons/oasis-network-rose-logo.svg";
 import polygonIcon from "../icons/polygon.svg";
@@ -35,8 +33,6 @@ import {
 import {
   WETH_ADDRESS,
   WETH_DECIMALS,
-  WFTM_ADDRESS,
-  WFTM_DECIMALS,
   WMATIC_ADDRESS,
   WMATIC_DECIMALS,
   WNEON_ADDRESS,
@@ -99,12 +95,6 @@ const supportedTokens = {
     icon: oasisIcon,
     address: WROSE_ADDRESS,
     decimals: WROSE_DECIMALS,
-  },
-  [CHAIN_ID_FANTOM]: {
-    symbol: "WFTM",
-    icon: fantomIcon,
-    address: WFTM_ADDRESS,
-    decimals: WFTM_DECIMALS,
   },
   [CHAIN_ID_NEON]: {
     symbol: "WNEON",

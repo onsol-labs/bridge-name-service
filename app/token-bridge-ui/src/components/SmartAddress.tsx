@@ -1,7 +1,6 @@
 import {
   ChainId,
   CHAIN_ID_ETH,
-  CHAIN_ID_FANTOM,
   CHAIN_ID_MOONBEAM,
   CHAIN_ID_OASIS,
   CHAIN_ID_POLYGON,
@@ -106,10 +105,6 @@ export default function SmartAddress({
     ? `https://${
         CLUSTER === "testnet" ? "testnet." : ""
       }explorer.emerald.oasis.dev/${
-        isAsset ? "token" : "address"
-      }/${useableAddress}`
-    : chainId === CHAIN_ID_FANTOM
-    ? `https://${CLUSTER === "testnet" ? "testnet." : ""}ftmscan.com/${
         isAsset ? "token" : "address"
       }/${useableAddress}`
     : chainId === CHAIN_ID_MOONBEAM

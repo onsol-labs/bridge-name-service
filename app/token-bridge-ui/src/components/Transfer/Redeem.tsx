@@ -1,6 +1,5 @@
 import {
   CHAIN_ID_ETH,
-  CHAIN_ID_FANTOM,
   CHAIN_ID_NEON,
   CHAIN_ID_OASIS,
   CHAIN_ID_POLYGON,
@@ -35,7 +34,6 @@ import {
   CHAINS_BY_ID,
   getHowToAddTokensToWalletUrl,
   WETH_ADDRESS,
-  WFTM_ADDRESS,
   WMATIC_ADDRESS,
   WNEON_ADDRESS,
   WROSE_ADDRESS,
@@ -101,10 +99,6 @@ function Redeem() {
     targetChain === CHAIN_ID_OASIS &&
     targetAsset &&
     targetAsset.toLowerCase() === WROSE_ADDRESS.toLowerCase();
-  const isFantomNative =
-    targetChain === CHAIN_ID_FANTOM &&
-    targetAsset &&
-    targetAsset.toLowerCase() === WFTM_ADDRESS.toLowerCase();
   const isNeonNative =
     targetChain === CHAIN_ID_NEON &&
     targetAsset &&
@@ -117,7 +111,6 @@ function Redeem() {
     isEthNative ||
     isPolygonNative ||
     isOasisNative ||
-    isFantomNative ||
     isNeonNative ||
     isSolNative;
   const [useNativeRedeem, setUseNativeRedeem] = useState(true);

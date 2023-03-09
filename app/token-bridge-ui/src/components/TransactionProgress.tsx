@@ -2,7 +2,6 @@ import {
   ChainId,
   CHAIN_ID_ARBITRUM,
   CHAIN_ID_BASE,
-  CHAIN_ID_FANTOM,
   CHAIN_ID_MOONBEAM,
   CHAIN_ID_OASIS,
   CHAIN_ID_POLYGON,
@@ -81,7 +80,6 @@ export default function TransactionProgress({
         ? 64
         : 512
       : chainId === CHAIN_ID_OASIS ||
-        chainId === CHAIN_ID_FANTOM ||
         chainId === CHAIN_ID_MOONBEAM
       ? 1 // these chains only require 1 conf
       : chainId === CHAIN_ID_SOLANA

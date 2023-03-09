@@ -30,13 +30,6 @@ export const METAMASK_CHAIN_PARAMETERS: {
     rpcUrls: ["https://rpc.ankr.com/eth_goerli"],
     blockExplorerUrls: ["https://goerli.etherscan.io"],
   },
-  4002: {
-    chainId: "0xfa2",
-    chainName: "Fantom Testnet",
-    nativeCurrency: { name: "Fantom", symbol: "FTM", decimals: 18 },
-    rpcUrls: ["https://rpc.testnet.fantom.network"],
-    blockExplorerUrls: ["https://testnet.ftmscan.com"],
-  },
   42261: {
     chainId: "0xa515",
     chainName: "Emerald Paratime Testnet",

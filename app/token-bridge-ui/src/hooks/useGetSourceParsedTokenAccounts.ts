@@ -1,7 +1,6 @@
 import {
   ChainId,
   CHAIN_ID_ETH,
-  CHAIN_ID_FANTOM,
   CHAIN_ID_MOONBEAM,
   CHAIN_ID_NEAR,
   CHAIN_ID_NEON,
@@ -34,7 +33,6 @@ import {
 import { useNearContext } from "../contexts/NearWalletContext";
 import { useSolanaWallet } from "../contexts/SolanaWalletContext";
 import ethIcon from "../icons/eth.svg";
-import fantomIcon from "../icons/fantom.svg";
 import neonIcon from "../icons/neon.svg";
 import oasisIcon from "../icons/oasis-network-rose-logo.svg";
 import polygonIcon from "../icons/polygon.svg";
@@ -74,8 +72,6 @@ import {
   SOLANA_HOST,
   WETH_ADDRESS,
   WETH_DECIMALS,
-  WFTM_ADDRESS,
-  WFTM_DECIMALS,
   WMATIC_ADDRESS,
   WMATIC_DECIMALS,
   WNEON_ADDRESS,
@@ -278,29 +274,6 @@ const createNativeOasisParsedTokenAccount = (
           "ROSE", //A white lie for display purposes
           "Rose", //A white lie for display purposes
           oasisIcon,
-          true //isNativeAsset
-        );
-      });
-};
-
-const createNativeFantomParsedTokenAccount = (
-  provider: Provider,
-  signerAddress: string | undefined
-) => {
-  return !(provider && signerAddress)
-    ? Promise.reject()
-    : provider.getBalance(signerAddress).then((balanceInWei) => {
-        const balanceInEth = ethers.utils.formatEther(balanceInWei);
-        return createParsedTokenAccount(
-          signerAddress, //public key
-          WFTM_ADDRESS, //Mint key, On the other side this will be wavax, so this is hopefully a white lie.
-          balanceInWei.toString(), //amount, in wei
-          WFTM_DECIMALS,
-          parseFloat(balanceInEth), //This loses precision, but is a limitation of the current datamodel. This field is essentially deprecated
-          balanceInEth.toString(), //This is the actual display field, which has full precision.
-          "FTM", //A white lie for display purposes
-          "Fantom", //A white lie for display purposes
-          fantomIcon,
           true //isNativeAsset
         );
       });
@@ -870,39 +843,6 @@ function useGetAvailableTokens(nft: boolean = false) {
             setEthNativeAccount(undefined);
             setEthNativeAccountLoading(false);
             setEthNativeAccountError("Unable to retrieve your Oasis balance.");
-          }
-        }
-      );
-    }
-
-    return () => {
-      cancelled = true;
-    };
-  }, [lookupChain, provider, signerAddress, nft, ethNativeAccount]);
-
-  useEffect(() => {
-    let cancelled = false;
-    if (
-      signerAddress &&
-      lookupChain === CHAIN_ID_FANTOM &&
-      !ethNativeAccount &&
-      !nft
-    ) {
-      setEthNativeAccountLoading(true);
-      createNativeFantomParsedTokenAccount(provider, signerAddress).then(
-        (result) => {
-          console.log("create native account returned with value", result);
-          if (!cancelled) {
-            setEthNativeAccount(result);
-            setEthNativeAccountLoading(false);
-            setEthNativeAccountError("");
-          }
-        },
-        (error) => {
-          if (!cancelled) {
-            setEthNativeAccount(undefined);
-            setEthNativeAccountLoading(false);
-            setEthNativeAccountError("Unable to retrieve your Fantom balance.");
           }
         }
       );
