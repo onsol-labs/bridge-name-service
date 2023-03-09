@@ -6,7 +6,6 @@ import {
   CHAIN_ID_POLYGON,
   CHAIN_ID_SOLANA,
   CHAIN_ID_XPLA,
-  CHAIN_ID_ARBITRUM,
   CHAIN_ID_NEAR,
   CHAIN_ID_BASE,
 } from "@certusone/wormhole-sdk";
@@ -127,10 +126,6 @@ export default function SmartAddress({
     ? `https://explorer.xpla.io/${
         CLUSTER === "testnet" ? "testnet/" : ""
       }address/${useableAddress}`
-    : chainId === CHAIN_ID_ARBITRUM
-    ? `https://${CLUSTER === "testnet" ? "goerli." : ""}arbiscan.io/${
-        isAsset ? "token" : "address"
-      }/${useableAddress}`
     : chainId === CHAIN_ID_NEAR && CLUSTER === "testnet"
     ? `https://explorer.testnetnear.org/accounts/${useableAddress}`
     : undefined;

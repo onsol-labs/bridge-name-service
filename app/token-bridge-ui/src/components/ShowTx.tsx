@@ -7,7 +7,6 @@ import {
   CHAIN_ID_POLYGON,
   CHAIN_ID_SOLANA,
   CHAIN_ID_XPLA,
-  CHAIN_ID_ARBITRUM,
   CHAIN_ID_BASE,
 } from "@certusone/wormhole-sdk";
 import { Button, makeStyles, Typography } from "@material-ui/core";
@@ -62,12 +61,9 @@ export default function ShowTx({
                 : chainId === CHAIN_ID_XPLA
                   ? `https://explorer.xpla.io/${CLUSTER === "testnet" ? "testnet/" : ""
                   }tx/${tx?.id}`
-                  : chainId === CHAIN_ID_ARBITRUM
-                    ? `https://${CLUSTER === "testnet" ? "goerli." : ""}arbiscan.io/tx/${tx?.id
-                    }`
-                    : chainId === CHAIN_ID_NEAR && CLUSTER === "testnet"
-                      ? `https://explorer.testnet.near.org/transactions/${tx?.id}`
-                      : undefined;
+                  : chainId === CHAIN_ID_NEAR && CLUSTER === "testnet"
+                    ? `https://explorer.testnet.near.org/transactions/${tx?.id}`
+                    : undefined;
   const explorerName = getExplorerName(chainId);
 
   return (

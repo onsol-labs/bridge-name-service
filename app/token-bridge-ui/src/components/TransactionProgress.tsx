@@ -1,6 +1,5 @@
 import {
   ChainId,
-  CHAIN_ID_ARBITRUM,
   CHAIN_ID_BASE,
   CHAIN_ID_MOONBEAM,
   CHAIN_ID_OASIS,
@@ -81,16 +80,14 @@ export default function TransactionProgress({
         : 512
       : chainId === CHAIN_ID_OASIS ||
         chainId === CHAIN_ID_MOONBEAM
-      ? 1 // these chains only require 1 conf
-      : chainId === CHAIN_ID_SOLANA
-      ? 32
-      : chainId === CHAIN_ID_ARBITRUM
-      ? 64 // something to show progress
-      : chainId === CHAIN_ID_BASE
-      ? 124 // something to show progress
-      : isEVMChain(chainId)
-      ? 15
-      : 1;
+        ? 1 // these chains only require 1 conf
+        : chainId === CHAIN_ID_SOLANA
+          ? 32
+          : chainId === CHAIN_ID_BASE
+            ? 124 // something to show progress
+            : isEVMChain(chainId)
+              ? 15
+              : 1;
   if (
     !isSendComplete &&
     (chainId === CHAIN_ID_SOLANA || isEVMChain(chainId)) &&
@@ -105,13 +102,11 @@ export default function TransactionProgress({
           variant="determinate"
         />
         <Typography variant="body2" className={classes.message}>
-          {chainId === CHAIN_ID_ARBITRUM
-            ? `Waiting for Ethereum finality on Arbitrum block ${tx?.block}` //TODO: more advanced finality checking for Arbitrum
-            : chainId === CHAIN_ID_BASE
+          {chainId === CHAIN_ID_BASE
             ? `Waiting for Ethereum finality on Base block ${tx?.block}` //TODO: more advanced finality checking for Base
             : blockDiff < expectedBlocks
-            ? `Waiting for ${blockDiff} / ${expectedBlocks} confirmations on ${CHAINS_BY_ID[chainId].name}...`
-            : `Waiting for Wormhole Network consensus...`}
+              ? `Waiting for ${blockDiff} / ${expectedBlocks} confirmations on ${CHAINS_BY_ID[chainId].name}...`
+              : `Waiting for Wormhole Network consensus...`}
         </Typography>
       </div>
     );
