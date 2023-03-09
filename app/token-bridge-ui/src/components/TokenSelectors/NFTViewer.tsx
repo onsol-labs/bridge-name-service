@@ -14,7 +14,6 @@ import clsx from "clsx";
 import {
   ChainId,
   CHAIN_ID_AVAX,
-  CHAIN_ID_BSC,
   CHAIN_ID_ETH,
   CHAIN_ID_POLYGON,
   CHAIN_ID_SOLANA,
@@ -23,7 +22,6 @@ import {
 } from "@certusone/wormhole-sdk";
 import SmartAddress from "../SmartAddress";
 import avaxIcon from "../../icons/avax.svg";
-import bscIcon from "../../icons/bsc.svg";
 import ethIcon from "../../icons/eth.svg";
 import fantomIcon from "../../icons/fantom.svg";
 import solanaIcon from "../../icons/solana.svg";
@@ -63,18 +61,6 @@ const LogoIcon = ({ chainId }: { chainId: ChainId }) =>
       }}
       src={ethIcon}
       alt="Ethereum"
-    />
-  ) : chainId === CHAIN_ID_BSC ? (
-    <Avatar
-      style={{
-        backgroundColor: "rgb(20, 21, 26)",
-        height: "1em",
-        width: "1em",
-        marginLeft: "4px",
-        padding: "2px",
-      }}
-      src={bscIcon}
-      alt="Binance Smart Chain"
     />
   ) : chainId === CHAIN_ID_POLYGON ? (
     <Avatar
@@ -199,12 +185,6 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: "rgb(69,74,117)",
     background:
       "linear-gradient(160deg, rgba(69,74,117,1) 0%, rgba(138,146,178,1) 33%, rgba(69,74,117,1) 66%, rgba(98,104,143,1) 100%)",
-  },
-  bsc: {
-    // color from binance background rgb(20, 21, 26), 2 and 1 tint lighter
-    backgroundColor: "#F0B90B",
-    background:
-      "linear-gradient(160deg, rgb(20, 21, 26) 0%, #4A4D57 33%, rgb(20, 21, 26) 66%, #2C2F3B 100%)",
   },
   polygon: {
     // color from polygon logo #8247E5 down to 30 lightness
@@ -383,7 +363,6 @@ export default function NFTViewer({
               chainId === CHAIN_ID_AVAX || //TODO: give avax it's own bg
               chainId === CHAIN_ID_OASIS || //TODO: give oasis it's own bg
               chainId === CHAIN_ID_FANTOM, //TODO: give fantom it's own bg
-            [classes.bsc]: chainId === CHAIN_ID_BSC,
             [classes.solana]: chainId === CHAIN_ID_SOLANA,
             [classes.polygon]: chainId === CHAIN_ID_POLYGON,
           })}

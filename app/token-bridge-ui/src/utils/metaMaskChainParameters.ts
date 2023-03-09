@@ -30,17 +30,6 @@ export const METAMASK_CHAIN_PARAMETERS: {
     rpcUrls: ["https://rpc.ankr.com/eth_goerli"],
     blockExplorerUrls: ["https://goerli.etherscan.io"],
   },
-  97: {
-    chainId: "0x61",
-    chainName: "Binance Smart Chain Testnet",
-    nativeCurrency: {
-      name: "Binance Chain Native Token",
-      symbol: "BNB",
-      decimals: 18,
-    },
-    rpcUrls: ["https://data-seed-prebsc-1-s1.binance.org:8545"],
-    blockExplorerUrls: ["https://testnet.bscscan.com"],
-  },
   596: {
     chainId: "0x254",
     chainName: "Karura Testnet",
@@ -61,7 +50,7 @@ export const METAMASK_CHAIN_PARAMETERS: {
     nativeCurrency: { name: "Fantom", symbol: "FTM", decimals: 18 },
     rpcUrls: ["https://rpc.testnet.fantom.network"],
     blockExplorerUrls: ["https://testnet.ftmscan.com"],
-  }
+  },
   44787: {
     chainId: "0xaef3",
     chainName: "Celo (Alfajores Testnet)",

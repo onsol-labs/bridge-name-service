@@ -19,7 +19,7 @@
     "@near-wallet-selector/nightly": "^7.0.1",
     "@near-wallet-selector/sender": "^7.0.1",
     "@project-serum/serum": "^0.13.60",
-    "@reduxjs/toolkit": "^1.6.1",
+    "@reduxjs/toolkit": "^1.9.3",
     "@solana/spl-token": "^0.1.6",
     "@solana/spl-token-registry": "^0.2.216",
     "@solana/wallet-adapter-base": "^0.9.3",

@@ -2,7 +2,6 @@ import {
   ChainId,
   CHAIN_ID_AURORA,
   CHAIN_ID_AVAX,
-  CHAIN_ID_BSC,
   CHAIN_ID_CELO,
   CHAIN_ID_ETH,
   CHAIN_ID_FANTOM,
@@ -102,10 +101,6 @@ export default function SmartAddress({
     ? null
     : chainId === CHAIN_ID_ETH
     ? `https://${CLUSTER === "testnet" ? "goerli." : ""}etherscan.io/${
-        isAsset ? "token" : "address"
-      }/${useableAddress}`
-    : chainId === CHAIN_ID_BSC
-    ? `https://${CLUSTER === "testnet" ? "testnet." : ""}bscscan.com/${
         isAsset ? "token" : "address"
       }/${useableAddress}`
     : chainId === CHAIN_ID_POLYGON

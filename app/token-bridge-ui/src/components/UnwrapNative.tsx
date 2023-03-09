@@ -1,6 +1,5 @@
 import {
   CHAIN_ID_AVAX,
-  CHAIN_ID_BSC,
   CHAIN_ID_ETH,
   CHAIN_ID_FANTOM,
   CHAIN_ID_NEON,
@@ -23,7 +22,6 @@ import { useCallback, useEffect, useState } from "react";
 import { useEthereumProvider } from "../contexts/EthereumProviderContext";
 import useIsWalletReady from "../hooks/useIsWalletReady";
 import avaxIcon from "../icons/avax.svg";
-import bnbIcon from "../icons/bnb.svg";
 import ethIcon from "../icons/eth.svg";
 import fantomIcon from "../icons/fantom.svg";
 import neonIcon from "../icons/neon.svg";
@@ -39,8 +37,6 @@ import {
 import {
   WAVAX_ADDRESS,
   WAVAX_DECIMALS,
-  WBNB_ADDRESS,
-  WBNB_DECIMALS,
   WETH_ADDRESS,
   WETH_DECIMALS,
   WFTM_ADDRESS,
@@ -95,12 +91,6 @@ const supportedTokens = {
     icon: ethIcon,
     address: WETH_ADDRESS,
     decimals: WETH_DECIMALS,
-  },
-  [CHAIN_ID_BSC]: {
-    symbol: "WBNB",
-    icon: bnbIcon,
-    address: WBNB_ADDRESS,
-    decimals: WBNB_DECIMALS,
   },
   [CHAIN_ID_POLYGON]: {
     symbol: "WMATIC",

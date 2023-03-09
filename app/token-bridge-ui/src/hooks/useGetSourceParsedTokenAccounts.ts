@@ -3,7 +3,6 @@ import {
   CHAIN_ID_ACALA,
   CHAIN_ID_AURORA,
   CHAIN_ID_AVAX,
-  CHAIN_ID_BSC,
   CHAIN_ID_CELO,
   CHAIN_ID_ETH,
   CHAIN_ID_FANTOM,
@@ -42,7 +41,6 @@ import { useSolanaWallet } from "../contexts/SolanaWalletContext";
 import acalaIcon from "../icons/acala.svg";
 import auroraIcon from "../icons/aurora.svg";
 import avaxIcon from "../icons/avax.svg";
-import bnbIcon from "../icons/bnb.svg";
 import celoIcon from "../icons/celo.svg";
 import ethIcon from "../icons/eth.svg";
 import fantomIcon from "../icons/fantom.svg";
@@ -90,8 +88,6 @@ import {
   SOLANA_HOST,
   WAVAX_ADDRESS,
   WAVAX_DECIMALS,
-  WBNB_ADDRESS,
-  WBNB_DECIMALS,
   CELO_ADDRESS,
   CELO_DECIMALS,
   WETH_ADDRESS,
@@ -256,29 +252,6 @@ const createNativeEthParsedTokenAccount = (
           "ETH", //A white lie for display purposes
           "Ethereum", //A white lie for display purposes
           ethIcon,
-          true //isNativeAsset
-        );
-      });
-};
-
-const createNativeBscParsedTokenAccount = (
-  provider: Provider,
-  signerAddress: string | undefined
-) => {
-  return !(provider && signerAddress)
-    ? Promise.reject()
-    : provider.getBalance(signerAddress).then((balanceInWei) => {
-        const balanceInEth = ethers.utils.formatEther(balanceInWei);
-        return createParsedTokenAccount(
-          signerAddress, //public key
-          WBNB_ADDRESS, //Mint key, On the other side this will be WBNB, so this is hopefully a white lie.
-          balanceInWei.toString(), //amount, in wei
-          WBNB_DECIMALS, //Luckily both BNB and WBNB have 18 decimals, so this should not be an issue.
-          parseFloat(balanceInEth), //This loses precision, but is a limitation of the current datamodel. This field is essentially deprecated
-          balanceInEth.toString(), //This is the actual display field, which has full precision.
-          "BNB", //A white lie for display purposes
-          "Binance Coin", //A white lie for display purposes
-          bnbIcon,
           true //isNativeAsset
         );
       });
@@ -991,40 +964,6 @@ function useGetAvailableTokens(nft: boolean = false) {
     };
   }, [lookupChain, provider, signerAddress, nft, ethNativeAccount]);
 
-  //Binance Smart Chain native asset load
-  useEffect(() => {
-    let cancelled = false;
-    if (
-      signerAddress &&
-      lookupChain === CHAIN_ID_BSC &&
-      !ethNativeAccount &&
-      !nft
-    ) {
-      setEthNativeAccountLoading(true);
-      createNativeBscParsedTokenAccount(provider, signerAddress).then(
-        (result) => {
-          console.log("create native account returned with value", result);
-          if (!cancelled) {
-            setEthNativeAccount(result);
-            setEthNativeAccountLoading(false);
-            setEthNativeAccountError("");
-          }
-        },
-        (error) => {
-          if (!cancelled) {
-            setEthNativeAccount(undefined);
-            setEthNativeAccountLoading(false);
-            setEthNativeAccountError("Unable to retrieve your BNB balance.");
-          }
-        }
-      );
-    }
-
-    return () => {
-      cancelled = true;
-    };
-  }, [lookupChain, provider, signerAddress, nft, ethNativeAccount]);
-
   //Polygon native asset load
   useEffect(() => {
     let cancelled = false;
@@ -1366,7 +1305,6 @@ function useGetAvailableTokens(nft: boolean = false) {
     // const nftTestWallet1 = "0x3f304c6721f35ff9af00fd32650c8e0a982180ab";
     // const nftTestWallet2 = "0x98ed231428088eb440e8edb5cc8d66dcf913b86e";
     // const nftTestWallet3 = "0xb1fadf677a7e9b90e9d4f31c8ffb3dc18c138c6f";
-    // const nftBscTestWallet1 = "0x5f464a652bd1991df0be37979b93b3306d64a909";
 
     let cancelled = false;
     const walletAddress = signerAddress;

@@ -2,7 +2,6 @@ import {
   ChainId,
   CHAIN_ID_AURORA,
   CHAIN_ID_AVAX,
-  CHAIN_ID_BSC,
   CHAIN_ID_ETH,
   CHAIN_ID_FANTOM,
   CHAIN_ID_OASIS,
@@ -306,17 +305,6 @@ export default function NFTOriginVerifier() {
                     variant="outlined"
                   >
                     View on Solscan
-                  </Button>
-                ) : originInfo.chainId === CHAIN_ID_BSC ? (
-                  <Button
-                    href={`https://bscscan.com/token/${readableAddress}?a=${originInfo.tokenId}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    startIcon={<Launch />}
-                    className={classes.viewButton}
-                    variant="outlined"
-                  >
-                    View on BscScan
                   </Button>
                 ) : originInfo.chainId === CHAIN_ID_POLYGON ? (
                   <Button
