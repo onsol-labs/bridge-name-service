@@ -1,12 +1,7 @@
 import {
   ChainId,
   CHAIN_ID_ETH,
-  CHAIN_ID_MOONBEAM,
-  CHAIN_ID_NEON,
-  CHAIN_ID_POLYGON,
   CHAIN_ID_SOLANA,
-  CHAIN_ID_XPLA,
-  ethers_contracts,
   isEVMChain,
   WSOL_ADDRESS,
   WSOL_DECIMALS,
@@ -30,9 +25,6 @@ import {
 } from "../contexts/EthereumProviderContext";
 import { useSolanaWallet } from "../contexts/SolanaWalletContext";
 import ethIcon from "../icons/eth.svg";
-import neonIcon from "../icons/neon.svg";
-import polygonIcon from "../icons/polygon.svg";
-import moonbeamIcon from "../icons/moonbeam.svg";
 import {
   errorSourceParsedTokenAccounts as errorSourceParsedTokenAccountsNFT,
   fetchSourceParsedTokenAccounts as fetchSourceParsedTokenAccountsNFT,
@@ -65,13 +57,7 @@ import {
   SOLANA_HOST,
   WETH_ADDRESS,
   WETH_DECIMALS,
-  WMATIC_ADDRESS,
-  WMATIC_DECIMALS,
-  WNEON_ADDRESS,
-  WNEON_DECIMALS,
   getDefaultNativeCurrencyAddressEvm,
-  WGLMR_ADDRESS,
-  WGLMR_DECIMALS,
 } from "../utils/consts";
 import {
   ExtractedMintInfo,
@@ -218,75 +204,6 @@ const createNativeEthParsedTokenAccount = (
         "ETH", //A white lie for display purposes
         "Ethereum", //A white lie for display purposes
         ethIcon,
-        true //isNativeAsset
-      );
-    });
-};
-
-const createNativePolygonParsedTokenAccount = (
-  provider: Provider,
-  signerAddress: string | undefined
-) => {
-  return !(provider && signerAddress)
-    ? Promise.reject()
-    : provider.getBalance(signerAddress).then((balanceInWei) => {
-      const balanceInEth = ethers.utils.formatEther(balanceInWei);
-      return createParsedTokenAccount(
-        signerAddress, //public key
-        WMATIC_ADDRESS, //Mint key, On the other side this will be WMATIC, so this is hopefully a white lie.
-        balanceInWei.toString(), //amount, in wei
-        WMATIC_DECIMALS, //Luckily both MATIC and WMATIC have 18 decimals, so this should not be an issue.
-        parseFloat(balanceInEth), //This loses precision, but is a limitation of the current datamodel. This field is essentially deprecated
-        balanceInEth.toString(), //This is the actual display field, which has full precision.
-        "MATIC", //A white lie for display purposes
-        "Matic", //A white lie for display purposes
-        polygonIcon,
-        true //isNativeAsset
-      );
-    });
-};
-
-const createNativeNeonParsedTokenAccount = (
-  provider: Provider,
-  signerAddress: string | undefined
-) => {
-  return !(provider && signerAddress)
-    ? Promise.reject()
-    : provider.getBalance(signerAddress).then((balanceInWei) => {
-      const balanceInEth = ethers.utils.formatEther(balanceInWei);
-      return createParsedTokenAccount(
-        signerAddress, //public key
-        WNEON_ADDRESS, //Mint key, On the other side this will be wneon, so this is hopefully a white lie.
-        balanceInWei.toString(), //amount, in wei
-        WNEON_DECIMALS,
-        parseFloat(balanceInEth), //This loses precision, but is a limitation of the current datamodel. This field is essentially deprecated
-        balanceInEth.toString(), //This is the actual display field, which has full precision.
-        "NEON", //A white lie for display purposes
-        "NEON", //A white lie for display purposes
-        neonIcon,
-        true //isNativeAsset
-      );
-    });
-};
-
-const createNativeMoonbeamParsedTokenAccount = (
-  provider: Provider,
-  signerAddress: string | undefined
-) => {
-  return !(provider && signerAddress)
-    ? Promise.reject()
-    : provider.getBalance(signerAddress).then((balanceInWei) => {
-      const balanceInEth = ethers.utils.formatEther(balanceInWei);
-      return createParsedTokenAccount(
-        signerAddress, //public key
-        WGLMR_ADDRESS, //Mint key, On the other side this will be wneon, so this is hopefully a white lie.
-        balanceInWei.toString(), //amount, in wei
-        WGLMR_DECIMALS,
-        parseFloat(balanceInEth), //This loses precision, but is a limitation of the current datamodel. This field is essentially deprecated
-        balanceInEth.toString(), //This is the actual display field, which has full precision.
-        "GLMR", //A white lie for display purposes
-        "GLMR", //A white lie for display purposes
-        moonbeamIcon,
         true //isNativeAsset
       );
     });
@@ -711,108 +628,6 @@ function useGetAvailableTokens(nft: boolean = false) {
     };
   }, [lookupChain, provider, signerAddress, nft, ethNativeAccount]);
 
-  //Polygon native asset load
-  useEffect(() => {
-    let cancelled = false;
-    if (
-      signerAddress &&
-      lookupChain === CHAIN_ID_POLYGON &&
-      !ethNativeAccount &&
-      !nft
-    ) {
-      setEthNativeAccountLoading(true);
-      createNativePolygonParsedTokenAccount(provider, signerAddress).then(
-        (result) => {
-          console.log("create native account returned with value", result);
-          if (!cancelled) {
-            setEthNativeAccount(result);
-            setEthNativeAccountLoading(false);
-            setEthNativeAccountError("");
-          }
-        },
-        (error) => {
-          if (!cancelled) {
-            setEthNativeAccount(undefined);
-            setEthNativeAccountLoading(false);
-            setEthNativeAccountError("Unable to retrieve your MATIC balance.");
-          }
-        }
-      );
-    }
-
-    return () => {
-      cancelled = true;
-    };
-  }, [lookupChain, provider, signerAddress, nft, ethNativeAccount]);
-
-  useEffect(() => {
-    let cancelled = false;
-    if (
-      signerAddress &&
-      lookupChain === CHAIN_ID_NEON &&
-      !ethNativeAccount &&
-      !nft
-    ) {
-      setEthNativeAccountLoading(true);
-      createNativeNeonParsedTokenAccount(provider, signerAddress).then(
-        (result) => {
-          console.log("create native account returned with value", result);
-          if (!cancelled) {
-            setEthNativeAccount(result);
-            setEthNativeAccountLoading(false);
-            setEthNativeAccountError("");
-          }
-        },
-        (error) => {
-          if (!cancelled) {
-            setEthNativeAccount(undefined);
-            setEthNativeAccountLoading(false);
-            setEthNativeAccountError("Unable to retrieve your Neon balance.");
-          }
-        }
-      );
-    }
-
-    return () => {
-      cancelled = true;
-    };
-  }, [lookupChain, provider, signerAddress, nft, ethNativeAccount]);
-
-  useEffect(() => {
-    let cancelled = false;
-    if (
-      signerAddress &&
-      lookupChain === CHAIN_ID_MOONBEAM &&
-      !ethNativeAccount &&
-      !nft
-    ) {
-      setEthNativeAccountLoading(true);
-      createNativeMoonbeamParsedTokenAccount(provider, signerAddress).then(
-        (result) => {
-          console.log("create native account returned with value", result);
-          if (!cancelled) {
-            setEthNativeAccount(result);
-            setEthNativeAccountLoading(false);
-            setEthNativeAccountError("");
-          }
-        },
-        (error) => {
-          if (!cancelled) {
-            setEthNativeAccount(undefined);
-            setEthNativeAccountLoading(false);
-            setEthNativeAccountError(
-              "Unable to retrieve your Moonbeam balance."
-            );
-          }
-        }
-      );
-    }
-
-    return () => {
-      cancelled = true;
-    };
-  }, [lookupChain, provider, signerAddress, nft, ethNativeAccount]);
-
   //Ethereum covalent or blockscout accounts load
   useEffect(() => {
     //const testWallet = "0xf60c2ea62edbfe808163751dd0d8693dcb30019c";
@@ -931,11 +746,7 @@ function useGetAvailableTokens(nft: boolean = false) {
         },
         resetAccounts: resetSourceAccounts,
       }
-      : lookupChain === CHAIN_ID_XPLA
-        ? {
-          resetAccounts: resetSourceAccounts,
-        }
-        : undefined;
+      : undefined;
 }
 
 export default useGetAvailableTokens;

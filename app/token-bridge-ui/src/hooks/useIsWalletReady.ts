@@ -1,11 +1,9 @@
 import {
   ChainId,
   CHAIN_ID_SOLANA,
-  CHAIN_ID_XPLA,
   isEVMChain,
 } from "@certusone/wormhole-sdk";
 import { hexlify, hexStripZeros } from "@ethersproject/bytes";
-import { useConnectedWallet as useXplaConnectedWallet } from "@xpla/wallet-provider";
 import { useCallback, useMemo } from "react";
 import {
   ConnectType,
@@ -52,8 +50,6 @@ function useIsWalletReady(
   const hasEthInfo = !!provider && !!signerAddress;
   const correctEvmNetwork = getEvmChainId(chainId);
   const hasCorrectEvmNetwork = evmChainId === correctEvmNetwork;
-  const xplaWallet = useXplaConnectedWallet();
-  const hasXplaWallet = !!xplaWallet;
   // The wallets do not all match on network names and the adapter doesn't seem to normalize this yet.
   // Petra = "Testnet"
   // Martian = "Testnet"
@@ -106,18 +102,6 @@ function useIsWalletReady(
         solPK.toString()
       );
     }
-    if (
-      chainId === CHAIN_ID_XPLA &&
-      hasXplaWallet &&
-      xplaWallet?.walletAddress
-    ) {
-      return createWalletStatus(
-        true,
-        undefined,
-        forceNetworkSwitch,
-        xplaWallet.walletAddress
-      );
-    }
     if (isEVMChain(chainId) && hasEthInfo && signerAddress) {
       if (hasCorrectEvmNetwork) {
         return createWalletStatus(
@@ -155,8 +139,6 @@ function useIsWalletReady(
     hasCorrectEvmNetwork,
     provider,
     signerAddress,
-    xplaWallet,
-    hasXplaWallet,
   ]);
 }
 

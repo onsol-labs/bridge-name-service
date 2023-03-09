@@ -1,23 +1,16 @@
 import {
   ChainId,
   CHAIN_ID_SOLANA,
-  CHAIN_ID_XPLA,
   createWrappedOnEth,
   createWrappedOnSolana,
-  createWrappedOnXpla,
   isEVMChain,
   postVaaSolanaWithRetry,
   updateWrappedOnEth,
   updateWrappedOnSolana,
-  updateWrappedOnXpla,
 } from "@certusone/wormhole-sdk";
 import { Alert } from "@material-ui/lab";
 import { WalletContextState } from "@solana/wallet-adapter-react";
 import { Connection } from "@solana/web3.js";
-import {
-  ConnectedWallet as XplaConnectedWallet,
-  useConnectedWallet as useXplaConnectedWallet,
-} from "@xpla/wallet-provider";
 import { Signer } from "ethers";
 import { useSnackbar } from "notistack";
 import { useCallback, useMemo } from "react";
@@ -38,7 +31,6 @@ import {
 } from "../utils/consts";
 import parseError from "../utils/parseError";
 import { signSendAndConfirm } from "../utils/solana";
-import { postWithFeesXpla } from "../utils/xpla";
 import useAttestSignedVAA from "./useAttestSignedVAA";
 
 async function evm(
@@ -130,46 +122,6 @@ async function solana(
   }
 }
 
-async function xpla(
-  dispatch: any,
-  enqueueSnackbar: any,
-  wallet: XplaConnectedWallet,
-  signedVAA: Uint8Array,
-  shouldUpdate: boolean
-) {
-  dispatch(setIsCreating(true));
-  const tokenBridgeAddress = getTokenBridgeAddressForChain(CHAIN_ID_XPLA);
-  try {
-    const msg = shouldUpdate
-      ? await updateWrappedOnXpla(
-        tokenBridgeAddress,
-        wallet.xplaAddress,
-        signedVAA
-      )
-      : await createWrappedOnXpla(
-        tokenBridgeAddress,
-        wallet.xplaAddress,
-        signedVAA
-      );
-    const result = await postWithFeesXpla(
-      wallet,
-      [msg],
-      "Wormhole - Create Wrapped"
-    );
-    dispatch(
-      setCreateTx({ id: result.result.txhash, block: result.result.height })
-    );
-    enqueueSnackbar(null, {
-      content: <Alert severity="success">Transaction confirmed</Alert>,
-    });
-  } catch (e) {
-    enqueueSnackbar(null, {
-      content: <Alert severity="error">{parseError(e)}</Alert>,
-    });
-    dispatch(setIsCreating(false));
-  }
-}
-
 export function useHandleCreateWrapped(shouldUpdate: boolean) {
   const dispatch = useDispatch();
   const { enqueueSnackbar } = useSnackbar();
@@ -179,7 +131,6 @@ export function useHandleCreateWrapped(shouldUpdate: boolean) {
   const signedVAA = useAttestSignedVAA();
   const isCreating = useSelector(selectAttestIsCreating);
   const { signer } = useEthereumProvider();
-  const xplaWallet = useXplaConnectedWallet();
   const handleCreateClick = useCallback(() => {
     if (isEVMChain(targetChain) && !!signer && !!signedVAA) {
       evm(
@@ -204,8 +155,6 @@ export function useHandleCreateWrapped(shouldUpdate: boolean) {
         signedVAA,
         shouldUpdate
       );
-    } else if (targetChain === CHAIN_ID_XPLA && !!xplaWallet && !!signedVAA) {
-      xpla(dispatch, enqueueSnackbar, xplaWallet, signedVAA, shouldUpdate);
     }  else {
       // enqueueSnackbar(
       //   "Creating wrapped tokens on this chain is not yet supported",
@@ -223,7 +172,6 @@ export function useHandleCreateWrapped(shouldUpdate: boolean) {
     signedVAA,
     signer,
     shouldUpdate,
-    xplaWallet,
   ]);
   return useMemo(
     () => ({

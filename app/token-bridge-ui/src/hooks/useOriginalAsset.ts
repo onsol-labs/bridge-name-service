@@ -1,7 +1,6 @@
 import {
   ChainId,
   CHAIN_ID_SOLANA,
-  CHAIN_ID_XPLA,
   getOriginalAssetEth,
   getOriginalAssetSol,
   hexToNativeAssetString,
@@ -17,7 +16,6 @@ import {
 } from "@certusone/wormhole-sdk/lib/esm/nft_bridge";
 import { Web3Provider } from "@ethersproject/providers";
 import { Connection } from "@solana/web3.js";
-import { LCDClient as XplaLCDClient } from "@xpla/xpla.js";
 import { ethers } from "ethers";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
@@ -32,7 +30,6 @@ import {
   SOLANA_SYSTEM_PROGRAM_ADDRESS,
   SOL_NFT_BRIDGE_ADDRESS,
   SOL_TOKEN_BRIDGE_ADDRESS,
-  XPLA_LCD_CLIENT_CONFIG,
 } from "../utils/consts";
 import useIsWalletReady from "./useIsWalletReady";
 
@@ -211,29 +208,15 @@ function useOriginalAsset(
         if (!cancelled) {
           setIsLoading(false);
           setArgs();
-          if (
-            result.chainId === CHAIN_ID_XPLA
-          ) {
-            const lcd = new XplaLCDClient(XPLA_LCD_CLIENT_CONFIG);
-            const tokenBridgeAddress = getTokenBridgeAddressForChain(
+          setOriginAddress(
+            hexToNativeAssetString(
+              uint8ArrayToHex(result.assetAddress),
               result.chainId
-            );
-            queryExternalId(
-              lcd,
-              tokenBridgeAddress,
-              uint8ArrayToHex(result.assetAddress)
-            ).then((tokenId) => setOriginAddress(tokenId || null));
-          } else {
-            setOriginAddress(
-              hexToNativeAssetString(
-                uint8ArrayToHex(result.assetAddress),
-                result.chainId
-              ) || null
-            );
-          }
-          setOriginTokenId(result.tokenId || null);
-          setOriginChain(result.chainId);
+            ) || null
+          );
         }
+        setOriginTokenId(result.tokenId || null);
+        setOriginChain(result.chainId);
       })
       .catch((e) => {
         if (!cancelled) {

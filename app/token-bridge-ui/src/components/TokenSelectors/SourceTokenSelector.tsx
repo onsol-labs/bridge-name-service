@@ -1,6 +1,5 @@
 import {
   CHAIN_ID_SOLANA,
-  CHAIN_ID_XPLA,
   isEVMChain,
 } from "@certusone/wormhole-sdk";
 import { TextField, Typography } from "@material-ui/core";
@@ -26,7 +25,6 @@ import {
 import EvmTokenPicker from "./EvmTokenPicker";
 import RefreshButtonWrapper from "./RefreshButtonWrapper";
 import SolanaTokenPicker from "./SolanaTokenPicker";
-import XplaTokenPicker from "./XplaTokenPicker";
 
 type TokenSelectorProps = {
   disabled: boolean;
@@ -103,14 +101,6 @@ export const TokenSelector = (props: TokenSelectorProps) => {
       resetAccounts={maps?.resetAccounts}
       chainId={lookupChain}
       nft={nft}
-    />
-  ) : lookupChain === CHAIN_ID_XPLA ? (
-    <XplaTokenPicker
-      value={sourceParsedTokenAccount || null}
-      disabled={disabled}
-      onChange={handleOnChange}
-      resetAccounts={maps?.resetAccounts}
-      tokenAccounts={maps?.tokenAccounts}
     />
   ) : (
     <TextField

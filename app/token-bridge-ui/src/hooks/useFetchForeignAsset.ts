@@ -1,10 +1,8 @@
 import {
   ChainId,
   CHAIN_ID_SOLANA,
-  CHAIN_ID_XPLA,
   getForeignAssetEth,
   getForeignAssetSolana,
-  getForeignAssetXpla,
   hexToUint8Array,
   isEVMChain,
   nativeToHexString,
@@ -19,10 +17,8 @@ import {
   getTokenBridgeAddressForChain,
   SOLANA_HOST,
   SOL_TOKEN_BRIDGE_ADDRESS,
-  XPLA_LCD_CLIENT_CONFIG,
 } from "../utils/consts";
 import useIsWalletReady from "./useIsWalletReady";
-import { LCDClient as XplaLCDClient } from "@xpla/xpla.js";
 
 export type ForeignAssetInfo = {
   doesExist: boolean;
@@ -109,27 +105,17 @@ function useFetchForeignAsset(
             originChain,
             hexToUint8Array(originAssetHex)
           )
-        : foreignChain === CHAIN_ID_XPLA
+        : foreignChain === CHAIN_ID_SOLANA
           ? () => {
-            const lcd = new XplaLCDClient(XPLA_LCD_CLIENT_CONFIG);
-            return getForeignAssetXpla(
-              getTokenBridgeAddressForChain(foreignChain),
-              lcd,
+            const connection = new Connection(SOLANA_HOST, "confirmed");
+            return getForeignAssetSolana(
+              connection,
+              SOL_TOKEN_BRIDGE_ADDRESS,
               originChain,
               hexToUint8Array(originAssetHex)
             );
           }
-          : foreignChain === CHAIN_ID_SOLANA
-            ? () => {
-              const connection = new Connection(SOLANA_HOST, "confirmed");
-              return getForeignAssetSolana(
-                connection,
-                SOL_TOKEN_BRIDGE_ADDRESS,
-                originChain,
-                hexToUint8Array(originAssetHex)
-              );
-            }
-            : () => Promise.resolve(null);
+          : () => Promise.resolve(null);
 
       getterFunc()
         .then((result) => {

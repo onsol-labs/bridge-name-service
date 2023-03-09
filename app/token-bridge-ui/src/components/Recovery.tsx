@@ -1,10 +1,8 @@
 import {
   ChainId,
   CHAIN_ID_SOLANA,
-  CHAIN_ID_XPLA,
   getEmitterAddressEth,
   getEmitterAddressSolana,
-  getEmitterAddressXpla,
   hexToNativeAssetString,
   hexToNativeString,
   hexToUint8Array,
@@ -12,7 +10,6 @@ import {
   parseNFTPayload,
   parseSequenceFromLogEth,
   parseSequenceFromLogSolana,
-  parseSequenceFromLogXpla,
   parseTransferPayload,
   parseVaa,
   queryExternalId,
@@ -35,10 +32,8 @@ import {
 import { ExpandMore } from "@material-ui/icons";
 import { Alert } from "@material-ui/lab";
 import { Connection } from "@solana/web3.js";
-import { LCDClient as XplaLCDClient } from "@xpla/xpla.js";
 import axios from "axios";
 import { ethers } from "ethers";
-import { base58 } from "ethers/lib/utils";
 import { useSnackbar } from "notistack";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
@@ -60,7 +55,6 @@ import {
   SOL_NFT_BRIDGE_ADDRESS,
   SOL_TOKEN_BRIDGE_ADDRESS,
   WORMHOLE_RPC_HOSTS,
-  XPLA_LCD_CLIENT_CONFIG,
 } from "../utils/consts";
 import { getSignedVAAWithRetry } from "../utils/getSignedVAAWithRetry";
 import parseError from "../utils/parseError";
@@ -148,23 +142,6 @@ async function solana(tx: string, enqueueSnackbar: any, nft: boolean) {
       nft ? SOL_NFT_BRIDGE_ADDRESS : SOL_TOKEN_BRIDGE_ADDRESS
     );
     return await fetchSignedVAA(CHAIN_ID_SOLANA, emitterAddress, sequence);
-  } catch (e) {
-    return handleError(e, enqueueSnackbar);
-  }
-}
-
-async function xpla(tx: string, enqueueSnackbar: any) {
-  try {
-    const lcd = new XplaLCDClient(XPLA_LCD_CLIENT_CONFIG);
-    const info = await lcd.tx.txInfo(tx);
-    const sequence = parseSequenceFromLogXpla(info);
-    if (!sequence) {
-      throw new Error("Sequence not found");
-    }
-    const emitterAddress = await getEmitterAddressXpla(
-      getTokenBridgeAddressForChain(CHAIN_ID_XPLA)
-    );
-    return await fetchSignedVAA(CHAIN_ID_XPLA, emitterAddress, sequence);
   } catch (e) {
     return handleError(e, enqueueSnackbar);
   }
@@ -296,27 +273,9 @@ export default function Recovery() {
     }
   }, [recoveryParsedVAA, isNFT]);
 
+  //Vlad test recovery - todo check this
   useEffect(() => {
     let cancelled = false;
-    if (
-      parsedPayload &&
-      (parsedPayload.targetChain === CHAIN_ID_XPLA)
-    ) {
-      (async () => {
-        const lcd = new XplaLCDClient(XPLA_LCD_CLIENT_CONFIG);
-        const tokenBridgeAddress = getTokenBridgeAddressForChain(
-          parsedPayload.targetChain as ChainId
-        );
-        const tokenId = await queryExternalId(
-          lcd,
-          tokenBridgeAddress,
-          parsedPayload.originAddress
-        );
-        if (!cancelled) {
-          setTokenId(tokenId || "");
-        }
-      })();
-    }
     return () => {
       cancelled = true;
     };
@@ -381,26 +340,6 @@ export default function Recovery() {
             recoverySourceTx,
             enqueueSnackbar,
             isNFT
-          );
-          if (!cancelled) {
-            setRecoverySourceTxIsLoading(false);
-            if (vaa) {
-              setRecoverySignedVAA(vaa);
-            }
-            if (error) {
-              setRecoverySourceTxError(error);
-            }
-            setIsVAAPending(isPending);
-          }
-        })();
-      } else if (recoverySourceChain === CHAIN_ID_XPLA) {
-        setRecoverySourceTxError("");
-        setRecoverySourceTxIsLoading(true);
-        setTokenId("");
-        (async () => {
-          const { vaa, isPending, error } = await xpla(
-            recoverySourceTx,
-            enqueueSnackbar
           );
           if (!cancelled) {
             setRecoverySourceTxIsLoading(false);
@@ -486,24 +425,6 @@ export default function Recovery() {
             })
           );
           push("/nft");
-        } else {
-          dispatch(
-            setRecoveryVaa({
-              vaa: recoverySignedVAA,
-              useRelayer,
-              parsedPayload: {
-                targetChain: parsedPayload.targetChain as ChainId,
-                targetAddress: parsedPayload.targetAddress,
-                originChain: parsedPayload.originChain as ChainId,
-                originAddress: parsedPayload.originAddress,
-                amount:
-                  "amount" in parsedPayload
-                    ? parsedPayload.amount.toString()
-                    : "",
-              },
-            })
-          );
-          push("/transfer");
         }
       }
     },
@@ -698,12 +619,10 @@ export default function Recovery() {
                   disabled
                   value={
                     parsedPayload
-                      ? parsedPayload.targetChain === CHAIN_ID_XPLA
-                        ? tokenId
-                        : hexToNativeAssetString(
-                          parsedPayload.originAddress,
-                          parsedPayload.originChain as ChainId
-                        ) || ""
+                      ? hexToNativeAssetString(
+                        parsedPayload.originAddress,
+                        parsedPayload.originChain as ChainId
+                      ) || ""
                       : ""
                   }
                   fullWidth

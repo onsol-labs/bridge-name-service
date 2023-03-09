@@ -29,35 +29,7 @@ export const METAMASK_CHAIN_PARAMETERS: {
     nativeCurrency: { name: "Görli Ether", symbol: "GOR", decimals: 18 },
     rpcUrls: ["https://rpc.ankr.com/eth_goerli"],
     blockExplorerUrls: ["https://goerli.etherscan.io"],
-  },
-  80001: {
-    chainId: "0x13881",
-    chainName: "Mumbai",
-    nativeCurrency: { name: "MATIC", symbol: "MATIC", decimals: 18 },
-    rpcUrls: ["https://rpc-mumbai.maticvigil.com"],
-    blockExplorerUrls: ["https://mumbai.polygonscan.com"],
-  },
-  245022926: {
-    chainId: "0xE9AC0CE",
-    chainName: "remote proxy — solana devnet",
-    nativeCurrency: { name: "NEON", symbol: "NEON", decimals: 18 },
-    rpcUrls: ["https://proxy.devnet.neonlabs.org/solana"],
-    blockExplorerUrls: ["https://neonscan.org/"],
-  },
-  1287: {
-    chainId: "0x507",
-    chainName: "Moonbase Alpha",
-    nativeCurrency: { name: "Dev", symbol: "DEV", decimals: 18 },
-    rpcUrls: ["https://rpc.api.moonbase.moonbeam.network"],
-    blockExplorerUrls: ["https://moonbase.moonscan.io"],
-  },
-  84531: {
-    chainId: "0x14A33",
-    chainName: "Base Goerli",
-    nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
-    rpcUrls: ["https://goerli.base.org"],
-    blockExplorerUrls: ["https://goerli.basescan.org"],
-  },
+  }
 };
 
 export interface EvmRpcMap {

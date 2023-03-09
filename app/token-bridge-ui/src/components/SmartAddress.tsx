@@ -1,10 +1,7 @@
 import {
   ChainId,
   CHAIN_ID_ETH,
-  CHAIN_ID_MOONBEAM,
-  CHAIN_ID_POLYGON,
   CHAIN_ID_SOLANA,
-  CHAIN_ID_XPLA,
 } from "@certusone/wormhole-sdk";
 import { Button, makeStyles, Tooltip, Typography } from "@material-ui/core";
 import { FileCopy, OpenInNew } from "@material-ui/icons";
@@ -83,37 +80,23 @@ export default function SmartAddress({
   const useableName = isNative
     ? "Native Currency"
     : parsedTokenAccount?.name
-    ? parsedTokenAccount.name
-    : tokenName
-    ? tokenName
-    : "";
+      ? parsedTokenAccount.name
+      : tokenName
+        ? tokenName
+        : "";
   const explorerAddress = isNative
     ? null
     : chainId === CHAIN_ID_ETH
-    ? `https://${CLUSTER === "testnet" ? "goerli." : ""}etherscan.io/${
-        isAsset ? "token" : "address"
+      ? `https://${CLUSTER === "testnet" ? "goerli." : ""}etherscan.io/${isAsset ? "token" : "address"
       }/${useableAddress}`
-    : chainId === CHAIN_ID_POLYGON
-    ? `https://${CLUSTER === "testnet" ? "mumbai." : ""}polygonscan.com/${
-        isAsset ? "token" : "address"
-      }/${useableAddress}`
-    : chainId === CHAIN_ID_MOONBEAM
-    ? `https://${CLUSTER === "testnet" ? "moonbase." : ""}moonscan.io/${
-        isAsset ? "token" : "address"
-      }/${useableAddress}`
-    : chainId === CHAIN_ID_SOLANA
-    ? `https://solscan.io/address/${useableAddress}${
-        CLUSTER === "testnet"
+      : chainId === CHAIN_ID_SOLANA
+        ? `https://solscan.io/address/${useableAddress}${CLUSTER === "testnet"
           ? "?cluster=devnet"
           : CLUSTER === "devnet"
-          ? "?cluster=custom&customUrl=http%3A%2F%2Flocalhost%3A8899"
-          : ""
-      }`
-    : chainId === CHAIN_ID_XPLA
-    ? `https://explorer.xpla.io/${
-        CLUSTER === "testnet" ? "testnet/" : ""
-      }address/${useableAddress}`
-    : undefined;
+            ? "?cluster=custom&customUrl=http%3A%2F%2Flocalhost%3A8899"
+            : ""
+        }`
+        : undefined;
   const explorerName = getExplorerName(chainId);
 
   const copyToClipboard = useCopyToClipboard(useableAddress);

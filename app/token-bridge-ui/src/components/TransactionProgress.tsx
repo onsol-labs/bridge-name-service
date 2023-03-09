@@ -1,7 +1,5 @@
 import {
   ChainId,
-  CHAIN_ID_MOONBEAM,
-  CHAIN_ID_POLYGON,
   CHAIN_ID_SOLANA,
   isEVMChain,
 } from "@certusone/wormhole-sdk";
@@ -10,7 +8,7 @@ import { Connection } from "@solana/web3.js";
 import { useEffect, useState } from "react";
 import { useEthereumProvider } from "../contexts/EthereumProviderContext";
 import { Transaction } from "../store/transferSlice";
-import { CHAINS_BY_ID, CLUSTER, SOLANA_HOST } from "../utils/consts";
+import { CHAINS_BY_ID, SOLANA_HOST } from "../utils/consts";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -72,17 +70,11 @@ export default function TransactionProgress({
   const blockDiff =
     tx && tx.block && currentBlock ? currentBlock - tx.block : undefined;
   const expectedBlocks = // minimum confirmations enforced by guardians or specified by the contract
-    chainId === CHAIN_ID_POLYGON
-      ? CLUSTER === "testnet"
-        ? 64
-        : 512
-      : chainId === CHAIN_ID_MOONBEAM
-        ? 1 // these chains only require 1 conf
-        : chainId === CHAIN_ID_SOLANA
-          ? 32
-            : isEVMChain(chainId)
-              ? 15
-              : 1;
+    chainId === CHAIN_ID_SOLANA
+        ? 32
+        : isEVMChain(chainId)
+          ? 15
+          : 1;
   if (
     !isSendComplete &&
     (chainId === CHAIN_ID_SOLANA || isEVMChain(chainId)) &&

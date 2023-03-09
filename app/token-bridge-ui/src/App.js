@@ -12,16 +12,11 @@ import {
 import { useCallback } from "react";
 import { useLocation } from "react-router";
 import { Link, Redirect, Route, Switch } from "react-router-dom";
-import Attest from "./components/Attest";
 import Footer from "./components/Footer";
 import HeaderText from "./components/HeaderText";
 import NFT from "./components/NFT";
 import NFTOriginVerifier from "./components/NFTOriginVerifier";
 import Recovery from "./components/Recovery";
-import TokenOriginVerifier from "./components/TokenOriginVerifier";
-import Transfer from "./components/Transfer";
-import UnwrapNative from "./components/UnwrapNative";
-import USDC from "./components/USDC";
 import { CLUSTER } from "./utils/consts";
 
 const useStyles = makeStyles((theme) => ({
@@ -83,12 +78,6 @@ function App() {
       {
         <AppBar position="static" elevation={0} style={{ marginBottom: 40 }}>
           <Toolbar variant="dense">
-            <Button component={Link} to="/usdc">
-              USDC
-            </Button>
-            <Button component={Link} to="/transfer">
-              Tokens
-            </Button>
             <Button component={Link} to="/nft">
               NFTs
             </Button>
@@ -108,7 +97,7 @@ function App() {
           </Toolbar>
         </AppBar>
       }
-      {["/transfer", "/nft", "/redeem"].includes(pathname) ? (
+      {[ "/nft", "/redeem"].includes(pathname) ? (
         <Container maxWidth="md" style={{ paddingBottom: 24 }}>
           <HeaderText
             white
@@ -126,12 +115,6 @@ function App() {
         </Container>
       ) : null}
       <Switch>
-        <Route exact path="/usdc">
-          <USDC />
-        </Route>
-        <Route exact path="/transfer">
-          <Transfer />
-        </Route>
         <Route exact path="/nft">
           <NFT />
         </Route>
@@ -141,17 +124,8 @@ function App() {
         <Route exact path="/nft-origin-verifier">
           <NFTOriginVerifier />
         </Route>
-        <Route exact path="/token-origin-verifier">
-          <TokenOriginVerifier />
-        </Route>
-        <Route exact path="/register">
-          <Attest />
-        </Route>
-        <Route exact path="/unwrap-native">
-          <UnwrapNative />
-        </Route>
         <Route>
-          <Redirect to="/transfer" />
+          <Redirect to="/nft" />
         </Route>
       </Switch>
       <div className={classes.spacer} />

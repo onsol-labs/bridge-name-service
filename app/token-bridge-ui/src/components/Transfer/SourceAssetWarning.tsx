@@ -1,7 +1,5 @@
-import { ChainId, CHAIN_ID_POLYGON, isEVMChain } from "@certusone/wormhole-sdk";
-import { makeStyles, Typography } from "@material-ui/core";
-import { Alert } from "@material-ui/lab";
-import { POLYGON_TERRA_WRAPPED_TOKENS } from "../../utils/consts";
+import { ChainId, isEVMChain } from "@certusone/wormhole-sdk";
+import { makeStyles } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -14,20 +12,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function PolygonTerraWrappedWarning() {
-  const classes = useStyles();
-  return (
-    <Alert severity="warning" variant="outlined" className={classes.alert}>
-      <Typography variant="body1">
-        This is a Shuttle-wrapped asset from Polygon! Transferring it will
-        result in a double wrapped (Portal-wrapped Shuttle-wrapped) asset, which
-        has no liquid markets.
-      </Typography>
-    </Alert>
-  );
-}
-
-export default function SoureAssetWarning({
+export default function SourceAssetWarning({
   sourceChain,
   sourceAsset,
 }: {
@@ -44,13 +29,10 @@ export default function SoureAssetWarning({
   const searchableAddress = isEVMChain(sourceChain)
     ? sourceAsset.toLowerCase()
     : sourceAsset;
-  const showPolygonTerraWrappedWarning =
-    sourceChain === CHAIN_ID_POLYGON &&
-    POLYGON_TERRA_WRAPPED_TOKENS.includes(searchableAddress);
 
   return (
     <>
-      {showPolygonTerraWrappedWarning ? <PolygonTerraWrappedWarning /> : null}
+      { null}
     </>
   );
 }

@@ -17,7 +17,6 @@ import {
 } from "../../store/selectors";
 import {
   ChainId,
-  CHAIN_ID_XPLA,
   hexToNativeAssetString,
 } from "@certusone/wormhole-sdk";
 
@@ -40,9 +39,7 @@ export function RegisterNowButtonCore({
   const canSwitch = originChain && originAsset && !signedVAAHex;
   const handleClick = useCallback(() => {
     const nativeAsset = originChain
-      ? originChain === CHAIN_ID_XPLA
-        ? sourceAsset || forceAsset
-        : hexToNativeAssetString(originAsset, originChain)
+      ? hexToNativeAssetString(originAsset, originChain)
       : undefined;
     if (originChain && originAsset && nativeAsset && canSwitch) {
       dispatch(setSourceChain(originChain));

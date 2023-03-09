@@ -1,7 +1,5 @@
 import {
-  cosmos,
   CHAIN_ID_SOLANA,
-  CHAIN_ID_XPLA,
   isEVMChain,
   uint8ArrayToHex,
 } from "@certusone/wormhole-sdk";
@@ -25,7 +23,6 @@ import {
   selectTransferTargetParsedTokenAccount,
 } from "../store/selectors";
 import { setTargetAddressHex as setTransferTargetAddressHex } from "../store/transferSlice";
-import { useConnectedWallet as useXplaConnectedWallet } from "@xpla/wallet-provider";
 
 function useSyncTargetAddress(shouldFire: boolean, nft?: boolean) {
   const dispatch = useDispatch();
@@ -42,7 +39,6 @@ function useSyncTargetAddress(shouldFire: boolean, nft?: boolean) {
     selectTransferTargetParsedTokenAccount
   );
   const targetTokenAccountPublicKey = targetParsedTokenAccount?.publicKey;
-  const xplaWallet = useXplaConnectedWallet();
   const setTargetAddressHex = nft
     ? setNFTTargetAddressHex
     : setTransferTargetAddressHex;
@@ -96,18 +92,6 @@ function useSyncTargetAddress(shouldFire: boolean, nft?: boolean) {
             }
           }
         })();
-      } else if (
-        targetChain === CHAIN_ID_XPLA &&
-        xplaWallet &&
-        xplaWallet.walletAddress
-      ) {
-        dispatch(
-          setTargetAddressHex(
-            uint8ArrayToHex(
-              zeroPad(cosmos.canonicalAddress(xplaWallet.walletAddress), 32)
-            )
-          )
-        );
       } else {
         dispatch(setTargetAddressHex(undefined));
       }
@@ -125,7 +109,6 @@ function useSyncTargetAddress(shouldFire: boolean, nft?: boolean) {
     targetTokenAccountPublicKey,
     nft,
     setTargetAddressHex,
-    xplaWallet,
   ]);
 }
 

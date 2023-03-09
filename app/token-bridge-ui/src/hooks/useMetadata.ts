@@ -1,7 +1,6 @@
 import {
   ChainId,
   CHAIN_ID_SOLANA,
-  CHAIN_ID_XPLA,
   isEVMChain,
 } from "@certusone/wormhole-sdk";
 import { TokenInfo } from "@solana/spl-token-registry";
@@ -11,7 +10,6 @@ import { Metadata } from "../utils/metaplex";
 import useEvmMetadata, { EvmMetadata } from "./useEvmMetadata";
 import useMetaplexData from "./useMetaplexData";
 import useSolanaTokenMap from "./useSolanaTokenMap";
-import useXplaMetadata, { XplaMetadata } from "./useXplaMetadata";
 
 export type GenericMetadata = {
   symbol?: string;
@@ -41,33 +39,6 @@ const constructSolanaMetadata = (
       tokenName: metaplex?.data?.name || tokenInfo?.name || undefined,
       decimals: tokenInfo?.decimals || undefined, //TODO decimals are actually on the mint, not the metaplex account.
       raw: metaplex,
-    };
-    data.set(address, obj);
-  });
-
-  return {
-    isFetching,
-    error,
-    receivedAt,
-    data,
-  };
-};
-
-const constructXplaMetadata = (
-  addresses: string[],
-  metadataMap: DataWrapper<Map<string, XplaMetadata>>
-) => {
-  const isFetching = metadataMap.isFetching;
-  const error = metadataMap.error;
-  const receivedAt = metadataMap.receivedAt;
-  const data = new Map<string, GenericMetadata>();
-  addresses.forEach((address) => {
-    const meta = metadataMap.data?.get(address);
-    const obj = {
-      symbol: meta?.symbol || undefined,
-      logo: undefined,
-      tokenName: meta?.tokenName || undefined,
-      decimals: meta?.decimals,
     };
     data.set(address, obj);
   });
@@ -116,15 +87,11 @@ export default function useMetadata(
   const solanaAddresses = useMemo(() => {
     return chainId === CHAIN_ID_SOLANA ? addresses : [];
   }, [chainId, addresses]);
-  const xplaAddresses = useMemo(() => {
-    return chainId === CHAIN_ID_XPLA ? addresses : [];
-  }, [chainId, addresses]);
   const ethereumAddresses = useMemo(() => {
     return isEVMChain(chainId) ? addresses : [];
   }, [chainId, addresses]);
 
   const metaplexData = useMetaplexData(solanaAddresses);
-  const xplaMetadata = useXplaMetadata(xplaAddresses);
   const ethMetadata = useEvmMetadata(ethereumAddresses, chainId);
 
   const output: DataWrapper<Map<string, GenericMetadata>> = useMemo(
@@ -133,8 +100,6 @@ export default function useMetadata(
         ? constructSolanaMetadata(solanaAddresses, solanaTokenMap, metaplexData)
         : isEVMChain(chainId)
         ? constructEthMetadata(ethereumAddresses, ethMetadata)
-        : chainId === CHAIN_ID_XPLA
-        ? constructXplaMetadata(xplaAddresses, xplaMetadata)
         : getEmptyDataWrapper(),
     [
       chainId,
@@ -143,8 +108,6 @@ export default function useMetadata(
       metaplexData,
       ethereumAddresses,
       ethMetadata,
-      xplaAddresses,
-      xplaMetadata,
     ]
   );
 

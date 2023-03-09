@@ -1,24 +1,16 @@
 import {
   ChainId,
   CHAIN_ID_SOLANA,
-  CHAIN_ID_XPLA,
   isEVMChain,
   postVaaSolanaWithRetry,
   redeemAndUnwrapOnSolana,
   redeemOnEth,
   redeemOnEthNative,
   redeemOnSolana,
-  redeemOnXpla,
-  uint8ArrayToHex,
 } from "@certusone/wormhole-sdk";
 import { Alert } from "@material-ui/lab";
 import { WalletContextState } from "@solana/wallet-adapter-react";
 import { Connection } from "@solana/web3.js";
-import {
-  ConnectedWallet as XplaConnectedWallet,
-  useConnectedWallet as useXplaConnectedWallet,
-} from "@xpla/wallet-provider";
-import axios from "axios";
 import { Signer } from "ethers";
 import { useSnackbar } from "notistack";
 import { useCallback, useMemo } from "react";
@@ -39,7 +31,6 @@ import {
 } from "../utils/consts";
 import parseError from "../utils/parseError";
 import { signSendAndConfirm } from "../utils/solana";
-import { postWithFeesXpla } from "../utils/xpla";
 import useTransferSignedVAA from "./useTransferSignedVAA";
 
 async function evm(
@@ -132,38 +123,6 @@ async function solana(
   }
 }
 
-async function xpla(
-  dispatch: any,
-  enqueueSnackbar: any,
-  wallet: XplaConnectedWallet,
-  signedVAA: Uint8Array
-) {
-  dispatch(setIsRedeeming(true));
-  try {
-    const msg = await redeemOnXpla(
-      getTokenBridgeAddressForChain(CHAIN_ID_XPLA),
-      wallet.xplaAddress,
-      signedVAA
-    );
-    const result = await postWithFeesXpla(
-      wallet,
-      [msg],
-      "Wormhole - Complete Transfer"
-    );
-    dispatch(
-      setRedeemTx({ id: result.result.txhash, block: result.result.height })
-    );
-    enqueueSnackbar(null, {
-      content: <Alert severity="success">Transaction confirmed</Alert>,
-    });
-  } catch (e) {
-    enqueueSnackbar(null, {
-      content: <Alert severity="error">{parseError(e)}</Alert>,
-    });
-    dispatch(setIsRedeeming(false));
-  }
-}
-
 export function useHandleRedeem() {
   const dispatch = useDispatch();
   const { enqueueSnackbar } = useSnackbar();
@@ -171,7 +130,6 @@ export function useHandleRedeem() {
   const solanaWallet = useSolanaWallet();
   const solPK = solanaWallet?.publicKey;
   const { signer } = useEthereumProvider();
-  const xplaWallet = useXplaConnectedWallet();
 
   const signedVAA = useTransferSignedVAA();
   const isRedeeming = useSelector(selectTransferIsRedeeming);
@@ -192,8 +150,6 @@ export function useHandleRedeem() {
         signedVAA,
         false
       );
-    } else if (targetChain === CHAIN_ID_XPLA && !!xplaWallet && signedVAA) {
-      xpla(dispatch, enqueueSnackbar, xplaWallet, signedVAA);
     } else {
     }
   }, [
@@ -204,7 +160,6 @@ export function useHandleRedeem() {
     signedVAA,
     solanaWallet,
     solPK,
-    xplaWallet,
   ]);
 
   const handleRedeemNativeClick = useCallback(() => {

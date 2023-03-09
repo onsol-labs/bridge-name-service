@@ -1,7 +1,5 @@
 import {
   CHAIN_ID_ETH,
-  CHAIN_ID_NEON,
-  CHAIN_ID_POLYGON,
   CHAIN_ID_SOLANA,
   isEVMChain,
   WSOL_ADDRESS,
@@ -33,8 +31,6 @@ import {
   CHAINS_BY_ID,
   getHowToAddTokensToWalletUrl,
   WETH_ADDRESS,
-  WMATIC_ADDRESS,
-  WNEON_ADDRESS,
 } from "../../utils/consts";
 import ButtonWithLoader from "../ButtonWithLoader";
 import KeyAndBalance from "../KeyAndBalance";
@@ -89,22 +85,12 @@ function Redeem() {
     targetChain === CHAIN_ID_ETH &&
     targetAsset &&
     targetAsset.toLowerCase() === WETH_ADDRESS.toLowerCase();
-  const isPolygonNative =
-    targetChain === CHAIN_ID_POLYGON &&
-    targetAsset &&
-    targetAsset.toLowerCase() === WMATIC_ADDRESS.toLowerCase();
-  const isNeonNative =
-    targetChain === CHAIN_ID_NEON &&
-    targetAsset &&
-    targetAsset.toLowerCase() === WNEON_ADDRESS.toLowerCase();
   const isSolNative =
     targetChain === CHAIN_ID_SOLANA &&
     targetAsset &&
     targetAsset === WSOL_ADDRESS;
   const isNativeEligible =
     isEthNative ||
-    isPolygonNative ||
-    isNeonNative ||
     isSolNative;
   const [useNativeRedeem, setUseNativeRedeem] = useState(true);
   const toggleNativeRedeem = useCallback(() => {

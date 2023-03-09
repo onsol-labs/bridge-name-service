@@ -14,13 +14,11 @@ import clsx from "clsx";
 import {
   ChainId,
   CHAIN_ID_ETH,
-  CHAIN_ID_POLYGON,
   CHAIN_ID_SOLANA,
 } from "@certusone/wormhole-sdk";
 import SmartAddress from "../SmartAddress";
 import ethIcon from "../../icons/eth.svg";
 import solanaIcon from "../../icons/solana.svg";
-import polygonIcon from "../../icons/polygon.svg";
 import useCopyToClipboard from "../../hooks/useCopyToClipboard";
 
 const safeIPFS = (uri: string) =>
@@ -55,18 +53,6 @@ const LogoIcon = ({ chainId }: { chainId: ChainId }) =>
       }}
       src={ethIcon}
       alt="Ethereum"
-    />
-  ) : chainId === CHAIN_ID_POLYGON ? (
-    <Avatar
-      style={{
-        backgroundColor: "black",
-        height: "1em",
-        width: "1em",
-        marginLeft: "4px",
-        padding: "3px",
-      }}
-      src={polygonIcon}
-      alt="Polygon"
     />
   ) : null;
 
@@ -143,12 +129,6 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: "rgb(69,74,117)",
     background:
       "linear-gradient(160deg, rgba(69,74,117,1) 0%, rgba(138,146,178,1) 33%, rgba(69,74,117,1) 66%, rgba(98,104,143,1) 100%)",
-  },
-  polygon: {
-    // color from polygon logo #8247E5 down to 30 lightness
-    backgroundColor: "#0F0323",
-    background:
-      "linear-gradient(160deg, #0F0323 0%, #250957 33%, #0F0323 66%, #0F0323 100%)",
   },
   solana: {
     // colors from https://solana.com/branding/new/exchange/exchange-sq-black.svg
@@ -306,9 +286,7 @@ export default function NFTViewer({
       </div>
       <Card
         className={clsx(classes.card, {
-          [classes.silverBorder]:
-            chainId === CHAIN_ID_SOLANA ||
-            chainId === CHAIN_ID_POLYGON,
+          [classes.silverBorder]: chainId === CHAIN_ID_SOLANA,
           [classes.hidden]: isLoading,
         })}
         elevation={10}
@@ -317,7 +295,6 @@ export default function NFTViewer({
           className={clsx(classes.cardInset, {
             [classes.eth]: chainId === CHAIN_ID_ETH,
             [classes.solana]: chainId === CHAIN_ID_SOLANA,
-            [classes.polygon]: chainId === CHAIN_ID_POLYGON,
           })}
         >
           <CardContent className={classes.textContent}>
@@ -338,9 +315,7 @@ export default function NFTViewer({
           </CardContent>
           <CardMedia
             className={clsx(classes.mediaContent, {
-              [classes.silverMediaBorder]:
-                chainId === CHAIN_ID_SOLANA ||
-                chainId === CHAIN_ID_POLYGON,
+              [classes.silverMediaBorder]: chainId === CHAIN_ID_SOLANA
             })}
           >
             {media}

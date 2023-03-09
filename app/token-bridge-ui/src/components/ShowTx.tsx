@@ -1,10 +1,7 @@
 import {
   ChainId,
   CHAIN_ID_ETH,
-  CHAIN_ID_MOONBEAM,
-  CHAIN_ID_POLYGON,
   CHAIN_ID_SOLANA,
-  CHAIN_ID_XPLA,
 } from "@certusone/wormhole-sdk";
 import { Button, makeStyles, Typography } from "@material-ui/core";
 import { Transaction } from "../store/transferSlice";
@@ -36,23 +33,14 @@ export default function ShowTx({
     chainId === CHAIN_ID_ETH
       ? `https://${CLUSTER === "testnet" ? "goerli." : ""}etherscan.io/tx/${tx?.id
       }`
-      : chainId === CHAIN_ID_POLYGON
-        ? `https://${CLUSTER === "testnet" ? "mumbai." : ""}polygonscan.com/tx/${tx?.id
+      : chainId === CHAIN_ID_SOLANA
+        ? `https://solscan.io/tx/${tx?.id}${CLUSTER === "testnet"
+          ? "?cluster=devnet"
+          : CLUSTER === "devnet"
+            ? "?cluster=custom&customUrl=http%3A%2F%2Flocalhost%3A8899"
+            : ""
         }`
-        : chainId === CHAIN_ID_SOLANA
-          ? `https://solscan.io/tx/${tx?.id}${CLUSTER === "testnet"
-            ? "?cluster=devnet"
-            : CLUSTER === "devnet"
-              ? "?cluster=custom&customUrl=http%3A%2F%2Flocalhost%3A8899"
-              : ""
-          }`
-          : chainId === CHAIN_ID_MOONBEAM
-            ? `https://${CLUSTER === "testnet" ? "moonbase." : ""}moonscan.io/tx/${tx?.id
-            }`
-            : chainId === CHAIN_ID_XPLA
-              ? `https://explorer.xpla.io/${CLUSTER === "testnet" ? "testnet/" : ""
-              }tx/${tx?.id}`
-              : undefined;
+        : undefined;
   const explorerName = getExplorerName(chainId);
 
   return (

@@ -1,9 +1,7 @@
 import {
   CHAIN_ID_SOLANA,
-  CHAIN_ID_XPLA,
   getIsTransferCompletedEth,
   getIsTransferCompletedSolana,
-  getIsTransferCompletedXpla,
   isEVMChain,
 } from "@certusone/wormhole-sdk";
 import { Connection } from "@solana/web3.js";
@@ -19,11 +17,9 @@ import {
   getEvmChainId,
   getTokenBridgeAddressForChain,
   SOLANA_HOST,
-  XPLA_LCD_CLIENT_CONFIG,
 } from "../utils/consts";
 import useIsWalletReady from "./useIsWalletReady";
 import useTransferSignedVAA from "./useTransferSignedVAA";
-import { LCDClient as XplaLCDClient } from "@xpla/xpla.js";
 
 /**
  * @param recoveryOnly Only fire when in recovery mode
@@ -98,24 +94,6 @@ export default function useGetIsTransferCompleted(
               getTokenBridgeAddressForChain(targetChain),
               signedVAA,
               connection
-            );
-          } catch (error) {
-            console.error(error);
-          }
-          if (!cancelled) {
-            setIsTransferCompleted(transferCompleted);
-            setIsLoading(false);
-          }
-        })();
-      } else if (targetChain === CHAIN_ID_XPLA) {
-        setIsLoading(true);
-        (async () => {
-          try {
-            const lcdClient = new XplaLCDClient(XPLA_LCD_CLIENT_CONFIG);
-            transferCompleted = await getIsTransferCompletedXpla(
-              getTokenBridgeAddressForChain(targetChain),
-              signedVAA,
-              lcdClient
             );
           } catch (error) {
             console.error(error);
