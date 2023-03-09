@@ -9,16 +9,6 @@
       "chainId": 2,
       "address": "0xDDb64fE46a91D46ee29420539FC25FD07c5FEa3E",
       "coingeckoId": "ethereum"
-    },
-    {
-      "chainId": 3,
-      "address": "uluna",
-      "coingeckoId": "terra-luna"
-    },
-    {
-      "chainId": 4,
-      "address": "0xDDb64fE46a91D46ee29420539FC25FD07c5FEa3E",
-      "coingeckoId": "binancecoin"
     }
   ],
   "relayers": [{ "name": "localhostRelayer", "url": "http://localhost:4201" }]

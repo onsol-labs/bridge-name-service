@@ -1,16 +1,5 @@
 import {
   ChainId,
-  CHAIN_ID_ACALA,
-  CHAIN_ID_ARBITRUM,
-  CHAIN_ID_AURORA,
-  CHAIN_ID_BASE,
-  CHAIN_ID_CELO,
-  CHAIN_ID_FANTOM,
-  CHAIN_ID_KARURA,
-  CHAIN_ID_KLAYTN,
-  CHAIN_ID_MOONBEAM,
-  CHAIN_ID_OASIS,
-  CHAIN_ID_POLYGON,
   CHAIN_ID_SOLANA,
   isEVMChain,
 } from "@certusone/wormhole-sdk";
@@ -19,7 +8,7 @@ import { Connection } from "@solana/web3.js";
 import { useEffect, useState } from "react";
 import { useEthereumProvider } from "../contexts/EthereumProviderContext";
 import { Transaction } from "../store/transferSlice";
-import { CHAINS_BY_ID, CLUSTER, SOLANA_HOST } from "../utils/consts";
+import { CHAINS_BY_ID, SOLANA_HOST } from "../utils/consts";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -81,28 +70,11 @@ export default function TransactionProgress({
   const blockDiff =
     tx && tx.block && currentBlock ? currentBlock - tx.block : undefined;
   const expectedBlocks = // minimum confirmations enforced by guardians or specified by the contract
-    chainId === CHAIN_ID_POLYGON
-      ? CLUSTER === "testnet"
-        ? 64
-        : 512
-      : chainId === CHAIN_ID_OASIS ||
-        chainId === CHAIN_ID_AURORA ||
-        chainId === CHAIN_ID_FANTOM ||
-        chainId === CHAIN_ID_KARURA ||
-        chainId === CHAIN_ID_ACALA ||
-        chainId === CHAIN_ID_KLAYTN ||
-        chainId === CHAIN_ID_CELO ||
-        chainId === CHAIN_ID_MOONBEAM
-      ? 1 // these chains only require 1 conf
-      : chainId === CHAIN_ID_SOLANA
-      ? 32
-      : chainId === CHAIN_ID_ARBITRUM
-      ? 64 // something to show progress
-      : chainId === CHAIN_ID_BASE
-      ? 124 // something to show progress
-      : isEVMChain(chainId)
-      ? 15
-      : 1;
+    chainId === CHAIN_ID_SOLANA
+        ? 32
+        : isEVMChain(chainId)
+          ? 15
+          : 1;
   if (
     !isSendComplete &&
     (chainId === CHAIN_ID_SOLANA || isEVMChain(chainId)) &&
@@ -117,11 +89,7 @@ export default function TransactionProgress({
           variant="determinate"
         />
         <Typography variant="body2" className={classes.message}>
-          {chainId === CHAIN_ID_ARBITRUM
-            ? `Waiting for Ethereum finality on Arbitrum block ${tx?.block}` //TODO: more advanced finality checking for Arbitrum
-            : chainId === CHAIN_ID_BASE
-            ? `Waiting for Ethereum finality on Base block ${tx?.block}` //TODO: more advanced finality checking for Base
-            : blockDiff < expectedBlocks
+          {blockDiff < expectedBlocks
             ? `Waiting for ${blockDiff} / ${expectedBlocks} confirmations on ${CHAINS_BY_ID[chainId].name}...`
             : `Waiting for Wormhole Network consensus...`}
         </Typography>

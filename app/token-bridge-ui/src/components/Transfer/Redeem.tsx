@@ -1,15 +1,5 @@
 import {
-  CHAIN_ID_ACALA,
-  CHAIN_ID_AURORA,
-  CHAIN_ID_AVAX,
-  CHAIN_ID_BSC,
   CHAIN_ID_ETH,
-  CHAIN_ID_FANTOM,
-  CHAIN_ID_KARURA,
-  CHAIN_ID_KLAYTN,
-  CHAIN_ID_NEON,
-  CHAIN_ID_OASIS,
-  CHAIN_ID_POLYGON,
   CHAIN_ID_SOLANA,
   isEVMChain,
   WSOL_ADDRESS,
@@ -40,15 +30,7 @@ import { reset } from "../../store/transferSlice";
 import {
   CHAINS_BY_ID,
   getHowToAddTokensToWalletUrl,
-  WAVAX_ADDRESS,
-  WBNB_ADDRESS,
   WETH_ADDRESS,
-  WETH_AURORA_ADDRESS,
-  WFTM_ADDRESS,
-  WKLAY_ADDRESS,
-  WMATIC_ADDRESS,
-  WNEON_ADDRESS,
-  WROSE_ADDRESS,
 } from "../../utils/consts";
 import ButtonWithLoader from "../ButtonWithLoader";
 import KeyAndBalance from "../KeyAndBalance";
@@ -74,7 +56,6 @@ function Redeem() {
   const {
     handleClick,
     handleNativeClick,
-    handleAcalaRelayerRedeemClick,
     disabled,
     showLoader,
   } = useHandleRedeem();
@@ -89,8 +70,6 @@ function Redeem() {
     }
   }, [useRelayer]);
   const targetChain = useSelector(selectTransferTargetChain);
-  const targetIsAcala =
-    targetChain === CHAIN_ID_ACALA || targetChain === CHAIN_ID_KARURA;
   const targetAsset = useSelector(selectTransferTargetAsset);
   const isRecovery = useSelector(selectTransferIsRecovery);
   const { isTransferCompletedLoading, isTransferCompleted } =
@@ -106,52 +85,12 @@ function Redeem() {
     targetChain === CHAIN_ID_ETH &&
     targetAsset &&
     targetAsset.toLowerCase() === WETH_ADDRESS.toLowerCase();
-  const isBscNative =
-    targetChain === CHAIN_ID_BSC &&
-    targetAsset &&
-    targetAsset.toLowerCase() === WBNB_ADDRESS.toLowerCase();
-  const isPolygonNative =
-    targetChain === CHAIN_ID_POLYGON &&
-    targetAsset &&
-    targetAsset.toLowerCase() === WMATIC_ADDRESS.toLowerCase();
-  const isAvaxNative =
-    targetChain === CHAIN_ID_AVAX &&
-    targetAsset &&
-    targetAsset.toLowerCase() === WAVAX_ADDRESS.toLowerCase();
-  const isOasisNative =
-    targetChain === CHAIN_ID_OASIS &&
-    targetAsset &&
-    targetAsset.toLowerCase() === WROSE_ADDRESS.toLowerCase();
-  const isAuroraNative =
-    targetChain === CHAIN_ID_AURORA &&
-    targetAsset &&
-    targetAsset.toLowerCase() === WETH_AURORA_ADDRESS.toLowerCase();
-  const isFantomNative =
-    targetChain === CHAIN_ID_FANTOM &&
-    targetAsset &&
-    targetAsset.toLowerCase() === WFTM_ADDRESS.toLowerCase();
-  const isKlaytnNative =
-    targetChain === CHAIN_ID_KLAYTN &&
-    targetAsset &&
-    targetAsset.toLowerCase() === WKLAY_ADDRESS.toLowerCase();
-  const isNeonNative =
-    targetChain === CHAIN_ID_NEON &&
-    targetAsset &&
-    targetAsset.toLowerCase() === WNEON_ADDRESS.toLowerCase();
   const isSolNative =
     targetChain === CHAIN_ID_SOLANA &&
     targetAsset &&
     targetAsset === WSOL_ADDRESS;
   const isNativeEligible =
     isEthNative ||
-    isBscNative ||
-    isPolygonNative ||
-    isAvaxNative ||
-    isOasisNative ||
-    isAuroraNative ||
-    isFantomNative ||
-    isKlaytnNative ||
-    isNeonNative ||
     isSolNative;
   const [useNativeRedeem, setUseNativeRedeem] = useState(true);
   const toggleNativeRedeem = useCallback(() => {
@@ -164,22 +103,20 @@ function Redeem() {
 
   const relayerContent = (
     <>
-      {isEVMChain(targetChain) && !isTransferCompleted && !targetIsAcala ? (
+      {isEVMChain(targetChain) && !isTransferCompleted ? (
         <KeyAndBalance chainId={targetChain} />
       ) : null}
 
       {!isReady &&
-      isEVMChain(targetChain) &&
-      !isTransferCompleted &&
-      !targetIsAcala ? (
+        isEVMChain(targetChain) &&
+        !isTransferCompleted ? (
         <Typography className={classes.centered}>
           {"Please connect your wallet to check for transfer completion."}
         </Typography>
       ) : null}
 
       {(!isEVMChain(targetChain) || isReady) &&
-      !isTransferCompleted &&
-      !targetIsAcala ? (
+        !isTransferCompleted ? (
         <div className={classes.centered}>
           <CircularProgress style={{ marginBottom: 16 }} />
           <Typography>
@@ -195,30 +132,6 @@ function Redeem() {
               Manually redeem instead
             </Button>
           </Tooltip>
-        </div>
-      ) : null}
-
-      {/* TODO: handle recovery */}
-      {targetIsAcala && !isTransferCompleted ? (
-        <div className={classes.centered}>
-          <ButtonWithLoader
-            disabled={disabled}
-            onClick={handleAcalaRelayerRedeemClick}
-            showLoader={showLoader}
-          >
-            <span>
-              Redeem ({CHAINS_BY_ID[targetChain].name} pays gas for you
-              &#127881;)
-            </span>
-          </ButtonWithLoader>
-          <Button
-            onClick={handleManuallyRedeemClick}
-            size="small"
-            variant="outlined"
-            style={{ marginTop: 16 }}
-          >
-            Manually redeem instead
-          </Button>
         </div>
       ) : null}
 

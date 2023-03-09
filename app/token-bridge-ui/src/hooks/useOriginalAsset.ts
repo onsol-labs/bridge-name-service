@@ -1,23 +1,11 @@
 import {
   ChainId,
-  CHAIN_ID_ALGORAND,
-  CHAIN_ID_APTOS,
-  CHAIN_ID_INJECTIVE,
-  CHAIN_ID_NEAR,
   CHAIN_ID_SOLANA,
-  CHAIN_ID_XPLA,
-  getOriginalAssetAlgorand,
-  getOriginalAssetAptos,
-  getOriginalAssetCosmWasm,
   getOriginalAssetEth,
-  getOriginalAssetInjective,
-  getOriginalAssetNear,
   getOriginalAssetSol,
-  getTypeFromExternalAddress,
   hexToNativeAssetString,
   isEVMChain,
   queryExternalId,
-  queryExternalIdInjective,
   uint8ArrayToHex,
   uint8ArrayToNative,
 } from "@certusone/wormhole-sdk";
@@ -28,33 +16,21 @@ import {
 } from "@certusone/wormhole-sdk/lib/esm/nft_bridge";
 import { Web3Provider } from "@ethersproject/providers";
 import { Connection } from "@solana/web3.js";
-import { LCDClient as XplaLCDClient } from "@xpla/xpla.js";
-import { Algodv2 } from "algosdk";
 import { ethers } from "ethers";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Provider,
   useEthereumProvider,
 } from "../contexts/EthereumProviderContext";
-import { useNearContext } from "../contexts/NearWalletContext";
 import { DataWrapper } from "../store/helpers";
-import { getAptosClient } from "../utils/aptos";
 import {
-  ALGORAND_HOST,
-  ALGORAND_TOKEN_BRIDGE_ID,
   getNFTBridgeAddressForChain,
   getTokenBridgeAddressForChain,
-  NATIVE_NEAR_PLACEHOLDER,
-  NATIVE_NEAR_WH_ADDRESS,
-  NEAR_TOKEN_BRIDGE_ACCOUNT,
   SOLANA_HOST,
   SOLANA_SYSTEM_PROGRAM_ADDRESS,
   SOL_NFT_BRIDGE_ADDRESS,
   SOL_TOKEN_BRIDGE_ADDRESS,
-  XPLA_LCD_CLIENT_CONFIG,
 } from "../utils/consts";
-import { getInjectiveWasmClient } from "../utils/injective";
-import { lookupHash, makeNearAccount, makeNearProvider } from "../utils/near";
 import useIsWalletReady from "./useIsWalletReady";
 
 export type OriginalAssetInfo = {
@@ -67,7 +43,6 @@ export async function getOriginalAssetToken(
   foreignChain: ChainId,
   foreignNativeStringAddress: string,
   provider?: Web3Provider,
-  nearAccountId?: string | null
 ) {
   let promise = null;
   try {
@@ -83,35 +58,6 @@ export async function getOriginalAssetToken(
       promise = await getOriginalAssetSol(
         connection,
         SOL_TOKEN_BRIDGE_ADDRESS,
-        foreignNativeStringAddress
-      );
-    } else if (foreignChain === CHAIN_ID_ALGORAND) {
-      const algodClient = new Algodv2(
-        ALGORAND_HOST.algodToken,
-        ALGORAND_HOST.algodServer,
-        ALGORAND_HOST.algodPort
-      );
-      promise = await getOriginalAssetAlgorand(
-        algodClient,
-        ALGORAND_TOKEN_BRIDGE_ID,
-        BigInt(foreignNativeStringAddress)
-      );
-    } else if (foreignChain === CHAIN_ID_APTOS) {
-      promise = await getOriginalAssetAptos(
-        getAptosClient(),
-        getTokenBridgeAddressForChain(CHAIN_ID_APTOS),
-        foreignNativeStringAddress
-      );
-    } else if (foreignChain === CHAIN_ID_INJECTIVE) {
-      promise = await getOriginalAssetInjective(
-        foreignNativeStringAddress,
-        getInjectiveWasmClient()
-      );
-    } else if (foreignChain === CHAIN_ID_NEAR && nearAccountId) {
-      const provider = makeNearProvider();
-      promise = await getOriginalAssetNear(
-        provider,
-        NEAR_TOKEN_BRIDGE_ACCOUNT,
         foreignNativeStringAddress
       );
     }
@@ -164,7 +110,6 @@ export async function getOriginalAsset(
   nft: boolean,
   tokenId?: string,
   provider?: Provider,
-  nearAccountId?: string | null
 ): Promise<WormholeWrappedNFTInfo> {
   const result = nft
     ? await getOriginalAssetNFT(
@@ -177,7 +122,6 @@ export async function getOriginalAsset(
       foreignChain,
       foreignNativeStringAddress,
       provider,
-      nearAccountId
     );
 
   if (
@@ -206,7 +150,6 @@ function useOriginalAsset(
   tokenId?: string
 ): DataWrapper<OriginalAssetInfo> {
   const { provider } = useEthereumProvider();
-  const { accountId: nearAccountId } = useNearContext();
   const { isReady } = useIsWalletReady(foreignChain, false);
   const [originAddress, setOriginAddress] = useState<string | null>(null);
   const [originTokenId, setOriginTokenId] = useState<string | null>(null);
@@ -251,15 +194,6 @@ function useOriginalAsset(
     if (argumentError) {
       return;
     }
-    // short circuit for near native
-    if (
-      foreignChain === CHAIN_ID_NEAR &&
-      foreignAddress === NATIVE_NEAR_PLACEHOLDER
-    ) {
-      setOriginChain(CHAIN_ID_NEAR);
-      setOriginAddress(NATIVE_NEAR_PLACEHOLDER);
-      return;
-    }
     let cancelled = false;
     setIsLoading(true);
 
@@ -269,69 +203,20 @@ function useOriginalAsset(
       nft,
       tokenId,
       provider,
-      nearAccountId
     )
       .then((result) => {
         if (!cancelled) {
           setIsLoading(false);
           setArgs();
-          if (
-            result.chainId === CHAIN_ID_XPLA
-          ) {
-            const lcd = new XplaLCDClient(XPLA_LCD_CLIENT_CONFIG);
-            const tokenBridgeAddress = getTokenBridgeAddressForChain(
+          setOriginAddress(
+            hexToNativeAssetString(
+              uint8ArrayToHex(result.assetAddress),
               result.chainId
-            );
-            queryExternalId(
-              lcd,
-              tokenBridgeAddress,
-              uint8ArrayToHex(result.assetAddress)
-            ).then((tokenId) => setOriginAddress(tokenId || null));
-          } else if (result.chainId === CHAIN_ID_APTOS) {
-            getTypeFromExternalAddress(
-              getAptosClient(),
-              getTokenBridgeAddressForChain(CHAIN_ID_APTOS),
-              uint8ArrayToHex(result.assetAddress)
-            ).then((tokenId) => setOriginAddress(tokenId || null));
-          } else if (result.chainId === CHAIN_ID_INJECTIVE) {
-            const client = getInjectiveWasmClient();
-            const tokenBridgeAddress = getTokenBridgeAddressForChain(
-              result.chainId
-            );
-            queryExternalIdInjective(
-              client,
-              tokenBridgeAddress,
-              uint8ArrayToHex(result.assetAddress)
-            ).then((tokenId) => setOriginAddress(tokenId));
-          } else if (result.chainId === CHAIN_ID_NEAR) {
-            if (
-              uint8ArrayToHex(result.assetAddress) === NATIVE_NEAR_WH_ADDRESS
-            ) {
-              setOriginAddress(NATIVE_NEAR_PLACEHOLDER);
-            } else if (nearAccountId) {
-              makeNearAccount(nearAccountId).then((account) => {
-                lookupHash(
-                  account,
-                  NEAR_TOKEN_BRIDGE_ACCOUNT,
-                  uint8ArrayToHex(result.assetAddress)
-                ).then((tokenAccount) => {
-                  if (!cancelled) {
-                    setOriginAddress(tokenAccount[1] || null);
-                  }
-                });
-              });
-            }
-          } else {
-            setOriginAddress(
-              hexToNativeAssetString(
-                uint8ArrayToHex(result.assetAddress),
-                result.chainId
-              ) || null
-            );
-          }
-          setOriginTokenId(result.tokenId || null);
-          setOriginChain(result.chainId);
+            ) || null
+          );
         }
+        setOriginTokenId(result.tokenId || null);
+        setOriginChain(result.chainId);
       })
       .catch((e) => {
         if (!cancelled) {
@@ -348,7 +233,6 @@ function useOriginalAsset(
     argumentError,
     tokenId,
     argsEqual,
-    nearAccountId,
   ]);
 
   const output: DataWrapper<OriginalAssetInfo> = useMemo(

@@ -3,7 +3,6 @@ import attestReducer from "./attestSlice";
 import nftReducer from "./nftSlice";
 import transferReducer from "./transferSlice";
 import tokenReducer from "./tokenSlice";
-import usdcReducer from "./usdcSlice";
 
 export const store = configureStore({
   reducer: {
@@ -11,7 +10,6 @@ export const store = configureStore({
     nft: nftReducer,
     transfer: transferReducer,
     tokens: tokenReducer,
-    usdc: usdcReducer,
   },
 });
 

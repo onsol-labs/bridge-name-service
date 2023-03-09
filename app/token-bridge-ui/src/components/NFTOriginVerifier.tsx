@@ -1,12 +1,6 @@
 import {
   ChainId,
-  CHAIN_ID_AURORA,
-  CHAIN_ID_AVAX,
-  CHAIN_ID_BSC,
   CHAIN_ID_ETH,
-  CHAIN_ID_FANTOM,
-  CHAIN_ID_OASIS,
-  CHAIN_ID_POLYGON,
   CHAIN_ID_SOLANA,
   hexToNativeAssetString,
   isEVMChain,
@@ -307,62 +301,7 @@ export default function NFTOriginVerifier() {
                   >
                     View on Solscan
                   </Button>
-                ) : originInfo.chainId === CHAIN_ID_BSC ? (
-                  <Button
-                    href={`https://bscscan.com/token/${readableAddress}?a=${originInfo.tokenId}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    startIcon={<Launch />}
-                    className={classes.viewButton}
-                    variant="outlined"
-                  >
-                    View on BscScan
-                  </Button>
-                ) : originInfo.chainId === CHAIN_ID_POLYGON ? (
-                  <Button
-                    href={`https://opensea.io/assets/matic/${readableAddress}/${originInfo.tokenId}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    startIcon={<Launch />}
-                    className={classes.viewButton}
-                    variant="outlined"
-                  >
-                    View on OpenSea
-                  </Button>
-                ) : originInfo.chainId === CHAIN_ID_AVAX ? (
-                  <Button
-                    href={`https://snowtrace.io/token/${readableAddress}?a=${originInfo.tokenId}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    startIcon={<Launch />}
-                    className={classes.viewButton}
-                    variant="outlined"
-                  >
-                    View on Snowtrace
-                  </Button>
-                ) : originInfo.chainId === CHAIN_ID_AURORA ? (
-                  <Button
-                    href={`https://aurorascan.dev/token/${readableAddress}?a=${originInfo.tokenId}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    startIcon={<Launch />}
-                    className={classes.viewButton}
-                    variant="outlined"
-                  >
-                    View on Explorer
-                  </Button>
-                ) : originInfo.chainId === CHAIN_ID_FANTOM ? (
-                  <Button
-                    href={`https://ftmscan.com/token/${readableAddress}?a=${originInfo.tokenId}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    startIcon={<Launch />}
-                    className={classes.viewButton}
-                    variant="outlined"
-                  >
-                    View on FTMScan
-                  </Button>
-                ) : originInfo.chainId === CHAIN_ID_OASIS ? null : (
+                ) : (
                   <Button
                     href={`https://opensea.io/assets/${readableAddress}/${originInfo.tokenId}`}
                     target="_blank"
