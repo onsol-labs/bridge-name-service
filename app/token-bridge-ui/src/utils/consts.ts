@@ -2,7 +2,6 @@ import {
   ChainId,
   CHAIN_ID_ARBITRUM,
   CHAIN_ID_BASE,
-  CHAIN_ID_CELO,
   CHAIN_ID_ETH,
   CHAIN_ID_FANTOM,
   CHAIN_ID_MOONBEAM,
@@ -21,7 +20,6 @@ import { getAddress } from "ethers/lib/utils";
 import { CHAIN_CONFIG_MAP } from "../config";
 import arbitrumIcon from "../icons/arbitrum.svg";
 import baseIcon from "../icons/base.svg";
-import celoIcon from "../icons/celo.svg";
 import ethIcon from "../icons/eth.svg";
 import fantomIcon from "../icons/fantom.svg";
 import moonbeamIcon from "../icons/moonbeam.svg";
@@ -55,11 +53,6 @@ export const CHAINS: ChainInfo[] =
         id: CHAIN_ID_BASE,
         name: "Base Goerli",
         logo: baseIcon,
-      },
-      {
-        id: CHAIN_ID_CELO,
-        name: "Celo",
-        logo: celoIcon,
       },
       {
         id: CHAIN_ID_ETH,
@@ -131,7 +124,6 @@ export const CHAINS_WITH_NFT_SUPPORT = CHAINS.filter(
     id === CHAIN_ID_OASIS ||
     id === CHAIN_ID_SOLANA ||
     id === CHAIN_ID_FANTOM ||
-    id === CHAIN_ID_CELO ||
     id === CHAIN_ID_NEON ||
     id === CHAIN_ID_ARBITRUM ||
     id === CHAIN_ID_MOONBEAM ||
@@ -155,19 +147,17 @@ export const getDefaultNativeCurrencySymbol = (chainId: ChainId) =>
           ? "ROSE"
           : chainId === CHAIN_ID_FANTOM
             ? "FTM"
-            : chainId === CHAIN_ID_CELO
-              ? "CELO"
-              : chainId === CHAIN_ID_NEON
-                ? "NEON"
-                : chainId === CHAIN_ID_XPLA
-                  ? "XPLA"
-                  : chainId === CHAIN_ID_ARBITRUM
-                    ? "ETH"
-                    : chainId === CHAIN_ID_MOONBEAM
-                      ? "GLMR"
-                      : chainId === CHAIN_ID_BASE
-                        ? "ETH"
-                        : "";
+            : chainId === CHAIN_ID_NEON
+              ? "NEON"
+              : chainId === CHAIN_ID_XPLA
+                ? "XPLA"
+                : chainId === CHAIN_ID_ARBITRUM
+                  ? "ETH"
+                  : chainId === CHAIN_ID_MOONBEAM
+                    ? "GLMR"
+                    : chainId === CHAIN_ID_BASE
+                      ? "ETH"
+                      : "";
 
 export const getDefaultNativeCurrencyAddressEvm = (chainId: ChainId) => {
   return chainId === CHAIN_ID_ETH
@@ -178,13 +168,11 @@ export const getDefaultNativeCurrencyAddressEvm = (chainId: ChainId) => {
         ? WROSE_ADDRESS
         : chainId === CHAIN_ID_FANTOM
           ? WFTM_ADDRESS
-          : chainId === CHAIN_ID_CELO
-            ? CELO_ADDRESS
-            : chainId === CHAIN_ID_NEON
-              ? WNEON_ADDRESS
-              : chainId === CHAIN_ID_MOONBEAM
-                ? WGLMR_ADDRESS
-                : "";
+          : chainId === CHAIN_ID_NEON
+            ? WNEON_ADDRESS
+            : chainId === CHAIN_ID_MOONBEAM
+              ? WGLMR_ADDRESS
+              : "";
 };
 
 export const getExplorerName = (chainId: ChainId) =>
@@ -213,7 +201,6 @@ export const ETH_NETWORK_CHAIN_ID = CLUSTER === "testnet" ? 5 : 1337;
 export const POLYGON_NETWORK_CHAIN_ID = CLUSTER === "testnet" ? 80001 : 1381;
 export const OASIS_NETWORK_CHAIN_ID = CLUSTER === "testnet" ? 42261 : 1381;
 export const FANTOM_NETWORK_CHAIN_ID = CLUSTER === "testnet" ? 4002 : 1381;
-export const CELO_NETWORK_CHAIN_ID = CLUSTER === "testnet" ? 44787 : 1381;
 export const NEON_NETWORK_CHAIN_ID = CLUSTER === "testnet" ? 245022926 : 1381;
 export const ARBITRUM_NETWORK_CHAIN_ID = CLUSTER === "testnet" ? 421613 : 1381;
 export const MOONBEAM_NETWORK_CHAIN_ID = CLUSTER === "testnet" ? 1287 : 1381;
@@ -227,17 +214,15 @@ export const getEvmChainId = (chainId: ChainId) =>
         ? OASIS_NETWORK_CHAIN_ID
         : chainId === CHAIN_ID_FANTOM
           ? FANTOM_NETWORK_CHAIN_ID
-          : chainId === CHAIN_ID_CELO
-            ? CELO_NETWORK_CHAIN_ID
-            : chainId === CHAIN_ID_NEON
-              ? NEON_NETWORK_CHAIN_ID
-              : chainId === CHAIN_ID_ARBITRUM
-                ? ARBITRUM_NETWORK_CHAIN_ID
-                : chainId === CHAIN_ID_MOONBEAM
-                  ? MOONBEAM_NETWORK_CHAIN_ID
-                  : chainId === CHAIN_ID_BASE
-                    ? BASE_NETWORK_CHAIN_ID
-                    : undefined;
+          : chainId === CHAIN_ID_NEON
+            ? NEON_NETWORK_CHAIN_ID
+            : chainId === CHAIN_ID_ARBITRUM
+              ? ARBITRUM_NETWORK_CHAIN_ID
+              : chainId === CHAIN_ID_MOONBEAM
+                ? MOONBEAM_NETWORK_CHAIN_ID
+                : chainId === CHAIN_ID_BASE
+                  ? BASE_NETWORK_CHAIN_ID
+                  : undefined;
 export const SOLANA_HOST = process.env.REACT_APP_SOLANA_API_URL
   ? process.env.REACT_APP_SOLANA_API_URL
   : CLUSTER === "testnet"
@@ -293,7 +278,6 @@ export const COVALENT_POLYGON =
   CLUSTER === "devnet" ? 137 : POLYGON_NETWORK_CHAIN_ID;
 export const COVALENT_FANTOM =
   CLUSTER === "devnet" ? 250 : FANTOM_NETWORK_CHAIN_ID;
-export const COVALENT_CELO = CLUSTER === "devnet" ? null : null;
 export const COVALENT_NEON = CLUSTER === "devnet" ? null : null;
 export const COVALENT_ARBITRUM =
   CLUSTER === "devnet" ? null : ARBITRUM_NETWORK_CHAIN_ID;
@@ -316,17 +300,15 @@ export const COVALENT_GET_TOKENS_URL = (
         ? COVALENT_POLYGON
         : chainId === CHAIN_ID_FANTOM
           ? COVALENT_FANTOM
-          : chainId === CHAIN_ID_CELO
-            ? COVALENT_CELO
-            : chainId === CHAIN_ID_NEON
-              ? COVALENT_NEON
-              : chainId === CHAIN_ID_ARBITRUM
-                ? COVALENT_ARBITRUM
-                : chainId === CHAIN_ID_MOONBEAM
-                  ? COVALENT_MOONBEAM
-                  : chainId === CHAIN_ID_BASE
-                    ? COVALENT_BASE
-                    : "";
+          : chainId === CHAIN_ID_NEON
+            ? COVALENT_NEON
+            : chainId === CHAIN_ID_ARBITRUM
+              ? COVALENT_ARBITRUM
+              : chainId === CHAIN_ID_MOONBEAM
+                ? COVALENT_MOONBEAM
+                : chainId === CHAIN_ID_BASE
+                  ? COVALENT_BASE
+                  : "";
   // https://www.covalenthq.com/docs/api/#get-/v1/{chain_id}/address/{address}/balances_v2/
   return chainNum
     ? `https://eth-goerli.g.alchemy.com/v2/xqzYNQBfiNgQPztNiM4mDvuc5R25ag8x/getNFTs/?owner=${walletAddress}`
@@ -343,11 +325,7 @@ export const BLOCKSCOUT_GET_TOKENS_URL = (
       ? CLUSTER === "testnet"
         ? "https://testnet.explorer.emerald.oasis.dev"
         : ""
-      : chainId === CHAIN_ID_CELO
-        ? CLUSTER === "testnet"
-          ? "https://alfajores-blockscout.celo-testnet.org"
-          : ""
-        : "";
+      : "";
   return baseUrl
     ? `${baseUrl}/api?module=account&action=tokenlist&address=${walletAddress}`
     : "";
@@ -376,12 +354,6 @@ export const WFTM_ADDRESS =
     ? "0xf1277d1Ed8AD466beddF92ef448A132661956621"
     : "0xDDb64fE46a91D46ee29420539FC25FD07c5FEa3E";
 export const WFTM_DECIMALS = 18;
-
-export const CELO_ADDRESS =
-  CLUSTER === "testnet"
-    ? "0xF194afDf50B03e69Bd7D057c1Aa9e10c9954E4C9"
-    : "0xDDb64fE46a91D46ee29420539FC25FD07c5FEa3E";
-export const CELO_DECIMALS = 18;
 
 export const WNEON_ADDRESS =
   CLUSTER === "testnet"
@@ -503,7 +475,6 @@ export const RELAYER_COMPARE_ASSET: RelayerCompareAsset = {
   [CHAIN_ID_POLYGON]: "matic-network",
   [CHAIN_ID_OASIS]: "oasis-network",
   [CHAIN_ID_FANTOM]: "fantom",
-  [CHAIN_ID_CELO]: "celo",
 } as RelayerCompareAsset;
 export const getCoinGeckoURL = (coinGeckoId: string) =>
   `https://api.coingecko.com/api/v3/simple/price?ids=${coinGeckoId}&vs_currencies=usd`;

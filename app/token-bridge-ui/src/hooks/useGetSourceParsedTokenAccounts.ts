@@ -1,9 +1,7 @@
 import {
   ChainId,
-  CHAIN_ID_CELO,
   CHAIN_ID_ETH,
   CHAIN_ID_FANTOM,
-
   CHAIN_ID_MOONBEAM,
   CHAIN_ID_NEAR,
   CHAIN_ID_NEON,
@@ -35,7 +33,6 @@ import {
 } from "../contexts/EthereumProviderContext";
 import { useNearContext } from "../contexts/NearWalletContext";
 import { useSolanaWallet } from "../contexts/SolanaWalletContext";
-import celoIcon from "../icons/celo.svg";
 import ethIcon from "../icons/eth.svg";
 import fantomIcon from "../icons/fantom.svg";
 import neonIcon from "../icons/neon.svg";
@@ -75,8 +72,6 @@ import {
   NATIVE_NEAR_DECIMALS,
   NATIVE_NEAR_PLACEHOLDER,
   SOLANA_HOST,
-  CELO_ADDRESS,
-  CELO_DECIMALS,
   WETH_ADDRESS,
   WETH_DECIMALS,
   WFTM_ADDRESS,
@@ -309,36 +304,6 @@ const createNativeFantomParsedTokenAccount = (
           true //isNativeAsset
         );
       });
-};
-
-const createNativeCeloParsedTokenAccount = (
-  provider: Provider,
-  signerAddress: string | undefined
-) => {
-  // Celo has a "native asset" ERC-20
-  // https://docs.celo.org/developer-guide/celo-for-eth-devs
-  return !(provider && signerAddress)
-    ? Promise.reject()
-    : ethers_contracts.TokenImplementation__factory.connect(
-        CELO_ADDRESS,
-        provider
-      )
-        .balanceOf(signerAddress)
-        .then((balance) => {
-          const balanceInEth = ethers.utils.formatUnits(balance, CELO_DECIMALS);
-          return createParsedTokenAccount(
-            signerAddress, //public key
-            CELO_ADDRESS, //Mint key, On the other side this will be wavax, so this is hopefully a white lie.
-            balance.toString(), //amount, in wei
-            CELO_DECIMALS,
-            parseFloat(balanceInEth), //This loses precision, but is a limitation of the current datamodel. This field is essentially deprecated
-            balanceInEth.toString(), //This is the actual display field, which has full precision.
-            "CELO", //A white lie for display purposes
-            "CELO", //A white lie for display purposes
-            celoIcon,
-            false //isNativeAsset
-          );
-        });
 };
 
 const createNativeNeonParsedTokenAccount = (
@@ -938,39 +903,6 @@ function useGetAvailableTokens(nft: boolean = false) {
             setEthNativeAccount(undefined);
             setEthNativeAccountLoading(false);
             setEthNativeAccountError("Unable to retrieve your Fantom balance.");
-          }
-        }
-      );
-    }
-
-    return () => {
-      cancelled = true;
-    };
-  }, [lookupChain, provider, signerAddress, nft, ethNativeAccount]);
-
-  useEffect(() => {
-    let cancelled = false;
-    if (
-      signerAddress &&
-      lookupChain === CHAIN_ID_CELO &&
-      !ethNativeAccount &&
-      !nft
-    ) {
-      setEthNativeAccountLoading(true);
-      createNativeCeloParsedTokenAccount(provider, signerAddress).then(
-        (result) => {
-          console.log("create native account returned with value", result);
-          if (!cancelled) {
-            setEthNativeAccount(result);
-            setEthNativeAccountLoading(false);
-            setEthNativeAccountError("");
-          }
-        },
-        (error) => {
-          if (!cancelled) {
-            setEthNativeAccount(undefined);
-            setEthNativeAccountLoading(false);
-            setEthNativeAccountError("Unable to retrieve your Celo balance.");
           }
         }
       );

@@ -1,6 +1,5 @@
 import {
   ChainId,
-  CHAIN_ID_CELO,
   CHAIN_ID_ETH,
   CHAIN_ID_FANTOM,
   CHAIN_ID_MOONBEAM,
@@ -113,10 +112,6 @@ export default function SmartAddress({
     ? `https://${CLUSTER === "testnet" ? "testnet." : ""}ftmscan.com/${
         isAsset ? "token" : "address"
       }/${useableAddress}`
-    : chainId === CHAIN_ID_CELO
-    ? `https://${
-        CLUSTER === "testnet" ? "alfajores.celoscan.io" : "explorer.celo.org"
-      }/address/${useableAddress}`
     : chainId === CHAIN_ID_MOONBEAM
     ? `https://${CLUSTER === "testnet" ? "moonbase." : ""}moonscan.io/${
         isAsset ? "token" : "address"
