@@ -93,13 +93,6 @@ export const METAMASK_CHAIN_PARAMETERS: {
     rpcUrls: ["https://proxy.devnet.neonlabs.org/solana"],
     blockExplorerUrls: ["https://neonscan.org/"],
   },
-  1313161555: {
-    chainId: "0x4e454153",
-    chainName: "Aurora Testnet",
-    nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
-    rpcUrls: ["https://testnet.aurora.dev"],
-    blockExplorerUrls: ["https://testnet.aurorascan.dev"],
-  },
   1287: {
     chainId: "0x507",
     chainName: "Moonbase Alpha",

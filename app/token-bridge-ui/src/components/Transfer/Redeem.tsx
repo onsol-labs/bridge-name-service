@@ -1,6 +1,5 @@
 import {
   CHAIN_ID_ACALA,
-  CHAIN_ID_AURORA,
   CHAIN_ID_AVAX,
   CHAIN_ID_ETH,
   CHAIN_ID_FANTOM,
@@ -40,7 +39,6 @@ import {
   getHowToAddTokensToWalletUrl,
   WAVAX_ADDRESS,
   WETH_ADDRESS,
-  WETH_AURORA_ADDRESS,
   WFTM_ADDRESS,
   WMATIC_ADDRESS,
   WNEON_ADDRESS,
@@ -114,10 +112,6 @@ function Redeem() {
     targetChain === CHAIN_ID_OASIS &&
     targetAsset &&
     targetAsset.toLowerCase() === WROSE_ADDRESS.toLowerCase();
-  const isAuroraNative =
-    targetChain === CHAIN_ID_AURORA &&
-    targetAsset &&
-    targetAsset.toLowerCase() === WETH_AURORA_ADDRESS.toLowerCase();
   const isFantomNative =
     targetChain === CHAIN_ID_FANTOM &&
     targetAsset &&
@@ -135,7 +129,6 @@ function Redeem() {
     isPolygonNative ||
     isAvaxNative ||
     isOasisNative ||
-    isAuroraNative ||
     isFantomNative ||
     isNeonNative ||
     isSolNative;
