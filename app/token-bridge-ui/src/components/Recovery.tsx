@@ -1,7 +1,5 @@
 import {
   ChainId,
-  CHAIN_ID_ACALA,
-  CHAIN_ID_KARURA,
   CHAIN_ID_NEAR,
   CHAIN_ID_SOLANA,
   CHAIN_ID_XPLA,
@@ -51,7 +49,6 @@ import { useDispatch } from "react-redux";
 import { useHistory, useLocation } from "react-router";
 import { useEthereumProvider } from "../contexts/EthereumProviderContext";
 import { useNearContext } from "../contexts/NearWalletContext";
-import { useAcalaRelayerInfo } from "../hooks/useAcalaRelayerInfo";
 import useIsWalletReady from "../hooks/useIsWalletReady";
 import useRelayersAvailable, { Relayer } from "../hooks/useRelayersAvailable";
 import { setRecoveryVaa as setRecoveryNFTVaa } from "../store/nftSlice";
@@ -283,52 +280,6 @@ function RelayerRecovery({
       </ButtonWithLoader>
     </Alert>
   );
-}
-
-function AcalaRelayerRecovery({
-  parsedPayload,
-  signedVaa,
-  onClick,
-  isNFT,
-}: {
-  parsedPayload: any;
-  signedVaa: string;
-  onClick: () => void;
-  isNFT: boolean;
-}) {
-  const classes = useStyles();
-  const originChain: ChainId = parsedPayload?.originChain;
-  const originAsset = parsedPayload?.originAddress;
-  const targetChain: ChainId = parsedPayload?.targetChain;
-  const amount =
-    parsedPayload && "amount" in parsedPayload
-      ? parsedPayload.amount.toString()
-      : "";
-  const shouldCheck =
-    parsedPayload &&
-    originChain &&
-    originAsset &&
-    signedVaa &&
-    targetChain &&
-    !isNFT &&
-    (targetChain === CHAIN_ID_ACALA || targetChain === CHAIN_ID_KARURA);
-  const acalaRelayerInfo = useAcalaRelayerInfo(
-    targetChain,
-    amount,
-    hexToNativeAssetString(originAsset, originChain),
-    false
-  );
-  const enabled = shouldCheck && acalaRelayerInfo.data?.shouldRelay;
-
-  return enabled ? (
-    <Alert variant="outlined" severity="info" className={classes.relayAlert}>
-      <Typography>
-        This transaction is eligible to be relayed by{" "}
-        {CHAINS_BY_ID[targetChain].name} &#127881;
-      </Typography>
-      <ButtonWithLoader onClick={onClick}>Request Relay</ButtonWithLoader>
-    </Alert>
-  ) : null;
 }
 
 export default function Recovery() {
@@ -689,12 +640,6 @@ export default function Recovery() {
           parsedPayload={parsedPayload}
           signedVaa={recoverySignedVAA}
           onClick={handleRecoverWithRelayerClick}
-        />
-        <AcalaRelayerRecovery
-          parsedPayload={parsedPayload}
-          signedVaa={recoverySignedVAA}
-          onClick={handleRecoverWithRelayerClick}
-          isNFT={isNFT}
         />
         <ButtonWithLoader
           onClick={handleRecoverClick}

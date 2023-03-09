@@ -1,8 +1,6 @@
 import {
-  CHAIN_ID_ACALA,
   CHAIN_ID_ETH,
   CHAIN_ID_FANTOM,
-  CHAIN_ID_KARURA,
   CHAIN_ID_NEON,
   CHAIN_ID_OASIS,
   CHAIN_ID_POLYGON,
@@ -66,7 +64,6 @@ function Redeem() {
   const {
     handleClick,
     handleNativeClick,
-    handleAcalaRelayerRedeemClick,
     disabled,
     showLoader,
   } = useHandleRedeem();
@@ -81,8 +78,6 @@ function Redeem() {
     }
   }, [useRelayer]);
   const targetChain = useSelector(selectTransferTargetChain);
-  const targetIsAcala =
-    targetChain === CHAIN_ID_ACALA || targetChain === CHAIN_ID_KARURA;
   const targetAsset = useSelector(selectTransferTargetAsset);
   const isRecovery = useSelector(selectTransferIsRecovery);
   const { isTransferCompletedLoading, isTransferCompleted } =
@@ -136,22 +131,20 @@ function Redeem() {
 
   const relayerContent = (
     <>
-      {isEVMChain(targetChain) && !isTransferCompleted && !targetIsAcala ? (
+      {isEVMChain(targetChain) && !isTransferCompleted ? (
         <KeyAndBalance chainId={targetChain} />
       ) : null}
 
       {!isReady &&
-      isEVMChain(targetChain) &&
-      !isTransferCompleted &&
-      !targetIsAcala ? (
+        isEVMChain(targetChain) &&
+        !isTransferCompleted ? (
         <Typography className={classes.centered}>
           {"Please connect your wallet to check for transfer completion."}
         </Typography>
       ) : null}
 
       {(!isEVMChain(targetChain) || isReady) &&
-      !isTransferCompleted &&
-      !targetIsAcala ? (
+        !isTransferCompleted ? (
         <div className={classes.centered}>
           <CircularProgress style={{ marginBottom: 16 }} />
           <Typography>
@@ -167,30 +160,6 @@ function Redeem() {
               Manually redeem instead
             </Button>
           </Tooltip>
-        </div>
-      ) : null}
-
-      {/* TODO: handle recovery */}
-      {targetIsAcala && !isTransferCompleted ? (
-        <div className={classes.centered}>
-          <ButtonWithLoader
-            disabled={disabled}
-            onClick={handleAcalaRelayerRedeemClick}
-            showLoader={showLoader}
-          >
-            <span>
-              Redeem ({CHAINS_BY_ID[targetChain].name} pays gas for you
-              &#127881;)
-            </span>
-          </ButtonWithLoader>
-          <Button
-            onClick={handleManuallyRedeemClick}
-            size="small"
-            variant="outlined"
-            style={{ marginTop: 16 }}
-          >
-            Manually redeem instead
-          </Button>
         </div>
       ) : null}
 

@@ -30,20 +30,6 @@ export const METAMASK_CHAIN_PARAMETERS: {
     rpcUrls: ["https://rpc.ankr.com/eth_goerli"],
     blockExplorerUrls: ["https://goerli.etherscan.io"],
   },
-  596: {
-    chainId: "0x254",
-    chainName: "Karura Testnet",
-    nativeCurrency: { name: "Karura Token", symbol: "KAR", decimals: 18 },
-    rpcUrls: ["https://karura-dev.aca-dev.network/eth/http"],
-    blockExplorerUrls: ["https://blockscout.karura-dev.aca-dev.network"],
-  },
-  597: {
-    chainId: "0x255",
-    chainName: "Acala Testnet",
-    nativeCurrency: { name: "Acala Token", symbol: "ACA", decimals: 18 },
-    rpcUrls: ["https://acala-dev.aca-dev.network/eth/http"],
-    blockExplorerUrls: ["https://blockscout.acala-dev.aca-dev.network"],
-  },
   4002: {
     chainId: "0xfa2",
     chainName: "Fantom Testnet",

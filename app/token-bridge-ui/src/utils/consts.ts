@@ -1,12 +1,10 @@
 import {
   ChainId,
-  CHAIN_ID_ACALA,
   CHAIN_ID_ARBITRUM,
   CHAIN_ID_BASE,
   CHAIN_ID_CELO,
   CHAIN_ID_ETH,
   CHAIN_ID_FANTOM,
-  CHAIN_ID_KARURA,
   CHAIN_ID_MOONBEAM,
   CHAIN_ID_NEAR,
   CHAIN_ID_NEON,
@@ -21,13 +19,11 @@ import {
 import { clusterApiUrl } from "@solana/web3.js";
 import { getAddress } from "ethers/lib/utils";
 import { CHAIN_CONFIG_MAP } from "../config";
-import acalaIcon from "../icons/acala.svg";
 import arbitrumIcon from "../icons/arbitrum.svg";
 import baseIcon from "../icons/base.svg";
 import celoIcon from "../icons/celo.svg";
 import ethIcon from "../icons/eth.svg";
 import fantomIcon from "../icons/fantom.svg";
-import karuraIcon from "../icons/karura.svg";
 import moonbeamIcon from "../icons/moonbeam.svg";
 import neonIcon from "../icons/neon.svg";
 import oasisIcon from "../icons/oasis-network-rose-logo.svg";
@@ -50,11 +46,6 @@ export interface ChainInfo {
 export const CHAINS: ChainInfo[] =
   CLUSTER === "testnet"
     ? [
-      {
-        id: CHAIN_ID_ACALA,
-        name: "Acala",
-        logo: acalaIcon,
-      },
       {
         id: CHAIN_ID_ARBITRUM,
         name: "Arbitrum",
@@ -79,11 +70,6 @@ export const CHAINS: ChainInfo[] =
         id: CHAIN_ID_FANTOM,
         name: "Fantom",
         logo: fantomIcon,
-      },
-      {
-        id: CHAIN_ID_KARURA,
-        name: "Karura",
-        logo: karuraIcon,
       },
       {
         id: CHAIN_ID_MOONBEAM,
@@ -145,8 +131,6 @@ export const CHAINS_WITH_NFT_SUPPORT = CHAINS.filter(
     id === CHAIN_ID_OASIS ||
     id === CHAIN_ID_SOLANA ||
     id === CHAIN_ID_FANTOM ||
-    id === CHAIN_ID_KARURA ||
-    id === CHAIN_ID_ACALA ||
     id === CHAIN_ID_CELO ||
     id === CHAIN_ID_NEON ||
     id === CHAIN_ID_ARBITRUM ||
@@ -171,23 +155,19 @@ export const getDefaultNativeCurrencySymbol = (chainId: ChainId) =>
           ? "ROSE"
           : chainId === CHAIN_ID_FANTOM
             ? "FTM"
-            : chainId === CHAIN_ID_KARURA
-              ? "KAR"
-              : chainId === CHAIN_ID_ACALA
-                ? "ACA"
-                : chainId === CHAIN_ID_CELO
-                  ? "CELO"
-                  : chainId === CHAIN_ID_NEON
-                    ? "NEON"
-                    : chainId === CHAIN_ID_XPLA
-                      ? "XPLA"
-                      : chainId === CHAIN_ID_ARBITRUM
+            : chainId === CHAIN_ID_CELO
+              ? "CELO"
+              : chainId === CHAIN_ID_NEON
+                ? "NEON"
+                : chainId === CHAIN_ID_XPLA
+                  ? "XPLA"
+                  : chainId === CHAIN_ID_ARBITRUM
+                    ? "ETH"
+                    : chainId === CHAIN_ID_MOONBEAM
+                      ? "GLMR"
+                      : chainId === CHAIN_ID_BASE
                         ? "ETH"
-                        : chainId === CHAIN_ID_MOONBEAM
-                          ? "GLMR"
-                          : chainId === CHAIN_ID_BASE
-                            ? "ETH"
-                            : "";
+                        : "";
 
 export const getDefaultNativeCurrencyAddressEvm = (chainId: ChainId) => {
   return chainId === CHAIN_ID_ETH
@@ -198,17 +178,13 @@ export const getDefaultNativeCurrencyAddressEvm = (chainId: ChainId) => {
         ? WROSE_ADDRESS
         : chainId === CHAIN_ID_FANTOM
           ? WFTM_ADDRESS
-          : chainId === CHAIN_ID_KARURA
-            ? KAR_ADDRESS
-            : chainId === CHAIN_ID_ACALA
-              ? ACA_ADDRESS
-              : chainId === CHAIN_ID_CELO
-                ? CELO_ADDRESS
-                : chainId === CHAIN_ID_NEON
-                  ? WNEON_ADDRESS
-                  : chainId === CHAIN_ID_MOONBEAM
-                    ? WGLMR_ADDRESS
-                    : "";
+          : chainId === CHAIN_ID_CELO
+            ? CELO_ADDRESS
+            : chainId === CHAIN_ID_NEON
+              ? WNEON_ADDRESS
+              : chainId === CHAIN_ID_MOONBEAM
+                ? WGLMR_ADDRESS
+                : "";
 };
 
 export const getExplorerName = (chainId: ChainId) =>
@@ -237,8 +213,6 @@ export const ETH_NETWORK_CHAIN_ID = CLUSTER === "testnet" ? 5 : 1337;
 export const POLYGON_NETWORK_CHAIN_ID = CLUSTER === "testnet" ? 80001 : 1381;
 export const OASIS_NETWORK_CHAIN_ID = CLUSTER === "testnet" ? 42261 : 1381;
 export const FANTOM_NETWORK_CHAIN_ID = CLUSTER === "testnet" ? 4002 : 1381;
-export const KARURA_NETWORK_CHAIN_ID = CLUSTER === "testnet" ? 596 : 1381;
-export const ACALA_NETWORK_CHAIN_ID = CLUSTER === "testnet" ? 597 : 1381;
 export const CELO_NETWORK_CHAIN_ID = CLUSTER === "testnet" ? 44787 : 1381;
 export const NEON_NETWORK_CHAIN_ID = CLUSTER === "testnet" ? 245022926 : 1381;
 export const ARBITRUM_NETWORK_CHAIN_ID = CLUSTER === "testnet" ? 421613 : 1381;
@@ -253,21 +227,17 @@ export const getEvmChainId = (chainId: ChainId) =>
         ? OASIS_NETWORK_CHAIN_ID
         : chainId === CHAIN_ID_FANTOM
           ? FANTOM_NETWORK_CHAIN_ID
-          : chainId === CHAIN_ID_KARURA
-            ? KARURA_NETWORK_CHAIN_ID
-            : chainId === CHAIN_ID_ACALA
-              ? ACALA_NETWORK_CHAIN_ID
-              : chainId === CHAIN_ID_CELO
-                ? CELO_NETWORK_CHAIN_ID
-                : chainId === CHAIN_ID_NEON
-                  ? NEON_NETWORK_CHAIN_ID
-                  : chainId === CHAIN_ID_ARBITRUM
-                    ? ARBITRUM_NETWORK_CHAIN_ID
-                    : chainId === CHAIN_ID_MOONBEAM
-                      ? MOONBEAM_NETWORK_CHAIN_ID
-                      : chainId === CHAIN_ID_BASE
-                        ? BASE_NETWORK_CHAIN_ID
-                        : undefined;
+          : chainId === CHAIN_ID_CELO
+            ? CELO_NETWORK_CHAIN_ID
+            : chainId === CHAIN_ID_NEON
+              ? NEON_NETWORK_CHAIN_ID
+              : chainId === CHAIN_ID_ARBITRUM
+                ? ARBITRUM_NETWORK_CHAIN_ID
+                : chainId === CHAIN_ID_MOONBEAM
+                  ? MOONBEAM_NETWORK_CHAIN_ID
+                  : chainId === CHAIN_ID_BASE
+                    ? BASE_NETWORK_CHAIN_ID
+                    : undefined;
 export const SOLANA_HOST = process.env.REACT_APP_SOLANA_API_URL
   ? process.env.REACT_APP_SOLANA_API_URL
   : CLUSTER === "testnet"
@@ -281,11 +251,6 @@ export const XPLA_LCD_CLIENT_CONFIG = {
 
 export const XPLA_GAS_PRICES_URL =
   "https://cube-fcd.xpla.dev/v1/txs/gas_prices";
-
-export const KARURA_HOST =
-  CLUSTER === "testnet" ? "https://karura-dev.aca-dev.network/eth/http" : "";
-export const ACALA_HOST =
-  CLUSTER === "testnet" ? "https://acala-dev.aca-dev.network/eth/http" : "";
 
 export const SOL_CUSTODY_ADDRESS =
   "GugU1tP7doLeTw9hQP51xRJyS8Da1fWxuiy2rVrnMD2m";
@@ -378,19 +343,11 @@ export const BLOCKSCOUT_GET_TOKENS_URL = (
       ? CLUSTER === "testnet"
         ? "https://testnet.explorer.emerald.oasis.dev"
         : ""
-      : chainId === CHAIN_ID_ACALA
+      : chainId === CHAIN_ID_CELO
         ? CLUSTER === "testnet"
-          ? "https://blockscout.acala-dev.aca-dev.network"
+          ? "https://alfajores-blockscout.celo-testnet.org"
           : ""
-        : chainId === CHAIN_ID_KARURA
-          ? CLUSTER === "testnet"
-            ? "https://blockscout.karura-dev.aca-dev.network"
-            : ""
-          : chainId === CHAIN_ID_CELO
-            ? CLUSTER === "testnet"
-              ? "https://alfajores-blockscout.celo-testnet.org"
-              : ""
-            : "";
+        : "";
   return baseUrl
     ? `${baseUrl}/api?module=account&action=tokenlist&address=${walletAddress}`
     : "";
@@ -419,18 +376,6 @@ export const WFTM_ADDRESS =
     ? "0xf1277d1Ed8AD466beddF92ef448A132661956621"
     : "0xDDb64fE46a91D46ee29420539FC25FD07c5FEa3E";
 export const WFTM_DECIMALS = 18;
-
-export const KAR_ADDRESS =
-  CLUSTER === "testnet"
-    ? "0x0000000000000000000100000000000000000080"
-    : "0xDDb64fE46a91D46ee29420539FC25FD07c5FEa3E";
-export const KAR_DECIMALS = 12;
-
-export const ACA_ADDRESS =
-  CLUSTER === "testnet"
-    ? "0x0000000000000000000100000000000000000000"
-    : "0xDDb64fE46a91D46ee29420539FC25FD07c5FEa3E";
-export const ACA_DECIMALS = 12;
 
 export const CELO_ADDRESS =
   CLUSTER === "testnet"
@@ -568,33 +513,12 @@ export const RELAYER_INFO_URL =
 
 export const RELAY_URL_EXTENSION = "/relayvaa/";
 
-// also for karura
-export const ACALA_RELAYER_URL =
-  CLUSTER === "testnet" ? "https://wormhole-relayer.aca-staging.network" : "";
-
-export const ACALA_RELAY_URL = `${ACALA_RELAYER_URL}/relay`;
-export const ACALA_SHOULD_RELAY_URL = `${ACALA_RELAYER_URL}/shouldRelay`;
-
-export const DISABLED_TOKEN_TRANSFERS: {
-  [key in ChainId]?: { [address: string]: ChainId[] };
-} = {
-  [CHAIN_ID_ACALA]: {
-    "0x0000000000000000000100000000000000000001": [CHAIN_ID_KARURA], // aUSD
-  },
-  [CHAIN_ID_KARURA]: {
-    "0x0000000000000000000100000000000000000081": [], // aUSD
-  },
-};
 export const getIsTokenTransferDisabled = (
   sourceChain: ChainId,
   targetChain: ChainId,
   tokenAddress: string
 ): boolean => {
-  const disabledTransfers =
-    DISABLED_TOKEN_TRANSFERS[sourceChain]?.[tokenAddress];
-  return disabledTransfers !== undefined
-    ? disabledTransfers.length === 0 || disabledTransfers.includes(targetChain)
-    : false;
+  return false;
 };
 
 export const USD_NUMBER_FORMATTER = new Intl.NumberFormat("en-US", {

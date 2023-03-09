@@ -1,7 +1,5 @@
 import {
   ChainId,
-  CHAIN_ID_ACALA,
-  CHAIN_ID_KARURA,
   CHAIN_ID_NEAR,
   CHAIN_ID_SOLANA,
   CHAIN_ID_XPLA,
@@ -36,16 +34,13 @@ import {
   selectAttestTargetChain,
 } from "../store/selectors";
 import {
-  ACALA_HOST,
   getTokenBridgeAddressForChain,
-  KARURA_HOST,
   MAX_VAA_UPLOAD_RETRIES_SOLANA,
   NEAR_TOKEN_BRIDGE_ACCOUNT,
   SOLANA_HOST,
   SOL_BRIDGE_ADDRESS,
   SOL_TOKEN_BRIDGE_ADDRESS,
 } from "../utils/consts";
-import { getKaruraGasParams } from "../utils/karura";
 import {
   makeNearAccount,
   makeNearProvider,
@@ -66,26 +61,20 @@ async function evm(
 ) {
   dispatch(setIsCreating(true));
   try {
-    // Karura and Acala need gas params for contract deploys
-    const overrides =
-      chainId === CHAIN_ID_KARURA
-        ? await getKaruraGasParams(KARURA_HOST)
-        : chainId === CHAIN_ID_ACALA
-        ? await getKaruraGasParams(ACALA_HOST)
-        : {};
+    const overrides = {};
     const receipt = shouldUpdate
       ? await updateWrappedOnEth(
-          getTokenBridgeAddressForChain(chainId),
-          signer,
-          signedVAA,
-          overrides
-        )
+        getTokenBridgeAddressForChain(chainId),
+        signer,
+        signedVAA,
+        overrides
+      )
       : await createWrappedOnEth(
-          getTokenBridgeAddressForChain(chainId),
-          signer,
-          signedVAA,
-          overrides
-        );
+        getTokenBridgeAddressForChain(chainId),
+        signer,
+        signedVAA,
+        overrides
+      );
     dispatch(
       setCreateTx({ id: receipt.transactionHash, block: receipt.blockNumber })
     );
@@ -157,19 +146,19 @@ async function solana(
     );
     const transaction = shouldUpdate
       ? await updateWrappedOnSolana(
-          connection,
-          SOL_BRIDGE_ADDRESS,
-          SOL_TOKEN_BRIDGE_ADDRESS,
-          payerAddress,
-          signedVAA
-        )
+        connection,
+        SOL_BRIDGE_ADDRESS,
+        SOL_TOKEN_BRIDGE_ADDRESS,
+        payerAddress,
+        signedVAA
+      )
       : await createWrappedOnSolana(
-          connection,
-          SOL_BRIDGE_ADDRESS,
-          SOL_TOKEN_BRIDGE_ADDRESS,
-          payerAddress,
-          signedVAA
-        );
+        connection,
+        SOL_BRIDGE_ADDRESS,
+        SOL_TOKEN_BRIDGE_ADDRESS,
+        payerAddress,
+        signedVAA
+      );
     const txid = await signSendAndConfirm(wallet, connection, transaction);
     // TODO: didn't want to make an info call we didn't need, can we get the block without it by modifying the above call?
     dispatch(setCreateTx({ id: txid, block: 1 }));
@@ -196,15 +185,15 @@ async function xpla(
   try {
     const msg = shouldUpdate
       ? await updateWrappedOnXpla(
-          tokenBridgeAddress,
-          wallet.xplaAddress,
-          signedVAA
-        )
+        tokenBridgeAddress,
+        wallet.xplaAddress,
+        signedVAA
+      )
       : await createWrappedOnXpla(
-          tokenBridgeAddress,
-          wallet.xplaAddress,
-          signedVAA
-        );
+        tokenBridgeAddress,
+        wallet.xplaAddress,
+        signedVAA
+      );
     const result = await postWithFeesXpla(
       wallet,
       [msg],

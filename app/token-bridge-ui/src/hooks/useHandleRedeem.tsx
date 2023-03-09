@@ -35,7 +35,6 @@ import {
 } from "../store/selectors";
 import { setIsRedeeming, setRedeemTx } from "../store/transferSlice";
 import {
-  ACALA_RELAY_URL,
   getTokenBridgeAddressForChain,
   MAX_VAA_UPLOAD_RETRIES_SOLANA,
   NEAR_TOKEN_BRIDGE_ACCOUNT,
@@ -289,39 +288,10 @@ export function useHandleRedeem() {
     solPK,
   ]);
 
-  const handleAcalaRelayerRedeemClick = useCallback(async () => {
-    if (!signedVAA) return;
-
-    dispatch(setIsRedeeming(true));
-
-    try {
-      const res = await axios.post(ACALA_RELAY_URL, {
-        targetChain,
-        signedVAA: uint8ArrayToHex(signedVAA),
-      });
-
-      dispatch(
-        setRedeemTx({
-          id: res.data.transactionHash,
-          block: res.data.blockNumber,
-        })
-      );
-      enqueueSnackbar(null, {
-        content: <Alert severity="success">Transaction confirmed</Alert>,
-      });
-    } catch (e) {
-      enqueueSnackbar(null, {
-        content: <Alert severity="error">{parseError(e)}</Alert>,
-      });
-      dispatch(setIsRedeeming(false));
-    }
-  }, [targetChain, signedVAA, enqueueSnackbar, dispatch]);
-
   return useMemo(
     () => ({
       handleNativeClick: handleRedeemNativeClick,
       handleClick: handleRedeemClick,
-      handleAcalaRelayerRedeemClick,
       disabled: !!isRedeeming,
       showLoader: !!isRedeeming,
     }),
@@ -329,7 +299,6 @@ export function useHandleRedeem() {
       handleRedeemClick,
       isRedeeming,
       handleRedeemNativeClick,
-      handleAcalaRelayerRedeemClick,
     ]
   );
 }

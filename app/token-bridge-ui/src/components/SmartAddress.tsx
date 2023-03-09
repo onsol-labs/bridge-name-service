@@ -3,12 +3,10 @@ import {
   CHAIN_ID_CELO,
   CHAIN_ID_ETH,
   CHAIN_ID_FANTOM,
-  CHAIN_ID_KARURA,
   CHAIN_ID_MOONBEAM,
   CHAIN_ID_OASIS,
   CHAIN_ID_POLYGON,
   CHAIN_ID_SOLANA,
-  CHAIN_ID_ACALA,
   CHAIN_ID_XPLA,
   CHAIN_ID_ARBITRUM,
   CHAIN_ID_NEAR,
@@ -127,18 +125,6 @@ export default function SmartAddress({
     ? `https://${CLUSTER === "testnet" ? "goerli." : ""}basescan.org/${
         isAsset ? "token" : "address"
       }/${useableAddress}`
-    : chainId === CHAIN_ID_KARURA
-    ? `https://${
-        CLUSTER === "testnet"
-          ? "blockscout.karura-dev.aca-dev.network"
-          : "blockscout.karura.network"
-      }/${isAsset ? "token" : "address"}/${useableAddress}`
-    : chainId === CHAIN_ID_ACALA
-    ? `https://${
-        CLUSTER === "testnet"
-          ? "blockscout.acala-dev.aca-dev.network"
-          : "blockscout.acala.network"
-      }/${isAsset ? "token" : "address"}/${useableAddress}`
     : chainId === CHAIN_ID_SOLANA
     ? `https://solscan.io/address/${useableAddress}${
         CLUSTER === "testnet"
