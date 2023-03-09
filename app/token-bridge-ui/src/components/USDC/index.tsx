@@ -1,6 +1,5 @@
 import {
   ChainId,
-  CHAIN_ID_AVAX,
   CHAIN_ID_ETH,
   getEmitterAddressEth,
   getSignedVAAWithRetry,
@@ -244,44 +243,30 @@ async function handleCircleMessageInLogs(
   return [circleMessage, signature];
 }
 
-// const USDC_CHAINS = CHAINS.filter(
-//   (c) => c.id === CHAIN_ID_ETH || c.id === CHAIN_ID_AVAX
-// );
-
 const USDC_DECIMALS = 6;
 const USDC_ADDRESSES: { [key in ChainId]?: string } = {
   [CHAIN_ID_ETH]: "0x07865c6E87B9F70255377e024ace6630C1Eaa37F",
-  [CHAIN_ID_AVAX]: "0x5425890298aed601595a70AB815c96711a31Bc65",
 };
 const CIRCLE_BRIDGE_ADDRESSES: { [key in ChainId]?: string } = {
   [CHAIN_ID_ETH]: "0xdAbec94B97F7b5FCA28f050cC8EeAc2Dc9920476",
-  [CHAIN_ID_AVAX]: "0x0fC1103927AF27aF808D03135214718bCEDbE9ad",
 };
 const CIRCLE_EMITTER_ADDRESSES: { [key in ChainId]?: string } = {
   [CHAIN_ID_ETH]: "0x40A61D3D2AfcF5A5d31FcDf269e575fB99dd87f7",
-  [CHAIN_ID_AVAX]: "0x52FfFb3EE8Fa7838e9858A2D5e454007b9027c3C",
 };
 const CIRCLE_DOMAINS: { [key in ChainId]?: number } = {
   [CHAIN_ID_ETH]: 0,
-  [CHAIN_ID_AVAX]: 1,
 };
 const CIRCLE_DOMAIN_TO_WORMHOLE_CHAIN: { [key in number]: ChainId } = {
   0: CHAIN_ID_ETH,
-  1: CHAIN_ID_AVAX,
 };
 const USDC_RELAYER: { [key in ChainId]?: string } = {
   [CHAIN_ID_ETH]: "0x2dacca34c172687efa15243a179ea9e170864a67",
-  [CHAIN_ID_AVAX]: "0x7b135d7959e59ba45c55ae08c14920b06f2658ec",
 };
 const USDC_WH_INTEGRATION: { [key in ChainId]?: string } = {
   [CHAIN_ID_ETH]: "0xbdcc4ebe3157df347671e078a41ee5ce137cd306",
-  [CHAIN_ID_AVAX]: "0xb200977d46aea35ce6368d181534f413570a0f54",
 };
 const USDC_WH_EMITTER: { [key in ChainId]?: string } = {
   [CHAIN_ID_ETH]: getEmitterAddressEth(USDC_WH_INTEGRATION[CHAIN_ID_ETH] || ""),
-  [CHAIN_ID_AVAX]: getEmitterAddressEth(
-    USDC_WH_INTEGRATION[CHAIN_ID_AVAX] || ""
-  ),
 };
 
 function USDC() {

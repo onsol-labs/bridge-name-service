@@ -13,7 +13,6 @@ import { NFTParsedTokenAccount } from "../../store/nftSlice";
 import clsx from "clsx";
 import {
   ChainId,
-  CHAIN_ID_AVAX,
   CHAIN_ID_ETH,
   CHAIN_ID_POLYGON,
   CHAIN_ID_SOLANA,
@@ -21,7 +20,6 @@ import {
   CHAIN_ID_FANTOM,
 } from "@certusone/wormhole-sdk";
 import SmartAddress from "../SmartAddress";
-import avaxIcon from "../../icons/avax.svg";
 import ethIcon from "../../icons/eth.svg";
 import fantomIcon from "../../icons/fantom.svg";
 import solanaIcon from "../../icons/solana.svg";
@@ -73,18 +71,6 @@ const LogoIcon = ({ chainId }: { chainId: ChainId }) =>
       }}
       src={polygonIcon}
       alt="Polygon"
-    />
-  ) : chainId === CHAIN_ID_AVAX ? (
-    <Avatar
-      style={{
-        backgroundColor: "black",
-        height: "1em",
-        width: "1em",
-        marginLeft: "4px",
-        padding: "3px",
-      }}
-      src={avaxIcon}
-      alt="Avalanche"
     />
   ) : chainId === CHAIN_ID_OASIS ? (
     <Avatar
@@ -350,8 +336,7 @@ export default function NFTViewer({
         className={clsx(classes.card, {
           [classes.silverBorder]:
             chainId === CHAIN_ID_SOLANA ||
-            chainId === CHAIN_ID_POLYGON ||
-            chainId === CHAIN_ID_AVAX,
+            chainId === CHAIN_ID_POLYGON,
           [classes.hidden]: isLoading,
         })}
         elevation={10}
@@ -360,7 +345,6 @@ export default function NFTViewer({
           className={clsx(classes.cardInset, {
             [classes.eth]:
               chainId === CHAIN_ID_ETH ||
-              chainId === CHAIN_ID_AVAX || //TODO: give avax it's own bg
               chainId === CHAIN_ID_OASIS || //TODO: give oasis it's own bg
               chainId === CHAIN_ID_FANTOM, //TODO: give fantom it's own bg
             [classes.solana]: chainId === CHAIN_ID_SOLANA,
@@ -388,8 +372,7 @@ export default function NFTViewer({
               [classes.silverMediaBorder]:
                 chainId === CHAIN_ID_SOLANA ||
                 chainId === CHAIN_ID_POLYGON ||
-                chainId === CHAIN_ID_OASIS ||
-                chainId === CHAIN_ID_AVAX,
+                chainId === CHAIN_ID_OASIS,
             })}
           >
             {media}

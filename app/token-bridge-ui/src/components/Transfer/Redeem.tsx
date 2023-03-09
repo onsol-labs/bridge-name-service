@@ -1,6 +1,5 @@
 import {
   CHAIN_ID_ACALA,
-  CHAIN_ID_AVAX,
   CHAIN_ID_ETH,
   CHAIN_ID_FANTOM,
   CHAIN_ID_KARURA,
@@ -37,7 +36,6 @@ import { reset } from "../../store/transferSlice";
 import {
   CHAINS_BY_ID,
   getHowToAddTokensToWalletUrl,
-  WAVAX_ADDRESS,
   WETH_ADDRESS,
   WFTM_ADDRESS,
   WMATIC_ADDRESS,
@@ -104,10 +102,6 @@ function Redeem() {
     targetChain === CHAIN_ID_POLYGON &&
     targetAsset &&
     targetAsset.toLowerCase() === WMATIC_ADDRESS.toLowerCase();
-  const isAvaxNative =
-    targetChain === CHAIN_ID_AVAX &&
-    targetAsset &&
-    targetAsset.toLowerCase() === WAVAX_ADDRESS.toLowerCase();
   const isOasisNative =
     targetChain === CHAIN_ID_OASIS &&
     targetAsset &&
@@ -127,7 +121,6 @@ function Redeem() {
   const isNativeEligible =
     isEthNative ||
     isPolygonNative ||
-    isAvaxNative ||
     isOasisNative ||
     isFantomNative ||
     isNeonNative ||

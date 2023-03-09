@@ -1,5 +1,4 @@
 import {
-  CHAIN_ID_AVAX,
   CHAIN_ID_ETH,
   CHAIN_ID_FANTOM,
   CHAIN_ID_NEON,
@@ -21,7 +20,6 @@ import { formatUnits } from "ethers/lib/utils";
 import { useCallback, useEffect, useState } from "react";
 import { useEthereumProvider } from "../contexts/EthereumProviderContext";
 import useIsWalletReady from "../hooks/useIsWalletReady";
-import avaxIcon from "../icons/avax.svg";
 import ethIcon from "../icons/eth.svg";
 import fantomIcon from "../icons/fantom.svg";
 import neonIcon from "../icons/neon.svg";
@@ -35,8 +33,6 @@ import {
   receiveDataWrapper,
 } from "../store/helpers";
 import {
-  WAVAX_ADDRESS,
-  WAVAX_DECIMALS,
   WETH_ADDRESS,
   WETH_DECIMALS,
   WFTM_ADDRESS,
@@ -97,12 +93,6 @@ const supportedTokens = {
     icon: polygonIcon,
     address: WMATIC_ADDRESS,
     decimals: WMATIC_DECIMALS,
-  },
-  [CHAIN_ID_AVAX]: {
-    symbol: "WAVAX",
-    icon: avaxIcon,
-    address: WAVAX_ADDRESS,
-    decimals: WAVAX_DECIMALS,
   },
   [CHAIN_ID_OASIS]: {
     symbol: "WROSE",

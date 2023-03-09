@@ -65,13 +65,6 @@ export const METAMASK_CHAIN_PARAMETERS: {
     rpcUrls: ["https://testnet.emerald.oasis.dev"],
     blockExplorerUrls: ["https://testnet.explorer.emerald.oasis.dev"],
   },
-  43113: {
-    chainId: "0xa869",
-    chainName: "Avalanche Fuji Testnet",
-    nativeCurrency: { name: "Avalanche", symbol: "AVAX", decimals: 18 },
-    rpcUrls: ["https://api.avax-test.network/ext/bc/C/rpc"],
-    blockExplorerUrls: ["https://testnet.snowtrace.io"],
-  },
   80001: {
     chainId: "0x13881",
     chainName: "Mumbai",

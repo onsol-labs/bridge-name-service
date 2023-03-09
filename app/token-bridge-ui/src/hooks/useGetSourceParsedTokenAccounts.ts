@@ -1,7 +1,7 @@
 import {
   ChainId,
   CHAIN_ID_ACALA,
-  CHAIN_ID_AVAX,
+
   CHAIN_ID_CELO,
   CHAIN_ID_ETH,
   CHAIN_ID_FANTOM,
@@ -38,7 +38,6 @@ import {
 import { useNearContext } from "../contexts/NearWalletContext";
 import { useSolanaWallet } from "../contexts/SolanaWalletContext";
 import acalaIcon from "../icons/acala.svg";
-import avaxIcon from "../icons/avax.svg";
 import celoIcon from "../icons/celo.svg";
 import ethIcon from "../icons/eth.svg";
 import fantomIcon from "../icons/fantom.svg";
@@ -84,8 +83,6 @@ import {
   NATIVE_NEAR_DECIMALS,
   NATIVE_NEAR_PLACEHOLDER,
   SOLANA_HOST,
-  WAVAX_ADDRESS,
-  WAVAX_DECIMALS,
   CELO_ADDRESS,
   CELO_DECIMALS,
   WETH_ADDRESS,
@@ -271,29 +268,6 @@ const createNativePolygonParsedTokenAccount = (
           "MATIC", //A white lie for display purposes
           "Matic", //A white lie for display purposes
           polygonIcon,
-          true //isNativeAsset
-        );
-      });
-};
-
-const createNativeAvaxParsedTokenAccount = (
-  provider: Provider,
-  signerAddress: string | undefined
-) => {
-  return !(provider && signerAddress)
-    ? Promise.reject()
-    : provider.getBalance(signerAddress).then((balanceInWei) => {
-        const balanceInEth = ethers.utils.formatEther(balanceInWei);
-        return createParsedTokenAccount(
-          signerAddress, //public key
-          WAVAX_ADDRESS, //Mint key, On the other side this will be wavax, so this is hopefully a white lie.
-          balanceInWei.toString(), //amount, in wei
-          WAVAX_DECIMALS,
-          parseFloat(balanceInEth), //This loses precision, but is a limitation of the current datamodel. This field is essentially deprecated
-          balanceInEth.toString(), //This is the actual display field, which has full precision.
-          "AVAX", //A white lie for display purposes
-          "Avalanche", //A white lie for display purposes
-          avaxIcon,
           true //isNativeAsset
         );
       });
@@ -972,40 +946,6 @@ function useGetAvailableTokens(nft: boolean = false) {
   }, [lookupChain, provider, signerAddress, nft, ethNativeAccount]);
 
   //TODO refactor all these into an isEVM effect
-  //avax native asset load
-  useEffect(() => {
-    let cancelled = false;
-    if (
-      signerAddress &&
-      lookupChain === CHAIN_ID_AVAX &&
-      !ethNativeAccount &&
-      !nft
-    ) {
-      setEthNativeAccountLoading(true);
-      createNativeAvaxParsedTokenAccount(provider, signerAddress).then(
-        (result) => {
-          console.log("create native account returned with value", result);
-          if (!cancelled) {
-            setEthNativeAccount(result);
-            setEthNativeAccountLoading(false);
-            setEthNativeAccountError("");
-          }
-        },
-        (error) => {
-          if (!cancelled) {
-            setEthNativeAccount(undefined);
-            setEthNativeAccountLoading(false);
-            setEthNativeAccountError("Unable to retrieve your AVAX balance.");
-          }
-        }
-      );
-    }
-
-    return () => {
-      cancelled = true;
-    };
-  }, [lookupChain, provider, signerAddress, nft, ethNativeAccount]);
-
   useEffect(() => {
     let cancelled = false;
     if (

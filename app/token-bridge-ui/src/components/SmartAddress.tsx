@@ -1,6 +1,5 @@
 import {
   ChainId,
-  CHAIN_ID_AVAX,
   CHAIN_ID_CELO,
   CHAIN_ID_ETH,
   CHAIN_ID_FANTOM,
@@ -104,10 +103,6 @@ export default function SmartAddress({
       }/${useableAddress}`
     : chainId === CHAIN_ID_POLYGON
     ? `https://${CLUSTER === "testnet" ? "mumbai." : ""}polygonscan.com/${
-        isAsset ? "token" : "address"
-      }/${useableAddress}`
-    : chainId === CHAIN_ID_AVAX
-    ? `https://${CLUSTER === "testnet" ? "testnet." : ""}snowtrace.io/${
         isAsset ? "token" : "address"
       }/${useableAddress}`
     : chainId === CHAIN_ID_OASIS
