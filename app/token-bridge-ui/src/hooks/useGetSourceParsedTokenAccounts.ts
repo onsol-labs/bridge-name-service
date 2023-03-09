@@ -8,7 +8,6 @@ import {
   CHAIN_ID_ETH,
   CHAIN_ID_FANTOM,
   CHAIN_ID_KARURA,
-  CHAIN_ID_KLAYTN,
   CHAIN_ID_MOONBEAM,
   CHAIN_ID_NEAR,
   CHAIN_ID_NEON,
@@ -48,7 +47,6 @@ import celoIcon from "../icons/celo.svg";
 import ethIcon from "../icons/eth.svg";
 import fantomIcon from "../icons/fantom.svg";
 import karuraIcon from "../icons/karura.svg";
-import klaytnIcon from "../icons/klaytn.svg";
 import neonIcon from "../icons/neon.svg";
 import oasisIcon from "../icons/oasis-network-rose-logo.svg";
 import polygonIcon from "../icons/polygon.svg";
@@ -102,8 +100,6 @@ import {
   WETH_DECIMALS,
   WFTM_ADDRESS,
   WFTM_DECIMALS,
-  WKLAY_ADDRESS,
-  WKLAY_DECIMALS,
   WMATIC_ADDRESS,
   WMATIC_DECIMALS,
   WNEON_ADDRESS,
@@ -457,29 +453,6 @@ const createNativeAcalaParsedTokenAccount = (
             false //isNativeAsset
           );
         });
-};
-
-const createNativeKlaytnParsedTokenAccount = (
-  provider: Provider,
-  signerAddress: string | undefined
-) => {
-  return !(provider && signerAddress)
-    ? Promise.reject()
-    : provider.getBalance(signerAddress).then((balanceInWei) => {
-        const balanceInEth = ethers.utils.formatEther(balanceInWei);
-        return createParsedTokenAccount(
-          signerAddress, //public key
-          WKLAY_ADDRESS, //Mint key, On the other side this will be wklay, so this is hopefully a white lie.
-          balanceInWei.toString(), //amount, in wei
-          WKLAY_DECIMALS,
-          parseFloat(balanceInEth), //This loses precision, but is a limitation of the current datamodel. This field is essentially deprecated
-          balanceInEth.toString(), //This is the actual display field, which has full precision.
-          "KLAY", //A white lie for display purposes
-          "KLAY", //A white lie for display purposes
-          klaytnIcon,
-          true //isNativeAsset
-        );
-      });
 };
 
 const createNativeCeloParsedTokenAccount = (
@@ -1276,39 +1249,6 @@ function useGetAvailableTokens(nft: boolean = false) {
             setEthNativeAccount(undefined);
             setEthNativeAccountLoading(false);
             setEthNativeAccountError("Unable to retrieve your Acala balance.");
-          }
-        }
-      );
-    }
-
-    return () => {
-      cancelled = true;
-    };
-  }, [lookupChain, provider, signerAddress, nft, ethNativeAccount]);
-
-  useEffect(() => {
-    let cancelled = false;
-    if (
-      signerAddress &&
-      lookupChain === CHAIN_ID_KLAYTN &&
-      !ethNativeAccount &&
-      !nft
-    ) {
-      setEthNativeAccountLoading(true);
-      createNativeKlaytnParsedTokenAccount(provider, signerAddress).then(
-        (result) => {
-          console.log("create native account returned with value", result);
-          if (!cancelled) {
-            setEthNativeAccount(result);
-            setEthNativeAccountLoading(false);
-            setEthNativeAccountError("");
-          }
-        },
-        (error) => {
-          if (!cancelled) {
-            setEthNativeAccount(undefined);
-            setEthNativeAccountLoading(false);
-            setEthNativeAccountError("Unable to retrieve your Klaytn balance.");
           }
         }
       );

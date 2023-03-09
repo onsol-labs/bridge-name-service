@@ -6,7 +6,6 @@ import {
   CHAIN_ID_CELO,
   CHAIN_ID_ETH,
   CHAIN_ID_FANTOM,
-  CHAIN_ID_KLAYTN,
   CHAIN_ID_KARURA,
   CHAIN_ID_MOONBEAM,
   CHAIN_ID_OASIS,
@@ -129,10 +128,6 @@ export default function SmartAddress({
       }/${useableAddress}`
     : chainId === CHAIN_ID_FANTOM
     ? `https://${CLUSTER === "testnet" ? "testnet." : ""}ftmscan.com/${
-        isAsset ? "token" : "address"
-      }/${useableAddress}`
-    : chainId === CHAIN_ID_KLAYTN
-    ? `https://${CLUSTER === "testnet" ? "baobab." : ""}scope.klaytn.com/${
         isAsset ? "token" : "address"
       }/${useableAddress}`
     : chainId === CHAIN_ID_CELO

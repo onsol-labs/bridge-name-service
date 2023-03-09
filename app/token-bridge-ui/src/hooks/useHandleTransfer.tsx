@@ -1,6 +1,5 @@
 import {
   ChainId,
-  CHAIN_ID_KLAYTN,
   CHAIN_ID_SOLANA,
   CHAIN_ID_XPLA,
   createNonce,
@@ -138,11 +137,7 @@ async function evm(
     const baseAmountParsed = parseUnits(amount, decimals);
     const feeParsed = parseUnits(relayerFee || "0", decimals);
     const transferAmountParsed = baseAmountParsed.add(feeParsed);
-    // Klaytn requires specifying gasPrice
-    const overrides =
-      chainId === CHAIN_ID_KLAYTN
-        ? { gasPrice: (await signer.getGasPrice()).toString() }
-        : {};
+    const overrides = {};
     const receipt = isNative
       ? await transferFromEthNative(
         getTokenBridgeAddressForChain(chainId),

@@ -61,14 +61,7 @@ export const METAMASK_CHAIN_PARAMETERS: {
     nativeCurrency: { name: "Fantom", symbol: "FTM", decimals: 18 },
     rpcUrls: ["https://rpc.testnet.fantom.network"],
     blockExplorerUrls: ["https://testnet.ftmscan.com"],
-  },
-  1001: {
-    chainId: "0x3E9",
-    chainName: "Klaytn Testnet Baobab",
-    nativeCurrency: { name: "Klay", symbol: "KLAY", decimals: 18 },
-    rpcUrls: ["https://api.baobab.klaytn.net:8651"],
-    blockExplorerUrls: ["https://baobab.scope.klaytn.com/"],
-  },
+  }
   44787: {
     chainId: "0xaef3",
     chainName: "Celo (Alfajores Testnet)",

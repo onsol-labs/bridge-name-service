@@ -7,7 +7,6 @@ import {
   CHAIN_ID_CELO,
   CHAIN_ID_FANTOM,
   CHAIN_ID_KARURA,
-  CHAIN_ID_KLAYTN,
   CHAIN_ID_MOONBEAM,
   CHAIN_ID_OASIS,
   CHAIN_ID_POLYGON,
@@ -90,7 +89,6 @@ export default function TransactionProgress({
         chainId === CHAIN_ID_FANTOM ||
         chainId === CHAIN_ID_KARURA ||
         chainId === CHAIN_ID_ACALA ||
-        chainId === CHAIN_ID_KLAYTN ||
         chainId === CHAIN_ID_CELO ||
         chainId === CHAIN_ID_MOONBEAM
       ? 1 // these chains only require 1 conf

@@ -1,6 +1,5 @@
 import {
   ChainId,
-  CHAIN_ID_KLAYTN,
   CHAIN_ID_NEAR,
   CHAIN_ID_SOLANA,
   CHAIN_ID_XPLA,
@@ -64,11 +63,7 @@ async function evm(
 ) {
   dispatch(setIsRedeeming(true));
   try {
-    // Klaytn requires specifying gasPrice
-    const overrides =
-      chainId === CHAIN_ID_KLAYTN
-        ? { gasPrice: (await signer.getGasPrice()).toString() }
-        : {};
+    const overrides = {};
     const receipt = isNative
       ? await redeemOnEthNative(
         getTokenBridgeAddressForChain(chainId),

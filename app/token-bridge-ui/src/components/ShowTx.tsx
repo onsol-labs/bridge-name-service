@@ -6,7 +6,6 @@ import {
   CHAIN_ID_CELO,
   CHAIN_ID_ETH,
   CHAIN_ID_FANTOM,
-  CHAIN_ID_KLAYTN,
   CHAIN_ID_KARURA,
   CHAIN_ID_NEAR,
   CHAIN_ID_MOONBEAM,
@@ -66,44 +65,41 @@ export default function ShowTx({
                 : chainId === CHAIN_ID_FANTOM
                   ? `https://${CLUSTER === "testnet" ? "testnet." : ""}ftmscan.com/tx/${tx?.id
                   }`
-                  : chainId === CHAIN_ID_KLAYTN
-                    ? `https://${CLUSTER === "testnet" ? "baobab." : ""}scope.klaytn.com/tx/${tx?.id
-                    }`
-                    : chainId === CHAIN_ID_CELO
-                      ? `https://${CLUSTER === "testnet" ? "alfajores.celoscan.io" : "explorer.celo.org"
+                  : chainId === CHAIN_ID_CELO
+                    ? `https://${CLUSTER === "testnet" ? "alfajores.celoscan.io" : "explorer.celo.org"
+                    }/tx/${tx?.id}`
+                    : chainId === CHAIN_ID_KARURA
+                      ? `https://${CLUSTER === "testnet"
+                        ? "blockscout.karura-dev.aca-dev.network"
+                        : "blockscout.karura.network"
                       }/tx/${tx?.id}`
-                      : chainId === CHAIN_ID_KARURA
+                      : chainId === CHAIN_ID_ACALA
                         ? `https://${CLUSTER === "testnet"
-                          ? "blockscout.karura-dev.aca-dev.network"
-                          : "blockscout.karura.network"
+                          ? "blockscout.acala-dev.aca-dev.network"
+                          : "blockscout.acala.network"
                         }/tx/${tx?.id}`
-                        : chainId === CHAIN_ID_ACALA
-                          ? `https://${CLUSTER === "testnet"
-                            ? "blockscout.acala-dev.aca-dev.network"
-                            : "blockscout.acala.network"
-                          }/tx/${tx?.id}`
-                          : chainId === CHAIN_ID_SOLANA
-                            ? `https://solscan.io/tx/${tx?.id}${CLUSTER === "testnet"
-                              ? "?cluster=devnet"
-                              : CLUSTER === "devnet"
-                                ? "?cluster=custom&customUrl=http%3A%2F%2Flocalhost%3A8899"
-                                : ""
+                        : chainId === CHAIN_ID_SOLANA
+                          ? `https://solscan.io/tx/${tx?.id}${CLUSTER === "testnet"
+                            ? "?cluster=devnet"
+                            : CLUSTER === "devnet"
+                              ? "?cluster=custom&customUrl=http%3A%2F%2Flocalhost%3A8899"
+                              : ""
+                          }`
+                          : chainId === CHAIN_ID_MOONBEAM
+                            ? `https://${CLUSTER === "testnet" ? "moonbase." : ""}moonscan.io/tx/${tx?.id
                             }`
-                            : chainId === CHAIN_ID_MOONBEAM
-                              ? `https://${CLUSTER === "testnet" ? "moonbase." : ""}moonscan.io/tx/${tx?.id
+                            : chainId === CHAIN_ID_BASE
+                              ? `https://${CLUSTER === "testnet" ? "goerli." : ""}basescan.org/tx/${tx?.id
                               }`
-                              : chainId === CHAIN_ID_BASE
-                                ? `https://${CLUSTER === "testnet" ? "goerli." : ""}basescan.org/tx/${tx?.id
-                                }`
-                                : chainId === CHAIN_ID_XPLA
-                                  ? `https://explorer.xpla.io/${CLUSTER === "testnet" ? "testnet/" : ""
-                                  }tx/${tx?.id}`
-                                  : chainId === CHAIN_ID_ARBITRUM
-                                    ? `https://${CLUSTER === "testnet" ? "goerli." : ""}arbiscan.io/tx/${tx?.id
-                                    }`
-                                    : chainId === CHAIN_ID_NEAR && CLUSTER === "testnet"
-                                      ? `https://explorer.testnet.near.org/transactions/${tx?.id}`
-                                      : undefined;
+                              : chainId === CHAIN_ID_XPLA
+                                ? `https://explorer.xpla.io/${CLUSTER === "testnet" ? "testnet/" : ""
+                                }tx/${tx?.id}`
+                                : chainId === CHAIN_ID_ARBITRUM
+                                  ? `https://${CLUSTER === "testnet" ? "goerli." : ""}arbiscan.io/tx/${tx?.id
+                                  }`
+                                  : chainId === CHAIN_ID_NEAR && CLUSTER === "testnet"
+                                    ? `https://explorer.testnet.near.org/transactions/${tx?.id}`
+                                    : undefined;
   const explorerName = getExplorerName(chainId);
 
   return (

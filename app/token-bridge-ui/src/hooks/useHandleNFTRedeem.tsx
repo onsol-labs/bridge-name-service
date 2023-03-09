@@ -2,7 +2,6 @@ import {
   ChainId,
   CHAIN_ID_ACALA,
   CHAIN_ID_KARURA,
-  CHAIN_ID_KLAYTN,
   CHAIN_ID_SOLANA,
   getClaimAddressSolana,
   hexToUint8Array,
@@ -60,10 +59,7 @@ async function evm(
         ? await getKaruraGasParams(KARURA_HOST)
         : chainId === CHAIN_ID_ACALA
           ? await getKaruraGasParams(ACALA_HOST)
-          : // Klaytn requires specifying gasPrice
-          chainId === CHAIN_ID_KLAYTN
-            ? { gasPrice: (await signer.getGasPrice()).toString() }
-            : {};
+          : {};
     const receipt = await redeemOnEth(
       getNFTBridgeAddressForChain(chainId),
       signer,

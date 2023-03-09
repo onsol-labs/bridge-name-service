@@ -5,7 +5,6 @@ import {
   attestNearFromNear,
   attestTokenFromNear,
   ChainId,
-  CHAIN_ID_KLAYTN,
   CHAIN_ID_NEAR,
   CHAIN_ID_SOLANA,
   CHAIN_ID_XPLA,
@@ -77,11 +76,7 @@ async function evm(
 ) {
   dispatch(setIsSending(true));
   try {
-    // Klaytn requires specifying gasPrice
-    const overrides =
-      chainId === CHAIN_ID_KLAYTN
-        ? { gasPrice: (await signer.getGasPrice()).toString() }
-        : {};
+    const overrides = {};
     console.log("ATTESSTINGGG")
     console.log(sourceAsset)
     const receipt = await attestFromEth(
