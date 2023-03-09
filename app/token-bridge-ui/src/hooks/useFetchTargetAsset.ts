@@ -1,10 +1,8 @@
 import {
   ChainId,
-  CHAIN_ID_NEAR,
   CHAIN_ID_SOLANA,
   CHAIN_ID_XPLA,
   getForeignAssetEth,
-  getForeignAssetNear,
   getForeignAssetSolana,
   getForeignAssetXpla,
   hexToNativeAssetString,
@@ -23,7 +21,6 @@ import { ethers } from "ethers";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useEthereumProvider } from "../contexts/EthereumProviderContext";
-import { useNearContext } from "../contexts/NearWalletContext";
 import {
   errorDataWrapper,
   fetchDataWrapper,
@@ -50,12 +47,8 @@ import {
   SOL_NFT_BRIDGE_ADDRESS,
   SOL_TOKEN_BRIDGE_ADDRESS,
   XPLA_LCD_CLIENT_CONFIG,
-  NEAR_TOKEN_BRIDGE_ACCOUNT,
-  NATIVE_NEAR_WH_ADDRESS,
-  NATIVE_NEAR_PLACEHOLDER,
 } from "../utils/consts";
 import { LCDClient as XplaLCDClient } from "@xpla/xpla.js";
-import { lookupHash, makeNearAccount, makeNearProvider } from "../utils/near";
 
 function useFetchTargetAsset(nft?: boolean) {
   const dispatch = useDispatch();
@@ -79,7 +72,6 @@ function useFetchTargetAsset(nft?: boolean) {
   const { provider, chainId: evmChainId } = useEthereumProvider();
   const correctEvmNetwork = getEvmChainId(targetChain);
   const hasCorrectEvmNetwork = evmChainId === correctEvmNetwork;
-  const { accountId: nearAccountId } = useNearContext();
   const [lastSuccessfulArgs, setLastSuccessfulArgs] = useState<{
     isSourceAssetWormholeWrapped: boolean | undefined;
     originChain: ChainId | undefined;
@@ -142,34 +134,6 @@ function useFetchTargetAsset(nft?: boolean) {
                 })
               )
             );
-          }
-        } else if (originChain === CHAIN_ID_NEAR && nearAccountId) {
-          if (originAsset === NATIVE_NEAR_WH_ADDRESS) {
-            dispatch(
-              setTargetAsset(
-                receiveDataWrapper({
-                  doesExist: true,
-                  address: NATIVE_NEAR_PLACEHOLDER,
-                })
-              )
-            );
-          } else {
-            const account = await makeNearAccount(nearAccountId);
-            const tokenAccount = await lookupHash(
-              account,
-              NEAR_TOKEN_BRIDGE_ACCOUNT,
-              originAsset || ""
-            );
-            if (!cancelled) {
-              dispatch(
-                setTargetAsset(
-                  receiveDataWrapper({
-                    doesExist: true,
-                    address: tokenAccount[1] || null,
-                  })
-                )
-              );
-            }
           }
         } else {
           if (!cancelled) {
@@ -304,44 +268,6 @@ function useFetchTargetAsset(nft?: boolean) {
           }
         }
       }
-      if (
-        targetChain === CHAIN_ID_NEAR &&
-        originChain &&
-        originAsset &&
-        nearAccountId
-      ) {
-        dispatch(setTargetAsset(fetchDataWrapper()));
-        try {
-          const asset = await getForeignAssetNear(
-            makeNearProvider(),
-            NEAR_TOKEN_BRIDGE_ACCOUNT,
-            originChain,
-            originAsset
-          );
-          if (!cancelled) {
-            dispatch(
-              setTargetAsset(
-                receiveDataWrapper({
-                  doesExist: !!asset,
-                  address: asset === null ? asset : asset.toString(),
-                })
-              )
-            );
-            setArgs();
-          }
-        } catch (e) {
-          console.error(e);
-          if (!cancelled) {
-            dispatch(
-              setTargetAsset(
-                errorDataWrapper(
-                  "Unable to determine existence of wrapped asset"
-                )
-              )
-            );
-          }
-        }
-      }
     })();
     return () => {
       cancelled = true;
@@ -359,7 +285,6 @@ function useFetchTargetAsset(nft?: boolean) {
     hasCorrectEvmNetwork,
     argsMatchLastSuccess,
     setArgs,
-    nearAccountId,
   ]);
 }
 

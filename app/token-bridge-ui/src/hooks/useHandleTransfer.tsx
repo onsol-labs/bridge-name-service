@@ -2,15 +2,12 @@ import {
   ChainId,
   CHAIN_ID_SOLANA,
   CHAIN_ID_XPLA,
-  createNonce,
   getEmitterAddressEth,
-  getEmitterAddressNear,
   getEmitterAddressSolana,
   getEmitterAddressXpla,
   hexToUint8Array,
   isEVMChain,
   parseSequenceFromLogEth,
-  parseSequenceFromLogNear,
   parseSequenceFromLogSolana,
   parseSequenceFromLogXpla,
   transferFromEth,
@@ -18,13 +15,9 @@ import {
   transferFromSolana,
   transferFromXpla,
   transferNativeSol,
-  transferNearFromNear,
-  transferTokenFromNear,
   uint8ArrayToHex,
 } from "@certusone/wormhole-sdk";
-import { CHAIN_ID_NEAR } from "@certusone/wormhole-sdk/lib/esm";
 import { Alert } from "@material-ui/lab";
-import { Wallet } from "@near-wallet-selector/core";
 import { WalletContextState } from "@solana/wallet-adapter-react";
 import { Connection } from "@solana/web3.js";
 import {
@@ -37,7 +30,6 @@ import { useSnackbar } from "notistack";
 import { useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useEthereumProvider } from "../contexts/EthereumProviderContext";
-import { useNearContext } from "../contexts/NearWalletContext";
 import { useSolanaWallet } from "../contexts/SolanaWalletContext";
 import {
   selectTransferAmount,
@@ -61,19 +53,11 @@ import {
 import {
   getBridgeAddressForChain,
   getTokenBridgeAddressForChain,
-  NATIVE_NEAR_PLACEHOLDER,
-  NEAR_CORE_BRIDGE_ACCOUNT,
-  NEAR_TOKEN_BRIDGE_ACCOUNT,
   SOLANA_HOST,
   SOL_BRIDGE_ADDRESS,
   SOL_TOKEN_BRIDGE_ADDRESS,
 } from "../utils/consts";
 import { getSignedVAAWithRetry } from "../utils/getSignedVAAWithRetry";
-import {
-  makeNearAccount,
-  makeNearProvider,
-  signAndSendTransactions,
-} from "../utils/near";
 import parseError from "../utils/parseError";
 import { signSendAndConfirm } from "../utils/solana";
 import { postWithFeesXpla, waitForXplaExecution } from "../utils/xpla";
@@ -171,76 +155,6 @@ async function evm(
     const emitterAddress = getEmitterAddressEth(
       getTokenBridgeAddressForChain(chainId)
     );
-    await fetchSignedVAA(
-      chainId,
-      emitterAddress,
-      sequence,
-      enqueueSnackbar,
-      dispatch
-    );
-  } catch (e) {
-    handleError(e, enqueueSnackbar, dispatch);
-  }
-}
-
-async function near(
-  dispatch: any,
-  enqueueSnackbar: any,
-  wallet: Wallet,
-  senderAddr: string,
-  tokenAddress: string,
-  decimals: number,
-  amount: string,
-  recipientChain: ChainId,
-  recipientAddress: Uint8Array,
-  chainId: ChainId,
-  relayerFee?: string
-) {
-  dispatch(setIsSending(true));
-  try {
-    const baseAmountParsed = parseUnits(amount, decimals);
-    const feeParsed = parseUnits(relayerFee || "0", decimals);
-    const transferAmountParsed = baseAmountParsed.add(feeParsed);
-    const account = await makeNearAccount(senderAddr);
-    const msgs =
-      tokenAddress === NATIVE_NEAR_PLACEHOLDER
-        ? [
-          await transferNearFromNear(
-            makeNearProvider(),
-            NEAR_CORE_BRIDGE_ACCOUNT,
-            NEAR_TOKEN_BRIDGE_ACCOUNT,
-            transferAmountParsed.toBigInt(),
-            recipientAddress,
-            recipientChain,
-            feeParsed.toBigInt()
-          ),
-        ]
-        : await transferTokenFromNear(
-          makeNearProvider(),
-          account.accountId,
-          NEAR_CORE_BRIDGE_ACCOUNT,
-          NEAR_TOKEN_BRIDGE_ACCOUNT,
-          tokenAddress,
-          transferAmountParsed.toBigInt(),
-          recipientAddress,
-          recipientChain,
-          feeParsed.toBigInt()
-        );
-    const receipt = await signAndSendTransactions(account, wallet, msgs);
-    const sequence = parseSequenceFromLogNear(receipt);
-    dispatch(
-      setTransferTx({
-        id: receipt.transaction_outcome.id,
-        block: 0,
-      })
-    );
-    if (sequence === null) {
-      throw new Error("Unable to parse sequence from log");
-    }
-    enqueueSnackbar(null, {
-      content: <Alert severity="success">Transaction confirmed</Alert>,
-    });
-    const emitterAddress = getEmitterAddressNear(NEAR_TOKEN_BRIDGE_ACCOUNT);
     await fetchSignedVAA(
       chainId,
       emitterAddress,
@@ -402,7 +316,6 @@ export function useHandleTransfer() {
   const solanaWallet = useSolanaWallet();
   const solPK = solanaWallet?.publicKey;
   const xplaWallet = useXplaConnectedWallet();
-  const { accountId: nearAccountId, wallet } = useNearContext();
   const sourceParsedTokenAccount = useSelector(
     selectTransferSourceParsedTokenAccount
   );
@@ -477,27 +390,6 @@ export function useHandleTransfer() {
         targetAddress,
         relayerFee
       );
-    } else if (
-      sourceChain === CHAIN_ID_NEAR &&
-      nearAccountId &&
-      wallet &&
-      !!sourceAsset &&
-      decimals !== undefined &&
-      !!targetAddress
-    ) {
-      near(
-        dispatch,
-        enqueueSnackbar,
-        wallet,
-        nearAccountId,
-        sourceAsset,
-        decimals,
-        amount,
-        targetChain,
-        targetAddress,
-        sourceChain,
-        relayerFee
-      );
     } else {
     }
   }, [
@@ -518,8 +410,6 @@ export function useHandleTransfer() {
     originChain,
     isNative,
     xplaWallet,
-    nearAccountId,
-    wallet,
   ]);
   return useMemo(
     () => ({

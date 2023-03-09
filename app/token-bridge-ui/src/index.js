@@ -6,7 +6,6 @@ import { Provider } from "react-redux";
 import { HashRouter } from "react-router-dom";
 import App from "./App";
 import { EthereumProviderProvider } from "./contexts/EthereumProviderContext";
-import { NearContextProvider } from "./contexts/NearWalletContext";
 import { SolanaWalletProvider } from "./contexts/SolanaWalletContext.tsx";
 import XplaWalletProvider from "./contexts/XplaWalletContext";
 import ErrorBoundary from "./ErrorBoundary";
@@ -23,11 +22,9 @@ ReactDOM.render(
             <SolanaWalletProvider>
               <EthereumProviderProvider>
                 <XplaWalletProvider>
-                  <NearContextProvider>
                     <HashRouter>
                       <App />
                     </HashRouter>
-                  </NearContextProvider>
                 </XplaWalletProvider>
               </EthereumProviderProvider>
             </SolanaWalletProvider>

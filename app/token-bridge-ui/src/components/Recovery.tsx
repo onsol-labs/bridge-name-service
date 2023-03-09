@@ -1,10 +1,8 @@
 import {
   ChainId,
-  CHAIN_ID_NEAR,
   CHAIN_ID_SOLANA,
   CHAIN_ID_XPLA,
   getEmitterAddressEth,
-  getEmitterAddressNear,
   getEmitterAddressSolana,
   getEmitterAddressXpla,
   hexToNativeAssetString,
@@ -13,13 +11,11 @@ import {
   isEVMChain,
   parseNFTPayload,
   parseSequenceFromLogEth,
-  parseSequenceFromLogNear,
   parseSequenceFromLogSolana,
   parseSequenceFromLogXpla,
   parseTransferPayload,
   parseVaa,
   queryExternalId,
-  tryHexToNativeStringNear,
   uint8ArrayToHex,
 } from "@certusone/wormhole-sdk";
 import {
@@ -48,7 +44,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useHistory, useLocation } from "react-router";
 import { useEthereumProvider } from "../contexts/EthereumProviderContext";
-import { useNearContext } from "../contexts/NearWalletContext";
 import useIsWalletReady from "../hooks/useIsWalletReady";
 import useRelayersAvailable, { Relayer } from "../hooks/useRelayersAvailable";
 import { setRecoveryVaa as setRecoveryNFTVaa } from "../store/nftSlice";
@@ -66,10 +61,8 @@ import {
   SOL_TOKEN_BRIDGE_ADDRESS,
   WORMHOLE_RPC_HOSTS,
   XPLA_LCD_CLIENT_CONFIG,
-  NEAR_TOKEN_BRIDGE_ACCOUNT,
 } from "../utils/consts";
 import { getSignedVAAWithRetry } from "../utils/getSignedVAAWithRetry";
-import { makeNearProvider } from "../utils/near";
 import parseError from "../utils/parseError";
 import ButtonWithLoader from "./ButtonWithLoader";
 import ChainSelect from "./ChainSelect";
@@ -138,23 +131,6 @@ async function evm(
         : getTokenBridgeAddressForChain(chainId)
     );
     return await fetchSignedVAA(chainId, emitterAddress, sequence);
-  } catch (e) {
-    return handleError(e, enqueueSnackbar);
-  }
-}
-
-async function near(tx: string, enqueueSnackbar: any, nearAccountId: string) {
-  try {
-    const receipt = await makeNearProvider().txStatusReceipts(
-      base58.decode(tx),
-      nearAccountId
-    );
-    const sequence = parseSequenceFromLogNear(receipt);
-    if (!sequence) {
-      throw new Error("Sequence not found");
-    }
-    const emitterAddress = getEmitterAddressNear(NEAR_TOKEN_BRIDGE_ACCOUNT);
-    return await fetchSignedVAA(CHAIN_ID_NEAR, emitterAddress, sequence);
   } catch (e) {
     return handleError(e, enqueueSnackbar);
   }
@@ -300,7 +276,6 @@ export default function Recovery() {
   const [recoveryParsedVAA, setRecoveryParsedVAA] = useState<any>(null);
   const [isVAAPending, setIsVAAPending] = useState(false);
   const [tokenId, setTokenId] = useState("");
-  const { accountId: nearAccountId } = useNearContext();
   const { isReady, statusMessage } = useIsWalletReady(recoverySourceChain);
   const walletConnectError =
     isEVMChain(recoverySourceChain) && !isReady ? statusMessage : "";
@@ -325,7 +300,7 @@ export default function Recovery() {
     let cancelled = false;
     if (
       parsedPayload &&
-      ( parsedPayload.targetChain === CHAIN_ID_XPLA)
+      (parsedPayload.targetChain === CHAIN_ID_XPLA)
     ) {
       (async () => {
         const lcd = new XplaLCDClient(XPLA_LCD_CLIENT_CONFIG);
@@ -334,20 +309,6 @@ export default function Recovery() {
         );
         const tokenId = await queryExternalId(
           lcd,
-          tokenBridgeAddress,
-          parsedPayload.originAddress
-        );
-        if (!cancelled) {
-          setTokenId(tokenId || "");
-        }
-      })();
-    }
-    if (parsedPayload && parsedPayload.targetChain === CHAIN_ID_NEAR) {
-      (async () => {
-        const provider = makeNearProvider();
-        const tokenBridgeAddress = getTokenBridgeAddressForChain(CHAIN_ID_NEAR);
-        const tokenId = await tryHexToNativeStringNear(
-          provider,
           tokenBridgeAddress,
           parsedPayload.originAddress
         );
@@ -452,27 +413,6 @@ export default function Recovery() {
             setIsVAAPending(isPending);
           }
         })();
-      } else if (recoverySourceChain === CHAIN_ID_NEAR && nearAccountId) {
-        setRecoverySourceTxError("");
-        setRecoverySourceTxIsLoading(true);
-        setTokenId("");
-        (async () => {
-          const { vaa, isPending, error } = await near(
-            recoverySourceTx,
-            enqueueSnackbar,
-            nearAccountId
-          );
-          if (!cancelled) {
-            setRecoverySourceTxIsLoading(false);
-            if (vaa) {
-              setRecoverySignedVAA(vaa);
-            }
-            if (error) {
-              setRecoverySourceTxError(error);
-            }
-            setIsVAAPending(isPending);
-          }
-        })();
       }
       return () => {
         cancelled = true;
@@ -485,7 +425,6 @@ export default function Recovery() {
     enqueueSnackbar,
     isNFT,
     isReady,
-    nearAccountId,
   ]);
   const handleTypeChange = useCallback((event) => {
     setRecoverySourceChain((prevChain) =>
@@ -759,8 +698,7 @@ export default function Recovery() {
                   disabled
                   value={
                     parsedPayload
-                      ? parsedPayload.targetChain === CHAIN_ID_XPLA ||
-                        parsedPayload.targetChain === CHAIN_ID_NEAR
+                      ? parsedPayload.targetChain === CHAIN_ID_XPLA
                         ? tokenId
                         : hexToNativeAssetString(
                           parsedPayload.originAddress,

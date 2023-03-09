@@ -1,10 +1,8 @@
 import {
   ChainId,
-  CHAIN_ID_NEAR,
   CHAIN_ID_SOLANA,
   CHAIN_ID_XPLA,
   createWrappedOnEth,
-  createWrappedOnNear,
   createWrappedOnSolana,
   createWrappedOnXpla,
   isEVMChain,
@@ -14,7 +12,6 @@ import {
   updateWrappedOnXpla,
 } from "@certusone/wormhole-sdk";
 import { Alert } from "@material-ui/lab";
-import { Wallet } from "@near-wallet-selector/core";
 import { WalletContextState } from "@solana/wallet-adapter-react";
 import { Connection } from "@solana/web3.js";
 import {
@@ -26,7 +23,6 @@ import { useSnackbar } from "notistack";
 import { useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useEthereumProvider } from "../contexts/EthereumProviderContext";
-import { useNearContext } from "../contexts/NearWalletContext";
 import { useSolanaWallet } from "../contexts/SolanaWalletContext";
 import { setCreateTx, setIsCreating } from "../store/attestSlice";
 import {
@@ -36,16 +32,10 @@ import {
 import {
   getTokenBridgeAddressForChain,
   MAX_VAA_UPLOAD_RETRIES_SOLANA,
-  NEAR_TOKEN_BRIDGE_ACCOUNT,
   SOLANA_HOST,
   SOL_BRIDGE_ADDRESS,
   SOL_TOKEN_BRIDGE_ADDRESS,
 } from "../utils/consts";
-import {
-  makeNearAccount,
-  makeNearProvider,
-  signAndSendTransactions,
-} from "../utils/near";
 import parseError from "../utils/parseError";
 import { signSendAndConfirm } from "../utils/solana";
 import { postWithFeesXpla } from "../utils/xpla";
@@ -77,39 +67,6 @@ async function evm(
       );
     dispatch(
       setCreateTx({ id: receipt.transactionHash, block: receipt.blockNumber })
-    );
-    enqueueSnackbar(null, {
-      content: <Alert severity="success">Transaction confirmed</Alert>,
-    });
-  } catch (e) {
-    enqueueSnackbar(null, {
-      content: <Alert severity="error">{parseError(e)}</Alert>,
-    });
-    dispatch(setIsCreating(false));
-  }
-}
-
-async function near(
-  dispatch: any,
-  enqueueSnackbar: any,
-  senderAddr: string,
-  signedVAA: Uint8Array,
-  wallet: Wallet
-) {
-  dispatch(setIsCreating(true));
-  try {
-    const account = await makeNearAccount(senderAddr);
-    const msgs = await createWrappedOnNear(
-      makeNearProvider(),
-      NEAR_TOKEN_BRIDGE_ACCOUNT,
-      signedVAA
-    );
-    const receipt = await signAndSendTransactions(account, wallet, msgs);
-    dispatch(
-      setCreateTx({
-        id: receipt.transaction_outcome.id,
-        block: 0,
-      })
     );
     enqueueSnackbar(null, {
       content: <Alert severity="success">Transaction confirmed</Alert>,
@@ -223,7 +180,6 @@ export function useHandleCreateWrapped(shouldUpdate: boolean) {
   const isCreating = useSelector(selectAttestIsCreating);
   const { signer } = useEthereumProvider();
   const xplaWallet = useXplaConnectedWallet();
-  const { accountId: nearAccountId, wallet } = useNearContext();
   const handleCreateClick = useCallback(() => {
     if (isEVMChain(targetChain) && !!signer && !!signedVAA) {
       evm(
@@ -250,14 +206,7 @@ export function useHandleCreateWrapped(shouldUpdate: boolean) {
       );
     } else if (targetChain === CHAIN_ID_XPLA && !!xplaWallet && !!signedVAA) {
       xpla(dispatch, enqueueSnackbar, xplaWallet, signedVAA, shouldUpdate);
-    } else if (
-      targetChain === CHAIN_ID_NEAR &&
-      nearAccountId &&
-      wallet &&
-      !!signedVAA
-    ) {
-      near(dispatch, enqueueSnackbar, nearAccountId, signedVAA, wallet);
-    } else {
+    }  else {
       // enqueueSnackbar(
       //   "Creating wrapped tokens on this chain is not yet supported",
       //   {
@@ -275,8 +224,6 @@ export function useHandleCreateWrapped(shouldUpdate: boolean) {
     signer,
     shouldUpdate,
     xplaWallet,
-    nearAccountId,
-    wallet,
   ]);
   return useMemo(
     () => ({

@@ -1,7 +1,6 @@
 import {
   ChainId,
   CHAIN_ID_ETH,
-  CHAIN_ID_NEAR,
   CHAIN_ID_SOLANA,
   isEVMChain,
   nativeToHexString,
@@ -117,8 +116,8 @@ function SecondaryAssetInformation({
     return originAddress && chainId === originAssetInfo?.originChain
       ? [originAddress]
       : foreignAssetInfo?.address
-      ? [foreignAssetInfo?.address]
-      : [];
+        ? [foreignAssetInfo?.address]
+        : [];
   }, [foreignAssetInfo, originAssetInfo, chainId]);
   const metadata = useMetadata(chainId, tokenArray);
   console.log("metadata", metadata, chainId, tokenArray);
@@ -149,19 +148,13 @@ function SecondaryAssetInformation({
       <RegisterNowButtonCore
         originChain={originAssetInfo?.originChain || undefined}
         originAsset={
-          // use pre-image for these
-          originAssetInfo?.originChain === CHAIN_ID_NEAR
-            ? originAssetInfo?.originAddress || undefined
-            : nativeToHexString(
-                originAssetInfo?.originAddress || undefined,
-                originAssetInfo?.originChain || CHAIN_ID_SOLANA // this should exist
-              ) || undefined
+          nativeToHexString(
+            originAssetInfo?.originAddress || undefined,
+            originAssetInfo?.originChain || CHAIN_ID_SOLANA // this should exist
+          ) || undefined
         }
         forceAsset={
-          // use pre-image for these
-          originAssetInfo?.originChain === CHAIN_ID_NEAR
-            ? originAssetInfo?.originAddress || undefined
-            : undefined
+          undefined
         }
         targetChain={chainId}
       />

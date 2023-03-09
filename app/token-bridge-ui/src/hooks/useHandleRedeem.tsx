@@ -1,6 +1,5 @@
 import {
   ChainId,
-  CHAIN_ID_NEAR,
   CHAIN_ID_SOLANA,
   CHAIN_ID_XPLA,
   isEVMChain,
@@ -8,13 +7,11 @@ import {
   redeemAndUnwrapOnSolana,
   redeemOnEth,
   redeemOnEthNative,
-  redeemOnNear,
   redeemOnSolana,
   redeemOnXpla,
   uint8ArrayToHex,
 } from "@certusone/wormhole-sdk";
 import { Alert } from "@material-ui/lab";
-import { Wallet } from "@near-wallet-selector/core";
 import { WalletContextState } from "@solana/wallet-adapter-react";
 import { Connection } from "@solana/web3.js";
 import {
@@ -27,7 +24,6 @@ import { useSnackbar } from "notistack";
 import { useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useEthereumProvider } from "../contexts/EthereumProviderContext";
-import { useNearContext } from "../contexts/NearWalletContext";
 import { useSolanaWallet } from "../contexts/SolanaWalletContext";
 import {
   selectTransferIsRedeeming,
@@ -37,16 +33,10 @@ import { setIsRedeeming, setRedeemTx } from "../store/transferSlice";
 import {
   getTokenBridgeAddressForChain,
   MAX_VAA_UPLOAD_RETRIES_SOLANA,
-  NEAR_TOKEN_BRIDGE_ACCOUNT,
   SOLANA_HOST,
   SOL_BRIDGE_ADDRESS,
   SOL_TOKEN_BRIDGE_ADDRESS,
 } from "../utils/consts";
-import {
-  makeNearAccount,
-  makeNearProvider,
-  signAndSendTransactions,
-} from "../utils/near";
 import parseError from "../utils/parseError";
 import { signSendAndConfirm } from "../utils/solana";
 import { postWithFeesXpla } from "../utils/xpla";
@@ -78,40 +68,6 @@ async function evm(
       );
     dispatch(
       setRedeemTx({ id: receipt.transactionHash, block: receipt.blockNumber })
-    );
-    enqueueSnackbar(null, {
-      content: <Alert severity="success">Transaction confirmed</Alert>,
-    });
-  } catch (e) {
-    enqueueSnackbar(null, {
-      content: <Alert severity="error">{parseError(e)}</Alert>,
-    });
-    dispatch(setIsRedeeming(false));
-  }
-}
-
-async function near(
-  dispatch: any,
-  enqueueSnackbar: any,
-  senderAddr: string,
-  signedVAA: Uint8Array,
-  wallet: Wallet
-) {
-  dispatch(setIsRedeeming(true));
-  try {
-    const account = await makeNearAccount(senderAddr);
-    const msgs = await redeemOnNear(
-      makeNearProvider(),
-      account.accountId,
-      NEAR_TOKEN_BRIDGE_ACCOUNT,
-      signedVAA
-    );
-    const receipt = await signAndSendTransactions(account, wallet, msgs);
-    dispatch(
-      setRedeemTx({
-        id: receipt.transaction_outcome.id,
-        block: 0,
-      })
     );
     enqueueSnackbar(null, {
       content: <Alert severity="success">Transaction confirmed</Alert>,
@@ -216,7 +172,7 @@ export function useHandleRedeem() {
   const solPK = solanaWallet?.publicKey;
   const { signer } = useEthereumProvider();
   const xplaWallet = useXplaConnectedWallet();
-  const { accountId: nearAccountId, wallet } = useNearContext();
+
   const signedVAA = useTransferSignedVAA();
   const isRedeeming = useSelector(selectTransferIsRedeeming);
   const handleRedeemClick = useCallback(() => {
@@ -238,13 +194,6 @@ export function useHandleRedeem() {
       );
     } else if (targetChain === CHAIN_ID_XPLA && !!xplaWallet && signedVAA) {
       xpla(dispatch, enqueueSnackbar, xplaWallet, signedVAA);
-    } else if (
-      targetChain === CHAIN_ID_NEAR &&
-      nearAccountId &&
-      wallet &&
-      !!signedVAA
-    ) {
-      near(dispatch, enqueueSnackbar, nearAccountId, signedVAA, wallet);
     } else {
     }
   }, [
@@ -256,8 +205,6 @@ export function useHandleRedeem() {
     solanaWallet,
     solPK,
     xplaWallet,
-    nearAccountId,
-    wallet,
   ]);
 
   const handleRedeemNativeClick = useCallback(() => {

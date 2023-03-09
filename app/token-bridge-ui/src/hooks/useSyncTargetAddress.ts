@@ -1,6 +1,5 @@
 import {
   cosmos,
-  CHAIN_ID_NEAR,
   CHAIN_ID_SOLANA,
   CHAIN_ID_XPLA,
   isEVMChain,
@@ -27,11 +26,6 @@ import {
 } from "../store/selectors";
 import { setTargetAddressHex as setTransferTargetAddressHex } from "../store/transferSlice";
 import { useConnectedWallet as useXplaConnectedWallet } from "@xpla/wallet-provider";
-import { useNearContext } from "../contexts/NearWalletContext";
-import { makeNearAccount, signAndSendTransactions } from "../utils/near";
-import { NEAR_TOKEN_BRIDGE_ACCOUNT } from "../utils/consts";
-import { getTransactionLastResult } from "near-api-js/lib/providers";
-import BN from "bn.js";
 
 function useSyncTargetAddress(shouldFire: boolean, nft?: boolean) {
   const dispatch = useDispatch();
@@ -49,7 +43,6 @@ function useSyncTargetAddress(shouldFire: boolean, nft?: boolean) {
   );
   const targetTokenAccountPublicKey = targetParsedTokenAccount?.publicKey;
   const xplaWallet = useXplaConnectedWallet();
-  const { accountId: nearAccountId, wallet } = useNearContext();
   const setTargetAddressHex = nft
     ? setNFTTargetAddressHex
     : setTransferTargetAddressHex;
@@ -115,55 +108,6 @@ function useSyncTargetAddress(shouldFire: boolean, nft?: boolean) {
             )
           )
         );
-      } else if (targetChain === CHAIN_ID_NEAR && nearAccountId && wallet) {
-        (async () => {
-          try {
-            const account = await makeNearAccount(nearAccountId);
-            // So, near can have account names up to 64 bytes but wormhole can only have 32...
-            //   as a result, we have to hash our account names to sha256's..  What we are doing
-            //   here is doing a RPC call (does not require any interaction with the wallet and is free)
-            //   that both tells us our account hash AND if we are already registered...
-            let account_hash = await account.viewFunction(
-              NEAR_TOKEN_BRIDGE_ACCOUNT,
-              "hash_account",
-              {
-                account: nearAccountId,
-              }
-            );
-            if (!cancelled) {
-              let myAddress = account_hash[1];
-              console.log("account hash for", nearAccountId, account_hash);
-
-              if (!account_hash[0]) {
-                console.log("Registering the receiving account");
-
-                let myAddress2 = getTransactionLastResult(
-                  await signAndSendTransactions(account, wallet, [
-                    {
-                      contractId: NEAR_TOKEN_BRIDGE_ACCOUNT,
-                      methodName: "register_account",
-                      args: { account: nearAccountId },
-                      gas: new BN("100000000000000"),
-                      attachedDeposit: new BN("2000000000000000000000"), // 0.002 NEAR
-                    },
-                  ])
-                );
-
-                console.log("account hash returned: " + myAddress2);
-              } else {
-                console.log("account already registered");
-              }
-              if (!cancelled) {
-                dispatch(setTargetAddressHex(myAddress));
-              }
-            }
-          } catch (e) {
-            console.log(e);
-            if (!cancelled) {
-              dispatch(setTargetAddressHex(undefined));
-            }
-          }
-        })();
       } else {
         dispatch(setTargetAddressHex(undefined));
       }
@@ -182,8 +126,6 @@ function useSyncTargetAddress(shouldFire: boolean, nft?: boolean) {
     nft,
     setTargetAddressHex,
     xplaWallet,
-    nearAccountId,
-    wallet,
   ]);
 }
 

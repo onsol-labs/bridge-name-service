@@ -1,7 +1,6 @@
 import {
   ChainId,
   CHAIN_ID_ETH,
-  CHAIN_ID_OASIS,
   CHAIN_ID_POLYGON,
   CHAIN_ID_SOLANA,
   hexToNativeAssetString,
@@ -314,7 +313,7 @@ export default function NFTOriginVerifier() {
                   >
                     View on OpenSea
                   </Button>
-                ) : originInfo.chainId === CHAIN_ID_OASIS ? null : (
+                ) : (
                   <Button
                     href={`https://opensea.io/assets/${readableAddress}/${originInfo.tokenId}`}
                     target="_blank"

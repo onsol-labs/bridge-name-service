@@ -30,13 +30,6 @@ export const METAMASK_CHAIN_PARAMETERS: {
     rpcUrls: ["https://rpc.ankr.com/eth_goerli"],
     blockExplorerUrls: ["https://goerli.etherscan.io"],
   },
-  42261: {
-    chainId: "0xa515",
-    chainName: "Emerald Paratime Testnet",
-    nativeCurrency: { name: "Emerald Rose", symbol: "ROSE", decimals: 18 },
-    rpcUrls: ["https://testnet.emerald.oasis.dev"],
-    blockExplorerUrls: ["https://testnet.explorer.emerald.oasis.dev"],
-  },
   80001: {
     chainId: "0x13881",
     chainName: "Mumbai",

@@ -2,12 +2,9 @@ import {
   ChainId,
   CHAIN_ID_ETH,
   CHAIN_ID_MOONBEAM,
-  CHAIN_ID_OASIS,
   CHAIN_ID_POLYGON,
   CHAIN_ID_SOLANA,
   CHAIN_ID_XPLA,
-  CHAIN_ID_NEAR,
-  CHAIN_ID_BASE,
 } from "@certusone/wormhole-sdk";
 import { Button, makeStyles, Tooltip, Typography } from "@material-ui/core";
 import { FileCopy, OpenInNew } from "@material-ui/icons";
@@ -100,18 +97,8 @@ export default function SmartAddress({
     ? `https://${CLUSTER === "testnet" ? "mumbai." : ""}polygonscan.com/${
         isAsset ? "token" : "address"
       }/${useableAddress}`
-    : chainId === CHAIN_ID_OASIS
-    ? `https://${
-        CLUSTER === "testnet" ? "testnet." : ""
-      }explorer.emerald.oasis.dev/${
-        isAsset ? "token" : "address"
-      }/${useableAddress}`
     : chainId === CHAIN_ID_MOONBEAM
     ? `https://${CLUSTER === "testnet" ? "moonbase." : ""}moonscan.io/${
-        isAsset ? "token" : "address"
-      }/${useableAddress}`
-    : chainId === CHAIN_ID_BASE
-    ? `https://${CLUSTER === "testnet" ? "goerli." : ""}basescan.org/${
         isAsset ? "token" : "address"
       }/${useableAddress}`
     : chainId === CHAIN_ID_SOLANA
@@ -126,8 +113,6 @@ export default function SmartAddress({
     ? `https://explorer.xpla.io/${
         CLUSTER === "testnet" ? "testnet/" : ""
       }address/${useableAddress}`
-    : chainId === CHAIN_ID_NEAR && CLUSTER === "testnet"
-    ? `https://explorer.testnetnear.org/accounts/${useableAddress}`
     : undefined;
   const explorerName = getExplorerName(chainId);
 

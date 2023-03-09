@@ -1,11 +1,8 @@
 import {
   ChainId,
-  CHAIN_ID_BASE,
   CHAIN_ID_ETH,
   CHAIN_ID_MOONBEAM,
-  CHAIN_ID_NEAR,
   CHAIN_ID_NEON,
-  CHAIN_ID_OASIS,
   CHAIN_ID_POLYGON,
   CHAIN_ID_SOLANA,
   CHAIN_ID_XPLA,
@@ -20,12 +17,9 @@ import baseIcon from "../icons/base.svg";
 import ethIcon from "../icons/eth.svg";
 import moonbeamIcon from "../icons/moonbeam.svg";
 import neonIcon from "../icons/neon.svg";
-import oasisIcon from "../icons/oasis-network-rose-logo.svg";
 import polygonIcon from "../icons/polygon.svg";
 import solanaIcon from "../icons/solana.svg";
 import xplaIcon from "../icons/xpla.svg";
-import nearIcon from "../icons/near.svg";
-import { ConnectConfig, keyStores } from "near-api-js";
 
 export type Cluster = "devnet" | "testnet";
 const urlParams = new URLSearchParams(window.location.search);
@@ -41,11 +35,6 @@ export const CHAINS: ChainInfo[] =
   CLUSTER === "testnet"
     ? [
       {
-        id: CHAIN_ID_BASE,
-        name: "Base Goerli",
-        logo: baseIcon,
-      },
-      {
         id: CHAIN_ID_ETH,
         name: "Ethereum (Goerli)",
         logo: ethIcon,
@@ -56,19 +45,9 @@ export const CHAINS: ChainInfo[] =
         logo: moonbeamIcon,
       },
       {
-        id: CHAIN_ID_NEAR,
-        name: "Near",
-        logo: nearIcon,
-      },
-      {
         id: CHAIN_ID_NEON,
         name: "Neon",
         logo: neonIcon,
-      },
-      {
-        id: CHAIN_ID_OASIS,
-        name: "Oasis",
-        logo: oasisIcon,
       },
       {
         id: CHAIN_ID_POLYGON,
@@ -93,11 +72,6 @@ export const CHAINS: ChainInfo[] =
         logo: ethIcon,
       },
       {
-        id: CHAIN_ID_NEAR,
-        name: "Near",
-        logo: nearIcon,
-      },
-      {
         id: CHAIN_ID_SOLANA,
         name: "Solana",
         logo: solanaIcon,
@@ -107,11 +81,9 @@ export const CHAINS_WITH_NFT_SUPPORT = CHAINS.filter(
   ({ id }) =>
     id === CHAIN_ID_ETH ||
     id === CHAIN_ID_POLYGON ||
-    id === CHAIN_ID_OASIS ||
     id === CHAIN_ID_SOLANA ||
     id === CHAIN_ID_NEON ||
-    id === CHAIN_ID_MOONBEAM ||
-    id === CHAIN_ID_BASE
+    id === CHAIN_ID_MOONBEAM
 );
 export type ChainsById = { [key in ChainId]: ChainInfo };
 export const CHAINS_BY_ID: ChainsById = CHAINS.reduce((obj, chain) => {
@@ -127,30 +99,24 @@ export const getDefaultNativeCurrencySymbol = (chainId: ChainId) =>
       ? "ETH"
       : chainId === CHAIN_ID_POLYGON
         ? "MATIC"
-        : chainId === CHAIN_ID_OASIS
-          ? "ROSE"
-          : chainId === CHAIN_ID_NEON
-            ? "NEON"
-            : chainId === CHAIN_ID_XPLA
-              ? "XPLA"
-              : chainId === CHAIN_ID_MOONBEAM
-                ? "GLMR"
-                : chainId === CHAIN_ID_BASE
-                  ? "ETH"
-                  : "";
+        : chainId === CHAIN_ID_NEON
+          ? "NEON"
+          : chainId === CHAIN_ID_XPLA
+            ? "XPLA"
+            : chainId === CHAIN_ID_MOONBEAM
+              ? "GLMR"
+              : "";
 
 export const getDefaultNativeCurrencyAddressEvm = (chainId: ChainId) => {
   return chainId === CHAIN_ID_ETH
     ? WETH_ADDRESS
     : chainId === CHAIN_ID_POLYGON
       ? WMATIC_ADDRESS
-      : chainId === CHAIN_ID_OASIS
-        ? WROSE_ADDRESS
-        : chainId === CHAIN_ID_NEON
-          ? WNEON_ADDRESS
-          : chainId === CHAIN_ID_MOONBEAM
-            ? WGLMR_ADDRESS
-            : "";
+      : chainId === CHAIN_ID_NEON
+        ? WNEON_ADDRESS
+        : chainId === CHAIN_ID_MOONBEAM
+          ? WGLMR_ADDRESS
+          : "";
 };
 
 export const getExplorerName = (chainId: ChainId) =>
@@ -164,16 +130,13 @@ export const getExplorerName = (chainId: ChainId) =>
           ? "XPLA Explorer"
           : chainId === CHAIN_ID_MOONBEAM
             ? "Moonscan"
-            : chainId === CHAIN_ID_BASE
-              ? "BaseScan"
-              : "Explorer";
+            : "Explorer";
 export const WORMHOLE_RPC_HOSTS =
   CLUSTER === "testnet"
     ? ["https://wormhole-v2-testnet-api.certus.one"]
     : ["http://localhost:7071"];
 export const ETH_NETWORK_CHAIN_ID = CLUSTER === "testnet" ? 5 : 1337;
 export const POLYGON_NETWORK_CHAIN_ID = CLUSTER === "testnet" ? 80001 : 1381;
-export const OASIS_NETWORK_CHAIN_ID = CLUSTER === "testnet" ? 42261 : 1381;
 export const NEON_NETWORK_CHAIN_ID = CLUSTER === "testnet" ? 245022926 : 1381;
 export const MOONBEAM_NETWORK_CHAIN_ID = CLUSTER === "testnet" ? 1287 : 1381;
 export const BASE_NETWORK_CHAIN_ID = CLUSTER === "testnet" ? 84531 : 1381;
@@ -182,15 +145,11 @@ export const getEvmChainId = (chainId: ChainId) =>
     ? ETH_NETWORK_CHAIN_ID
     : chainId === CHAIN_ID_POLYGON
       ? POLYGON_NETWORK_CHAIN_ID
-      : chainId === CHAIN_ID_OASIS
-        ? OASIS_NETWORK_CHAIN_ID
-        : chainId === CHAIN_ID_NEON
-          ? NEON_NETWORK_CHAIN_ID
-          : chainId === CHAIN_ID_MOONBEAM
-            ? MOONBEAM_NETWORK_CHAIN_ID
-            : chainId === CHAIN_ID_BASE
-              ? BASE_NETWORK_CHAIN_ID
-              : undefined;
+      : chainId === CHAIN_ID_NEON
+        ? NEON_NETWORK_CHAIN_ID
+        : chainId === CHAIN_ID_MOONBEAM
+          ? MOONBEAM_NETWORK_CHAIN_ID
+          : undefined;
 export const SOLANA_HOST = process.env.REACT_APP_SOLANA_API_URL
   ? process.env.REACT_APP_SOLANA_API_URL
   : CLUSTER === "testnet"
@@ -217,12 +176,6 @@ export const SOL_NFT_BRIDGE_ADDRESS =
   CONTRACTS[CLUSTER === "testnet" ? "TESTNET" : "DEVNET"].solana.nft_bridge;
 export const SOL_TOKEN_BRIDGE_ADDRESS =
   CONTRACTS[CLUSTER === "testnet" ? "TESTNET" : "DEVNET"].solana.token_bridge;
-
-export const NEAR_CORE_BRIDGE_ACCOUNT =
-  CLUSTER === "testnet" ? "wormhole.wormhole.testnet" : "wormhole.test.near";
-
-export const NEAR_TOKEN_BRIDGE_ACCOUNT =
-  CLUSTER === "testnet" ? "token.wormhole.testnet" : "token.test.near";
 
 export const getBridgeAddressForChain = (chainId: ChainId) =>
   CONTRACTS[CLUSTER === "testnet" ? "TESTNET" : "DEVNET"][
@@ -265,28 +218,11 @@ export const COVALENT_GET_TOKENS_URL = (
           ? COVALENT_NEON
           : chainId === CHAIN_ID_MOONBEAM
             ? COVALENT_MOONBEAM
-            : chainId === CHAIN_ID_BASE
-              ? COVALENT_BASE
-              : "";
+            : "";
   // https://www.covalenthq.com/docs/api/#get-/v1/{chain_id}/address/{address}/balances_v2/
   return chainNum
     ? `https://eth-goerli.g.alchemy.com/v2/xqzYNQBfiNgQPztNiM4mDvuc5R25ag8x/getNFTs/?owner=${walletAddress}`
     //`https://api.covalenthq.com/v1/${chainNum}/address//balances_nft/?key=${COVALENT_API_KEY}`
-    : "";
-};
-
-export const BLOCKSCOUT_GET_TOKENS_URL = (
-  chainId: ChainId,
-  walletAddress: string
-) => {
-  const baseUrl =
-    chainId === CHAIN_ID_OASIS
-      ? CLUSTER === "testnet"
-        ? "https://testnet.explorer.emerald.oasis.dev"
-        : ""
-      : "";
-  return baseUrl
-    ? `${baseUrl}/api?module=account&action=tokenlist&address=${walletAddress}`
     : "";
 };
 
@@ -355,31 +291,6 @@ export const MIGRATION_PROGRAM_ADDRESS =
 
 export const XPLA_NATIVE_DENOM = "axpla";
 
-export const nearKeyStore = new keyStores.BrowserLocalStorageKeyStore();
-
-export const getNearConnectionConfig = (): ConnectConfig =>
-  CLUSTER === "testnet"
-    ? {
-      networkId: "testnet",
-      keyStore: nearKeyStore,
-      nodeUrl: "https://rpc.testnet.near.org",
-      walletUrl: "https://wallet.testnet.near.org",
-      helperUrl: "https://helper.testnet.near.org",
-      headers: {},
-    }
-    : {
-      networkId: "sandbox",
-      keyStore: nearKeyStore,
-      nodeUrl: "http://localhost:3030",
-      helperUrl: "",
-      headers: {},
-    };
-
-export const NATIVE_NEAR_DECIMALS = 24;
-export const NATIVE_NEAR_PLACEHOLDER = "near";
-export const NATIVE_NEAR_WH_ADDRESS =
-  "0000000000000000000000000000000000000000000000000000000000000000";
-
 export const WORMHOLE_EXPLORER_BASE = "https://wormhole.com/explorer";
 
 export const SOLANA_SYSTEM_PROGRAM_ADDRESS = "11111111111111111111111111111111";
@@ -426,7 +337,6 @@ export const RELAYER_COMPARE_ASSET: RelayerCompareAsset = {
   [CHAIN_ID_SOLANA]: "solana",
   [CHAIN_ID_ETH]: "ethereum",
   [CHAIN_ID_POLYGON]: "matic-network",
-  [CHAIN_ID_OASIS]: "oasis-network",
 } as RelayerCompareAsset;
 export const getCoinGeckoURL = (coinGeckoId: string) =>
   `https://api.coingecko.com/api/v3/simple/price?ids=${coinGeckoId}&vs_currencies=usd`;

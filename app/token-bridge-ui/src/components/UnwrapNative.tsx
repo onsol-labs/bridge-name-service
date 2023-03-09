@@ -1,7 +1,6 @@
 import {
   CHAIN_ID_ETH,
   CHAIN_ID_NEON,
-  CHAIN_ID_OASIS,
   CHAIN_ID_POLYGON,
   ethers_contracts,
 } from "@certusone/wormhole-sdk";
@@ -21,7 +20,6 @@ import { useEthereumProvider } from "../contexts/EthereumProviderContext";
 import useIsWalletReady from "../hooks/useIsWalletReady";
 import ethIcon from "../icons/eth.svg";
 import neonIcon from "../icons/neon.svg";
-import oasisIcon from "../icons/oasis-network-rose-logo.svg";
 import polygonIcon from "../icons/polygon.svg";
 import {
   DataWrapper,
@@ -37,8 +35,6 @@ import {
   WMATIC_DECIMALS,
   WNEON_ADDRESS,
   WNEON_DECIMALS,
-  WROSE_ADDRESS,
-  WROSE_DECIMALS,
 } from "../utils/consts";
 import parseError from "../utils/parseError";
 import ButtonWithLoader from "./ButtonWithLoader";
@@ -89,12 +85,6 @@ const supportedTokens = {
     icon: polygonIcon,
     address: WMATIC_ADDRESS,
     decimals: WMATIC_DECIMALS,
-  },
-  [CHAIN_ID_OASIS]: {
-    symbol: "WROSE",
-    icon: oasisIcon,
-    address: WROSE_ADDRESS,
-    decimals: WROSE_DECIMALS,
   },
   [CHAIN_ID_NEON]: {
     symbol: "WNEON",

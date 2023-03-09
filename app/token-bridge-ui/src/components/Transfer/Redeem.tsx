@@ -1,7 +1,6 @@
 import {
   CHAIN_ID_ETH,
   CHAIN_ID_NEON,
-  CHAIN_ID_OASIS,
   CHAIN_ID_POLYGON,
   CHAIN_ID_SOLANA,
   isEVMChain,
@@ -36,7 +35,6 @@ import {
   WETH_ADDRESS,
   WMATIC_ADDRESS,
   WNEON_ADDRESS,
-  WROSE_ADDRESS,
 } from "../../utils/consts";
 import ButtonWithLoader from "../ButtonWithLoader";
 import KeyAndBalance from "../KeyAndBalance";
@@ -95,10 +93,6 @@ function Redeem() {
     targetChain === CHAIN_ID_POLYGON &&
     targetAsset &&
     targetAsset.toLowerCase() === WMATIC_ADDRESS.toLowerCase();
-  const isOasisNative =
-    targetChain === CHAIN_ID_OASIS &&
-    targetAsset &&
-    targetAsset.toLowerCase() === WROSE_ADDRESS.toLowerCase();
   const isNeonNative =
     targetChain === CHAIN_ID_NEON &&
     targetAsset &&
@@ -110,7 +104,6 @@ function Redeem() {
   const isNativeEligible =
     isEthNative ||
     isPolygonNative ||
-    isOasisNative ||
     isNeonNative ||
     isSolNative;
   const [useNativeRedeem, setUseNativeRedeem] = useState(true);

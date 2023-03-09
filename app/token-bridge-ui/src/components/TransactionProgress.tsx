@@ -1,8 +1,6 @@
 import {
   ChainId,
-  CHAIN_ID_BASE,
   CHAIN_ID_MOONBEAM,
-  CHAIN_ID_OASIS,
   CHAIN_ID_POLYGON,
   CHAIN_ID_SOLANA,
   isEVMChain,
@@ -78,13 +76,10 @@ export default function TransactionProgress({
       ? CLUSTER === "testnet"
         ? 64
         : 512
-      : chainId === CHAIN_ID_OASIS ||
-        chainId === CHAIN_ID_MOONBEAM
+      : chainId === CHAIN_ID_MOONBEAM
         ? 1 // these chains only require 1 conf
         : chainId === CHAIN_ID_SOLANA
           ? 32
-          : chainId === CHAIN_ID_BASE
-            ? 124 // something to show progress
             : isEVMChain(chainId)
               ? 15
               : 1;
@@ -102,11 +97,9 @@ export default function TransactionProgress({
           variant="determinate"
         />
         <Typography variant="body2" className={classes.message}>
-          {chainId === CHAIN_ID_BASE
-            ? `Waiting for Ethereum finality on Base block ${tx?.block}` //TODO: more advanced finality checking for Base
-            : blockDiff < expectedBlocks
-              ? `Waiting for ${blockDiff} / ${expectedBlocks} confirmations on ${CHAINS_BY_ID[chainId].name}...`
-              : `Waiting for Wormhole Network consensus...`}
+          {blockDiff < expectedBlocks
+            ? `Waiting for ${blockDiff} / ${expectedBlocks} confirmations on ${CHAINS_BY_ID[chainId].name}...`
+            : `Waiting for Wormhole Network consensus...`}
         </Typography>
       </div>
     );

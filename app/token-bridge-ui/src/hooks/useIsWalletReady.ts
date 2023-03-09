@@ -1,6 +1,5 @@
 import {
   ChainId,
-  CHAIN_ID_NEAR,
   CHAIN_ID_SOLANA,
   CHAIN_ID_XPLA,
   isEVMChain,
@@ -12,7 +11,6 @@ import {
   ConnectType,
   useEthereumProvider,
 } from "../contexts/EthereumProviderContext";
-import { useNearContext } from "../contexts/NearWalletContext";
 import { useSolanaWallet } from "../contexts/SolanaWalletContext";
 import { CLUSTER, getEvmChainId } from "../utils/consts";
 import {
@@ -60,7 +58,6 @@ function useIsWalletReady(
   // Petra = "Testnet"
   // Martian = "Testnet"
   // Nightly = undefined... error on NightlyWallet.ts
-  const { accountId: nearPK } = useNearContext();
 
   const forceNetworkSwitch = useCallback(async () => {
     if (provider && correctEvmNetwork) {
@@ -121,9 +118,6 @@ function useIsWalletReady(
         xplaWallet.walletAddress
       );
     }
-    if (chainId === CHAIN_ID_NEAR && nearPK) {
-      return createWalletStatus(true, undefined, forceNetworkSwitch, nearPK);
-    }
     if (isEVMChain(chainId) && hasEthInfo && signerAddress) {
       if (hasCorrectEvmNetwork) {
         return createWalletStatus(
@@ -163,7 +157,6 @@ function useIsWalletReady(
     signerAddress,
     xplaWallet,
     hasXplaWallet,
-    nearPK,
   ]);
 }
 

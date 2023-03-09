@@ -2,26 +2,20 @@ import {
   attestFromEth,
   attestFromSolana,
   attestFromXpla,
-  attestNearFromNear,
-  attestTokenFromNear,
   ChainId,
-  CHAIN_ID_NEAR,
   CHAIN_ID_SOLANA,
   CHAIN_ID_XPLA,
   getEmitterAddressEth,
-  getEmitterAddressNear,
   getEmitterAddressSolana,
   getEmitterAddressXpla,
   getSignedVAAWithRetry,
   isEVMChain,
   parseSequenceFromLogEth,
-  parseSequenceFromLogNear,
   parseSequenceFromLogSolana,
   parseSequenceFromLogXpla,
   uint8ArrayToHex,
 } from "@certusone/wormhole-sdk";
 import { Alert } from "@material-ui/lab";
-import { Wallet } from "@near-wallet-selector/core";
 import { WalletContextState } from "@solana/wallet-adapter-react";
 import { Connection, PublicKey } from "@solana/web3.js";
 import {
@@ -33,7 +27,6 @@ import { useSnackbar } from "notistack";
 import { useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useEthereumProvider } from "../contexts/EthereumProviderContext";
-import { useNearContext } from "../contexts/NearWalletContext";
 import { useSolanaWallet } from "../contexts/SolanaWalletContext";
 import {
   setAttestTx,
@@ -50,19 +43,11 @@ import {
 import {
   getBridgeAddressForChain,
   getTokenBridgeAddressForChain,
-  NATIVE_NEAR_PLACEHOLDER,
-  NEAR_CORE_BRIDGE_ACCOUNT,
-  NEAR_TOKEN_BRIDGE_ACCOUNT,
   SOLANA_HOST,
   SOL_BRIDGE_ADDRESS,
   SOL_TOKEN_BRIDGE_ADDRESS,
   WORMHOLE_RPC_HOSTS,
 } from "../utils/consts";
-import {
-  makeNearAccount,
-  makeNearProvider,
-  signAndSendTransactions,
-} from "../utils/near";
 import parseError from "../utils/parseError";
 import { signSendAndConfirm } from "../utils/solana";
 import { postWithFeesXpla, waitForXplaExecution } from "../utils/xpla";
@@ -104,68 +89,6 @@ async function evm(
     const { vaaBytes } = await getSignedVAAWithRetry(
       WORMHOLE_RPC_HOSTS,
       chainId,
-      emitterAddress,
-      sequence
-    );
-    dispatch(setSignedVAAHex(uint8ArrayToHex(vaaBytes)));
-    enqueueSnackbar(null, {
-      content: <Alert severity="success">Fetched Signed VAA</Alert>,
-    });
-  } catch (e) {
-    console.error(e);
-    enqueueSnackbar(null, {
-      content: <Alert severity="error">{parseError(e)}</Alert>,
-    });
-    dispatch(setIsSending(false));
-  }
-}
-
-async function near(
-  dispatch: any,
-  enqueueSnackbar: any,
-  senderAddr: string,
-  sourceAsset: string,
-  wallet: Wallet
-) {
-  dispatch(setIsSending(true));
-  try {
-    const account = await makeNearAccount(senderAddr);
-    const msgs =
-      sourceAsset === NATIVE_NEAR_PLACEHOLDER
-        ? [
-          await attestNearFromNear(
-            makeNearProvider(),
-            NEAR_CORE_BRIDGE_ACCOUNT,
-            NEAR_TOKEN_BRIDGE_ACCOUNT
-          ),
-        ]
-        : await attestTokenFromNear(
-          makeNearProvider(),
-          NEAR_CORE_BRIDGE_ACCOUNT,
-          NEAR_TOKEN_BRIDGE_ACCOUNT,
-          sourceAsset
-        );
-    const receipt = await signAndSendTransactions(account, wallet, msgs);
-    const sequence = parseSequenceFromLogNear(receipt);
-    if (sequence === null) {
-      throw new Error("Unable to parse sequence from log");
-    }
-    dispatch(
-      setAttestTx({
-        id: receipt.transaction_outcome.id,
-        block: 0,
-      })
-    );
-    enqueueSnackbar(null, {
-      content: <Alert severity="success">Transaction confirmed</Alert>,
-    });
-    const emitterAddress = getEmitterAddressNear(NEAR_TOKEN_BRIDGE_ACCOUNT);
-    enqueueSnackbar(null, {
-      content: <Alert severity="info">Fetching VAA</Alert>,
-    });
-    const { vaaBytes } = await getSignedVAAWithRetry(
-      WORMHOLE_RPC_HOSTS,
-      CHAIN_ID_NEAR,
       emitterAddress,
       sequence
     );
@@ -292,7 +215,6 @@ export function useHandleAttest() {
   const solanaWallet = useSolanaWallet();
   const solPK = solanaWallet?.publicKey;
   const xplaWallet = useXplaConnectedWallet();
-  const { accountId: nearAccountId, wallet } = useNearContext();
   const disabled = !isTargetComplete || isSending || isSendComplete;
   const handleAttestClick = useCallback(() => {
     if (isEVMChain(sourceChain) && !!signer) {
@@ -301,8 +223,6 @@ export function useHandleAttest() {
       solana(dispatch, enqueueSnackbar, solPK, sourceAsset, solanaWallet);
     } else if (sourceChain === CHAIN_ID_XPLA && !!xplaWallet) {
       xpla(dispatch, enqueueSnackbar, xplaWallet, sourceAsset);
-    } else if (sourceChain === CHAIN_ID_NEAR && nearAccountId && wallet) {
-      near(dispatch, enqueueSnackbar, nearAccountId, sourceAsset, wallet);
     } else {
     }
   }, [
@@ -314,8 +234,6 @@ export function useHandleAttest() {
     solPK,
     sourceAsset,
     xplaWallet,
-    nearAccountId,
-    wallet,
   ]);
   return useMemo(
     () => ({

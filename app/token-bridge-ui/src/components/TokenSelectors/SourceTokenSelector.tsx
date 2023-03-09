@@ -1,5 +1,4 @@
 import {
-  CHAIN_ID_NEAR,
   CHAIN_ID_SOLANA,
   CHAIN_ID_XPLA,
   isEVMChain,
@@ -25,7 +24,6 @@ import {
   setSourceWalletAddress as setTransferSourceWalletAddress,
 } from "../../store/transferSlice";
 import EvmTokenPicker from "./EvmTokenPicker";
-import NearTokenPicker from "./NearTokenPicker";
 import RefreshButtonWrapper from "./RefreshButtonWrapper";
 import SolanaTokenPicker from "./SolanaTokenPicker";
 import XplaTokenPicker from "./XplaTokenPicker";
@@ -108,14 +106,6 @@ export const TokenSelector = (props: TokenSelectorProps) => {
     />
   ) : lookupChain === CHAIN_ID_XPLA ? (
     <XplaTokenPicker
-      value={sourceParsedTokenAccount || null}
-      disabled={disabled}
-      onChange={handleOnChange}
-      resetAccounts={maps?.resetAccounts}
-      tokenAccounts={maps?.tokenAccounts}
-    />
-  ) : lookupChain === CHAIN_ID_NEAR ? (
-    <NearTokenPicker
       value={sourceParsedTokenAccount || null}
       disabled={disabled}
       onChange={handleOnChange}
