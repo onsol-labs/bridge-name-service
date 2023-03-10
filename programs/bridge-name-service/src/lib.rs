@@ -9,7 +9,7 @@ pub mod utils;
 pub use errors::*;
 pub use processor::*;
 
-declare_id!("Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS");
+declare_id!("BQqpUU12TqvMm6NRwM9Lv7vKZLWwWzgaZh2Q2qvkmcbi");
 
 #[program]
 pub mod bridge_name_service {
@@ -39,5 +39,15 @@ pub mod bridge_name_service {
             duration_rate,
             mint_bump,
         )
+    }
+
+    pub fn create_nft_ans<'info>(
+        ctx: Context<'_, '_, '_, 'info, CreateDomainNFT<'info>>,
+        tld: String,
+        hashed_name: Vec<u8>,
+        _reverse_acc_hashed_name: Vec<u8>,
+        name: String,
+    ) -> Result<()> {
+        handle_domain_nft_creation(ctx, name, hashed_name, tld)
     }
 }

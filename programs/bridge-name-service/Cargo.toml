@@ -16,7 +16,7 @@ cpi = ["no-entrypoint"]
 default = []
 
 [dependencies]
-nft-bridge-cpi = { version = "0.1.0", path = "../nft-bridge" }
+#nft-bridge-cpi = { version = "0.1.0", path = "../nft-bridge" }
 anchor-lang = { version = "0.26.0", features = ["init-if-needed"] }
 solana-program = "~1.13.6"
 anchor-spl = "~0.26.0"
@@ -29,4 +29,4 @@ tld_house = { git = "https://github.com/onsol-labs/tld-house.git", branch = "v0.
 mpl-token-metadata = { version = "=1.4.3", features = ["no-entrypoint"] }
 thiserror = "1.0.29"
 spl-name-service = { version = "0.2.0", features = ["no-entrypoint"] }
-uint = "=0.9.1"
+uint = "0.9.5"
