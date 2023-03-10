@@ -1,3 +1,5 @@
+import axios from 'axios';
+import { Transaction } from '@solana/web3.js';
 import { BigNumber } from '@ethersproject/bignumber';
 import { BinaryReader } from 'borsh';
 import { createWrapDomainInstruction, WrapDomainInstructionAccounts, WrapDomainInstructionArgs } from './generated/instructions/wrapDomain';
@@ -5,7 +7,7 @@ import { findCollectionMint, findNameHouse, findNameRecord, findRenewableMintAdd
 import * as config from "./config";
 import { Connection, PublicKey, SYSVAR_INSTRUCTIONS_PUBKEY, ComputeBudgetProgram, Keypair, VersionedTransaction, TransactionMessage, TransactionInstruction, AddressLookupTableProgram } from '@solana/web3.js';
 import { ANS_PROGRAM_ID, NAME_HOUSE_PROGRAM_ID, SOLANA_NATIVE_MINT, TLD_HOUSE_PROGRAM_ID, TOKEN_METADATA_PROGRAM_ID } from './constants';
-import { findBNSVault, getWormholeMintAccount } from './utils/bridgeNameService';
+import { findBNSVault, getWormholeMintAccount, NameRecordHeaderRaw } from './utils/bridgeNameService';
 import { BN } from 'bn.js';
 import { createCreateNftAnsInstruction, CreateNftAnsInstructionAccounts, CreateNftAnsInstructionArgs } from './generated';
 
@@ -67,27 +69,30 @@ export const signAndSendTransactionInstructionsModified = async (
   confirmIt?: boolean,
   // ): Promise<string> => {
 ) => {
-  const lookupTable = (await connection.getAddressLookupTable(config.LOOKUP_TABLE_BNS))
-    .value;
+  // const lookupTable = (await connection.getAddressLookupTable(config.LOOKUP_TABLE_BNS))
+  //   .value;
   let latestBlockhash = await connection.getLatestBlockhash();
-  const messageV0 = new TransactionMessage({
-    payerKey: feePayer.publicKey,
+  // const messageV0 = new TransactionMessage({
+  //   payerKey: feePayer.publicKey,
+  //   recentBlockhash: latestBlockhash.blockhash,
+  //   instructions,
+  // }).compileToV0Message([lookupTable]);
+  // const tx = new VersionedTransaction(messageV0);
+  const tx = new Transaction({
     recentBlockhash: latestBlockhash.blockhash,
-    instructions,
-  }).compileToV0Message([lookupTable]);
-  const tx = new VersionedTransaction(messageV0);
-  tx.sign(signers);
-  const tx_id2 = await connection.simulateTransaction(tx, { minContextSlot: (await config.CONNECTION.getSlot()) })
-  console.log(tx_id2.value.logs.forEach(log => console.log(log)))
-  // const tx_id = await connection.sendTransaction(tx, { skipPreflight: false });
-  // if (confirmIt) {
-  //   await connection.confirmTransaction({
-  //     signature: tx_id,
-  //     lastValidBlockHeight: latestBlockhash.lastValidBlockHeight,
-  //     blockhash: latestBlockhash.blockhash,
-  //   }, "confirmed");
-  // }
-  // return tx_id;
+  }).add(...instructions)
+  tx.sign(signers[0]);
+  // const tx_id2 = await connection.simulateTransaction(tx, signers)
+  // console.log(tx_id2.value.logs.forEach(log => console.log(log)))
+  const tx_id = await connection.sendRawTransaction(tx.serialize(), { skipPreflight: false });
+  if (confirmIt) {
+    await connection.confirmTransaction({
+      signature: tx_id,
+      lastValidBlockHeight: latestBlockhash.lastValidBlockHeight,
+      blockhash: latestBlockhash.blockhash,
+    }, "finalized");
+  }
+  return tx_id;
 };
 
 
@@ -112,17 +117,20 @@ async function wrapDomain(
   // console.log(collectionMintAccount.toBase58())
   let domainName = 'onsol';
   const [parentNameKey, parentBump] = await getParentNameKeyWithBump(config.TLD);
-  // console.log(parentNameKey.toBase58())
+  console.log(parentNameKey.toBase58())
   const hashedDomainName = await getHashedName(domainName);
   const [nameAccount, nameAccountBump] = await getNameAccountKey(
     hashedDomainName,
     undefined,
     parentNameKey,
   );
-  const [bnsMint] = getWormholeMintAccount(domainName)
-
-
-  let mainExpirationDate = 1709726556000;
+  const [bnsMint, hexedTokenId] = getWormholeMintAccount(domainName)
+  const ensMetadataUri = `https://metadata.ens.domains/goerli/0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85/0x${hexedTokenId}`
+  const offChainMetadata = await axios.get(ensMetadataUri);
+  const attribuesLen = offChainMetadata.data['attributes'].length
+  // console.log(offChainMetadata)
+  // the value below needs to be taken from the nft metadata.
+  let mainExpirationDate = offChainMetadata.data['attributes'][attribuesLen - 1]['value'];
   const minDuration: number = 864000000; // 1 year in seconds
   const expirationFromNow = mainExpirationDate - Date.now();
   // console.log(expirationFromNow)
@@ -130,9 +138,9 @@ async function wrapDomain(
 
   // console.log(durationRate)
   const expiresAt = (minDuration * durationRate) + Date.now();
-  console.log(Math.floor((expiresAt) / 1000) - 12)
+  console.log(Math.floor((expiresAt) / 1000))
   const expiresAtBuffer = Buffer.alloc(8);
-  expiresAtBuffer.writeBigInt64LE(BigNumber.from((Math.floor((expiresAt / 1000)) - 12)).toBigInt());
+  expiresAtBuffer.writeBigInt64LE(BigNumber.from((Math.floor((expiresAt / 1000)))).toBigInt());
 
 
   const [mintAccount, mintBump] = findRenewableMintAddress(
@@ -140,11 +148,6 @@ async function wrapDomain(
     nameHouseAccount,
     expiresAtBuffer,
   );
-
-  const mintAtaAccount = getAtaForMint(
-    mintAccount,
-    config.NAME_TOKENIZER_BUYER_KEYPAIR.publicKey,
-  )[0];
 
   const [nftRecord] = findNameRecord(
     nameAccount,
@@ -214,6 +217,31 @@ async function wrapDomain(
     name: domainName,
   }
 
+  const setComputUnits = ComputeBudgetProgram.setComputeUnitLimit({
+    units: 1400000,
+  });
+  // const tx_id = await signAndSendTransactionInstructionsModified(
+  //   connection,
+  //   [config.NAME_TOKENIZER_BUYER_KEYPAIR],
+  //   config.NAME_TOKENIZER_BUYER_KEYPAIR,
+  //   [setComputUnits, wrapBNStoANSIX],
+  //   true,
+  // );
+  // console.log(tx_id);
+  // console.log(`https://solscan.io/tx/${tx_id}?cluster=devnet`);
+
+  const nameAccountCreated = await NameRecordHeaderRaw.fromAccountAddress(connection, nameAccount)
+  console.log(nameAccountCreated.expiresAt)
+  const [mintAccountCreated] = findRenewableMintAddress(
+    nameAccount,
+    nameHouseAccount,
+    nameAccountCreated.expiresAtBuffer,
+  );
+
+  const mintAtaAccountCreated = getAtaForMint(
+    mintAccountCreated,
+    config.NAME_TOKENIZER_BUYER_KEYPAIR.publicKey,
+  )[0];
   let createNftAnsIxAccounts: CreateNftAnsInstructionAccounts = {
     owner: config.NAME_TOKENIZER_BUYER_KEYPAIR.publicKey,
     tldState: tldState,
@@ -226,16 +254,16 @@ async function wrapDomain(
       bnsMint,
       config.NAME_TOKENIZER_BUYER_KEYPAIR.publicKey,
     )[0],
-    ansMintAccount: mintAccount,
+    ansMintAccount: mintAccountCreated,
     nameClassAccount: PublicKey.default,
     nameParentAccount: parentNameKey,
-    ansMintAtaAccount: mintAtaAccount,
+    ansMintAtaAccount: mintAtaAccountCreated,
     nftRecord: nftRecord,
     collectionMint: collectionMintAccount,
     collectionMetadata: getMetadata(collectionMintAccount),
     collectionMasterEditionAccount: getMasterEdition(collectionMintAccount),
-    editionAccount: getMasterEdition(mintAccount),
-    metadataAccount: getMetadata(mintAccount),
+    editionAccount: getMasterEdition(mintAccountCreated),
+    metadataAccount: getMetadata(mintAccountCreated),
     nameHouseAccount: nameHouseAccount,
     tldHouseProgram: TLD_HOUSE_PROGRAM_ID,
     nameHouseProgram: NAME_HOUSE_PROGRAM_ID,
@@ -243,22 +271,19 @@ async function wrapDomain(
     tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
     instructionSysvarAccount: SYSVAR_INSTRUCTIONS_PUBKEY,
   }
-
   const createNftAnsIx = createCreateNftAnsInstruction(
     createNftAnsIxAccounts,
     createNftArgs,
   );
-  const setComputUnits = ComputeBudgetProgram.setComputeUnitLimit({
-    units: 1400000,
-  });
-  const tx_id = await signAndSendTransactionInstructionsModified(
+  const tx_id2 = await signAndSendTransactionInstructionsModified(
     connection,
     [config.NAME_TOKENIZER_BUYER_KEYPAIR],
     config.NAME_TOKENIZER_BUYER_KEYPAIR,
-    [setComputUnits, wrapBNStoANSIX, createNftAnsIx],
+    [setComputUnits, createNftAnsIx],
   );
-  console.log(tx_id);
-  console.log(`https://solscan.io/tx/${tx_id}?cluster=devnet`);
+  console.log(tx_id2);
+  console.log(`https://solscan.io/tx/${tx_id2}?cluster=devnet`);
+
 
 }
 

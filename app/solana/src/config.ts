@@ -8,6 +8,8 @@ export const SHDW_ACCOUNT = new PublicKey(
   process.env.SHDW_ACCOUNT_PK ||
   "7TqD2ZrqV3u6kZefQLQ5cDqJgbHJmPjCH5bKNbB4YM91",
 );
+export const LOOKUP_TABLE_BNS = new PublicKey("7JdWUiBfBZMDyTBTi7GPEruQ41x7Me2S5mvH96WecVhV")
+
 export const NAME_TOKENIZER_BUYER_KEYPAIR = new Keypair();
 
 /* .abc */
