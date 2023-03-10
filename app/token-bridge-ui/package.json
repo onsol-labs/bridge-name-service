@@ -39,7 +39,7 @@
     "build-contracts": "yarn build --prefix ../../ethereum && node scripts/copyContracts.js && typechain --target=ethers-v5 --out-dir=src/ethers-contracts contracts/*.json",
     "build-abis": "typechain --target=ethers-v5 --out-dir=src/ethers-contracts/abi abi/BNS.abi --show-stack-traces",
     "start": "react-app-rewired start",
-    "build": "react-app-rewired build",
+    "build": "react-app-rewired --max_old_space_size=4096 build",
     "test": "react-app-rewired test",
     "eject": "react-scripts eject"
   },
