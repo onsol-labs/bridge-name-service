@@ -79,7 +79,7 @@ function App() {
         <AppBar position="static" elevation={0} style={{ marginBottom: 40 }}>
           <Toolbar variant="dense">
             <Button component={Link} to="/nft">
-              NFTs
+              Domains
             </Button>
             <Button component={Link} to="/redeem">
               Redeem
@@ -91,6 +91,7 @@ function App() {
               variant="outlined"
               margin="dense"
             >
+              <MenuItem value="mainnet">Mainnet</MenuItem>
               <MenuItem value="testnet">Testnet</MenuItem>
               <MenuItem value="devnet">Devnet</MenuItem>
             </Select>
@@ -104,13 +105,13 @@ function App() {
             subtitle={
               <>
                 <Typography>
-                  This is a developmental token bridge that tests transfers
-                  across chains for tokens and NFTs wrapped by Wormhole.
+                  This is a experimental ENS domain bridge that transfers
+                  ENS domains across Solana and Ethereum through Wormhole.
                 </Typography>
               </>
             }
           >
-            Token Bridge
+            ENS Domain Bridge
           </HeaderText>
         </Container>
       ) : null}

@@ -11,7 +11,6 @@ import {
   isEVMChain,
   parseSequenceFromLogEth,
   parseSequenceFromLogSolana,
-  textToHexString,
   uint8ArrayToHex,
 } from "@certusone/wormhole-sdk";
 import { NFTImplementation__factory } from "@certusone/wormhole-sdk/lib/cjs/ethers-contracts";

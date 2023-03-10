@@ -53,7 +53,8 @@ import {
   setSourceWalletAddress,
 } from "../store/transferSlice";
 import {
-  COVALENT_GET_TOKENS_URL,
+  GET_TOKENS_URL,
+  CLUSTER,
   SOLANA_HOST,
   WETH_ADDRESS,
   WETH_DECIMALS,
@@ -630,7 +631,7 @@ function useGetAvailableTokens(nft: boolean = false) {
 
   //Ethereum covalent or blockscout accounts load
   useEffect(() => {
-    //const testWallet = "0xf60c2ea62edbfe808163751dd0d8693dcb30019c";
+    // const testWallet = "0xf60c2ea62edbfe808163751dd0d8693dcb30019c";
     // const nftTestWallet1 = "0x3f304c6721f35ff9af00fd32650c8e0a982180ab";
     // const nftTestWallet2 = "0x98ed231428088eb440e8edb5cc8d66dcf913b86e";
     // const nftTestWallet3 = "0xb1fadf677a7e9b90e9d4f31c8ffb3dc18c138c6f";
@@ -638,7 +639,7 @@ function useGetAvailableTokens(nft: boolean = false) {
     let cancelled = false;
     const walletAddress = signerAddress;
     if (walletAddress && isEVMChain(lookupChain) && !covalent) {
-      let url = COVALENT_GET_TOKENS_URL(lookupChain, walletAddress, nft);
+      let url = GET_TOKENS_URL(CLUSTER, lookupChain, walletAddress, nft);
       let getAccounts;
       if (url) {
         getAccounts = getEthereumAccountsCovalent;

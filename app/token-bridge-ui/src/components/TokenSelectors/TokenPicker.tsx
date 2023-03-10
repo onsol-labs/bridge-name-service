@@ -131,7 +131,7 @@ export const BasicAccountRender = (
       </div>
       <div>
         <Typography>{symbol}</Typography>
-        {/* <Typography>{name}</Typography> */}
+        <Typography>{name}</Typography>
         <Typography>{nftName}</Typography>
       </div>
       <div>
@@ -402,7 +402,7 @@ export default function TokenPicker({
     >
       <DialogTitle>
         <div id="simple-dialog-title" className={classes.flexTitle}>
-          <Typography variant="h5">Select a token</Typography>
+          <Typography variant="h5">Select a domain</Typography>
           <div className={classes.grower} />
           <Tooltip title="Reload tokens">
             <IconButton onClick={resetAccountsWrapper}>
@@ -478,7 +478,7 @@ export default function TokenPicker({
         {value ? (
           <RenderOption account={value} />
         ) : (
-          <Typography color="textSecondary">Select a token</Typography>
+          <Typography color="textSecondary">Select a domain</Typography>
         )}
       </Button>
     </div>

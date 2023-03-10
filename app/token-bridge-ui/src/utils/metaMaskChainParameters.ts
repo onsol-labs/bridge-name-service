@@ -16,6 +16,13 @@ export interface AddEthereumChainParameter {
 export const METAMASK_CHAIN_PARAMETERS: {
   [evmChainId: number]: AddEthereumChainParameter;
 } = {
+  1: {
+    chainId: "0x1",
+    chainName: "Ethereum Mainnet",
+    nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
+    rpcUrls: ["https://rpc.ankr.com/eth"],
+    blockExplorerUrls: ["https://etherscan.io"],
+  }, 
   3: {
     chainId: "0x3",
     chainName: "Ropsten",

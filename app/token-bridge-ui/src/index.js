@@ -3,7 +3,7 @@ import { ThemeProvider } from "@material-ui/core/styles";
 import { SnackbarProvider } from "notistack";
 import ReactDOM from "react-dom";
 import { Provider } from "react-redux";
-import { HashRouter } from "react-router-dom";
+import { BrowserRouter } from "react-router-dom";
 import App from "./App";
 import { EthereumProviderProvider } from "./contexts/EthereumProviderContext";
 import { SolanaWalletProvider } from "./contexts/SolanaWalletContext.tsx";
@@ -20,9 +20,9 @@ ReactDOM.render(
           <SnackbarProvider maxSnack={3}>
             <SolanaWalletProvider>
               <EthereumProviderProvider>
-                <HashRouter>
+                <BrowserRouter>
                   <App />
-                </HashRouter>
+                </BrowserRouter>
               </EthereumProviderProvider>
             </SolanaWalletProvider>
           </SnackbarProvider>
