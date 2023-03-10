@@ -12,7 +12,6 @@ import {
   parseSequenceFromLogSolana,
   parseTransferPayload,
   parseVaa,
-  queryExternalId,
   uint8ArrayToHex,
 } from "@certusone/wormhole-sdk";
 import {
@@ -42,7 +41,6 @@ import { useEthereumProvider } from "../contexts/EthereumProviderContext";
 import useIsWalletReady from "../hooks/useIsWalletReady";
 import useRelayersAvailable, { Relayer } from "../hooks/useRelayersAvailable";
 import { setRecoveryVaa as setRecoveryNFTVaa } from "../store/nftSlice";
-import { setRecoveryVaa } from "../store/transferSlice";
 import {
   CHAINS,
   CHAINS_BY_ID,
@@ -365,7 +363,7 @@ export default function Recovery() {
     isNFT,
     isReady,
   ]);
-  const handleTypeChange = useCallback((event) => {
+  const handleTypeChange = useCallback((event: any) => {
     setRecoverySourceChain((prevChain) =>
       event.target.value === "NFT" &&
         !CHAINS_WITH_NFT_SUPPORT.find((chain) => chain.id === prevChain)
@@ -374,14 +372,14 @@ export default function Recovery() {
     );
     setType(event.target.value);
   }, []);
-  const handleSourceChainChange = useCallback((event) => {
+  const handleSourceChainChange = useCallback((event: any) => {
     setRecoverySourceTx("");
     setRecoverySourceChain(event.target.value);
   }, []);
-  const handleSourceTxChange = useCallback((event) => {
+  const handleSourceTxChange = useCallback((event: any) => {
     setRecoverySourceTx(event.target.value.trim());
   }, []);
-  const handleSignedVAAChange = useCallback((event) => {
+  const handleSignedVAAChange = useCallback((event: any) => {
     setRecoverySignedVAA(event.target.value.trim());
   }, []);
   useEffect(() => {

@@ -22,7 +22,11 @@ import {
 import { FC, useMemo } from "react";
 import { CLUSTER, SOLANA_HOST } from "../utils/consts";
 
-export const SolanaWalletProvider: FC = (props) => {
+interface SolanaWalletProps {
+  children?: React.ReactNode;
+}
+
+export const SolanaWalletProvider: FC<SolanaWalletProps> = (props) => {
   const wallets = useMemo(() => {
     const wallets: Adapter[] = [
       new PhantomWalletAdapter(),
