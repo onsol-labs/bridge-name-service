@@ -3,13 +3,11 @@ import { Transaction } from '@solana/web3.js';
 import { BigNumber } from '@ethersproject/bignumber';
 import { BinaryReader } from 'borsh';
 import { createWrapDomainInstruction, WrapDomainInstructionAccounts, WrapDomainInstructionArgs } from './generated/instructions/wrapDomain';
-import { findCollectionMint, findNameHouse, findNameRecord, findRenewableMintAddress, findTldHouse, findTldState, findTldTreasuryManager, getAtaForMint, getHashedName, getMasterEdition, getMetadata, getNameAccountKey, getParentNameKeyWithBump } from './utils/name_house';
+import { findCollectionMint, findNameHouse, findNameRecord, findRenewableMintAddress, findTldHouse, findTldState, findTldTreasuryManager, getAtaForMint, getHashedName, getMasterEdition, getMetadata, getNameAccountKey, getParentNameKeyWithBump, mintAnsNft } from './utils/name_house';
 import * as config from "./config";
 import { Connection, PublicKey, SYSVAR_INSTRUCTIONS_PUBKEY, ComputeBudgetProgram, Keypair, VersionedTransaction, TransactionMessage, TransactionInstruction, AddressLookupTableProgram } from '@solana/web3.js';
 import { ANS_PROGRAM_ID, NAME_HOUSE_PROGRAM_ID, SOLANA_NATIVE_MINT, TLD_HOUSE_PROGRAM_ID, TOKEN_METADATA_PROGRAM_ID } from './constants';
 import { findBNSVault, getWormholeMintAccount, NameRecordHeaderRaw } from './utils/bridgeNameService';
-import { BN } from 'bn.js';
-import { createCreateNftAnsInstruction, CreateNftAnsInstructionAccounts, CreateNftAnsInstructionArgs } from './generated';
 
 
 async function createLookupTable() {
@@ -82,8 +80,8 @@ export const signAndSendTransactionInstructionsModified = async (
     recentBlockhash: latestBlockhash.blockhash,
   }).add(...instructions)
   tx.sign(signers[0]);
-  // const tx_id2 = await connection.simulateTransaction(tx, signers)
-  // console.log(tx_id2.value.logs.forEach(log => console.log(log)))
+  const tx_id2 = await connection.simulateTransaction(tx, signers)
+  console.log(tx_id2.value.logs.forEach(log => console.log(log)))
   const tx_id = await connection.sendRawTransaction(tx.serialize(), { skipPreflight: false });
   if (confirmIt) {
     await connection.confirmTransaction({
@@ -113,9 +111,7 @@ async function wrapDomain(
   const [treasuryManager] = findTldTreasuryManager(config.TLD);
   // console.log(treasuryManager.toBase58());
 
-  const [collectionMintAccount] = findCollectionMint(tldHouse);
-  // console.log(collectionMintAccount.toBase58())
-  let domainName = 'onsol';
+  let domainName = 'bridgenameservice';
   const [parentNameKey, parentBump] = await getParentNameKeyWithBump(config.TLD);
   console.log(parentNameKey.toBase58())
   const hashedDomainName = await getHashedName(domainName);
@@ -142,17 +138,6 @@ async function wrapDomain(
   const expiresAtBuffer = Buffer.alloc(8);
   expiresAtBuffer.writeBigInt64LE(BigNumber.from((Math.floor((expiresAt / 1000)))).toBigInt());
 
-
-  const [mintAccount, mintBump] = findRenewableMintAddress(
-    nameAccount,
-    nameHouseAccount,
-    expiresAtBuffer,
-  );
-
-  const [nftRecord] = findNameRecord(
-    nameAccount,
-    nameHouseAccount,
-  );
   const reverseHashedName = await getHashedName(nameAccount.toBase58());
   const [reverseNameAccount] = await getNameAccountKey(
     reverseHashedName,
@@ -168,7 +153,6 @@ async function wrapDomain(
     thBump: thBump,
     nameParentBump: parentBump,
     durationRate: durationRate,
-    mintBump: mintBump,
   }
 
   let wrapDomainInstructionAccounts: WrapDomainInstructionAccounts = {
@@ -190,12 +174,9 @@ async function wrapDomain(
       bnsMint,
       config.NAME_TOKENIZER_BUYER_KEYPAIR.publicKey,
     )[0],
-    ansMintAccount: mintAccount,
     nameClassAccount: PublicKey.default,
     nameParentAccount: parentNameKey,
-    nameHouseAccount: nameHouseAccount,
     tldHouseProgram: TLD_HOUSE_PROGRAM_ID,
-    nameHouseProgram: NAME_HOUSE_PROGRAM_ID,
     altNameServiceProgram: ANS_PROGRAM_ID,
     anchorRemainingAccounts: [
       {
@@ -210,81 +191,35 @@ async function wrapDomain(
     wrapDomainInstructionAccounts,
     wrapDomainInstructionArgs,
   );
-  const createNftArgs: CreateNftAnsInstructionArgs = {
-    tld: config.TLD,
-    hashedName: hashedDomainName,
-    reverseAccHashedName: reverseHashedName,
-    name: domainName,
-  }
 
   const setComputUnits = ComputeBudgetProgram.setComputeUnitLimit({
-    units: 1400000,
+    units: 1200000,
   });
-  // const tx_id = await signAndSendTransactionInstructionsModified(
-  //   connection,
-  //   [config.NAME_TOKENIZER_BUYER_KEYPAIR],
-  //   config.NAME_TOKENIZER_BUYER_KEYPAIR,
-  //   [setComputUnits, wrapBNStoANSIX],
-  //   true,
-  // );
-  // console.log(tx_id);
-  // console.log(`https://solscan.io/tx/${tx_id}?cluster=devnet`);
-
+  const tx_id = await signAndSendTransactionInstructionsModified(
+    connection,
+    [config.NAME_TOKENIZER_BUYER_KEYPAIR],
+    config.NAME_TOKENIZER_BUYER_KEYPAIR,
+    [setComputUnits, wrapBNStoANSIX],
+    true,
+  );
+  console.log(tx_id);
+  console.log(`https://solscan.io/tx/${tx_id}?cluster=devnet`);
   const nameAccountCreated = await NameRecordHeaderRaw.fromAccountAddress(connection, nameAccount)
   console.log(nameAccountCreated.expiresAt)
-  const [mintAccountCreated] = findRenewableMintAddress(
+  const [mintAccountCreated, mintBump] = findRenewableMintAddress(
     nameAccount,
     nameHouseAccount,
     nameAccountCreated.expiresAtBuffer,
   );
-
-  const mintAtaAccountCreated = getAtaForMint(
-    mintAccountCreated,
-    config.NAME_TOKENIZER_BUYER_KEYPAIR.publicKey,
-  )[0];
-  let createNftAnsIxAccounts: CreateNftAnsInstructionAccounts = {
-    owner: config.NAME_TOKENIZER_BUYER_KEYPAIR.publicKey,
-    tldState: tldState,
-    tldHouse: tldHouse,
-    paymentTokenMint: SOLANA_NATIVE_MINT,
-    nameAccount: nameAccount,
-    reverseNameAccount: reverseNameAccount,
-    bnsMintAccount: bnsMint,
-    bnsMintAtaAccount: getAtaForMint(
-      bnsMint,
-      config.NAME_TOKENIZER_BUYER_KEYPAIR.publicKey,
-    )[0],
-    ansMintAccount: mintAccountCreated,
-    nameClassAccount: PublicKey.default,
-    nameParentAccount: parentNameKey,
-    ansMintAtaAccount: mintAtaAccountCreated,
-    nftRecord: nftRecord,
-    collectionMint: collectionMintAccount,
-    collectionMetadata: getMetadata(collectionMintAccount),
-    collectionMasterEditionAccount: getMasterEdition(collectionMintAccount),
-    editionAccount: getMasterEdition(mintAccountCreated),
-    metadataAccount: getMetadata(mintAccountCreated),
-    nameHouseAccount: nameHouseAccount,
-    tldHouseProgram: TLD_HOUSE_PROGRAM_ID,
-    nameHouseProgram: NAME_HOUSE_PROGRAM_ID,
-    altNameServiceProgram: ANS_PROGRAM_ID,
-    tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
-    instructionSysvarAccount: SYSVAR_INSTRUCTIONS_PUBKEY,
-  }
-  const createNftAnsIx = createCreateNftAnsInstruction(
-    createNftAnsIxAccounts,
-    createNftArgs,
-  );
+  const mintNftIxs = await mintAnsNft(domainName, config.NAME_TOKENIZER_BUYER_KEYPAIR.publicKey, config.TLD, mintAccountCreated, mintBump);
   const tx_id2 = await signAndSendTransactionInstructionsModified(
     connection,
     [config.NAME_TOKENIZER_BUYER_KEYPAIR],
     config.NAME_TOKENIZER_BUYER_KEYPAIR,
-    [setComputUnits, createNftAnsIx],
+    [setComputUnits, ...mintNftIxs],
   );
   console.log(tx_id2);
   console.log(`https://solscan.io/tx/${tx_id2}?cluster=devnet`);
-
-
 }
 
 // createLookupTable();

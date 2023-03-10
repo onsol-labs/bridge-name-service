@@ -1,7 +1,9 @@
 use crate::uint::U256;
 use anchor_lang::prelude::*;
 use solana_program::{keccak, program::invoke_signed, pubkey};
-use tld_house::assert_keys_equal;
+use spl_associated_token_account::get_associated_token_address;
+use spl_token::state::Account as SplAccount;
+use tld_house::{assert_initialized, assert_keys_equal, assert_owned_by};
 
 pub fn check_wormhole_mint_account(domain: &str, bns_mint_key: &Pubkey) -> Result<()> {
     let hashed_bns_name = keccak::hashv(&[(domain).as_bytes()]).as_ref().to_vec();
@@ -77,5 +79,24 @@ pub fn make_ata<'a>(
         seeds,
     )?;
 
+    Ok(())
+}
+
+pub fn assert_is_ata_enhanced(
+    ata: &AccountInfo,
+    wallet: &Pubkey,
+    mint: &Pubkey,
+    is_token: bool,
+    initialized: bool,
+) -> Result<()> {
+    if initialized {
+        let ata_account: SplAccount = assert_initialized(ata)?;
+        if !is_token {
+            assert_owned_by(ata, &spl_token::id())?;
+            assert_keys_equal(ata_account.owner, *wallet)?;
+        };
+        assert_keys_equal(ata_account.mint, *mint)?;
+    }
+    assert_keys_equal(get_associated_token_address(wallet, mint), *ata.key)?;
     Ok(())
 }

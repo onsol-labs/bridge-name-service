@@ -11,22 +11,22 @@ import * as web3 from '@solana/web3.js'
 
 /**
  * @category Instructions
- * @category CreateNftAns
+ * @category RedeemNft
  * @category generated
  */
-export type CreateNftAnsInstructionArgs = {
+export type RedeemNftInstructionArgs = {
   tld: string
   hashedName: Uint8Array
-  reverseAccHashedName: Uint8Array
+  thBump: number
   name: string
 }
 /**
  * @category Instructions
- * @category CreateNftAns
+ * @category RedeemNft
  * @category generated
  */
-export const createNftAnsStruct = new beet.FixableBeetArgsStruct<
-  CreateNftAnsInstructionArgs & {
+export const redeemNftStruct = new beet.FixableBeetArgsStruct<
+  RedeemNftInstructionArgs & {
     instructionDiscriminator: number[] /* size: 8 */
   }
 >(
@@ -34,94 +34,73 @@ export const createNftAnsStruct = new beet.FixableBeetArgsStruct<
     ['instructionDiscriminator', beet.uniformFixedSizeArray(beet.u8, 8)],
     ['tld', beet.utf8String],
     ['hashedName', beet.bytes],
-    ['reverseAccHashedName', beet.bytes],
+    ['thBump', beet.u8],
     ['name', beet.utf8String],
   ],
-  'CreateNftAnsInstructionArgs'
+  'RedeemNftInstructionArgs'
 )
 /**
- * Accounts required by the _createNftAns_ instruction
+ * Accounts required by the _redeemNft_ instruction
  *
  * @property [_writable_, **signer**] owner
+ * @property [_writable_] bnsVault
+ * @property [_writable_] vaultAtaAccount
  * @property [] tldState
  * @property [_writable_] tldHouse
- * @property [_writable_] paymentTokenMint
  * @property [_writable_] nameAccount
- * @property [_writable_] reverseNameAccount
  * @property [_writable_] bnsMintAccount
  * @property [_writable_] bnsMintAtaAccount
  * @property [_writable_] ansMintAccount
  * @property [] nameClassAccount
  * @property [_writable_] nameParentAccount
- * @property [_writable_] ansMintAtaAccount
- * @property [_writable_] nftRecord
- * @property [_writable_] collectionMint
- * @property [_writable_] collectionMetadata
- * @property [] collectionMasterEditionAccount
- * @property [_writable_] editionAccount
- * @property [_writable_] metadataAccount
- * @property [_writable_] nameHouseAccount
  * @property [] tldHouseProgram
- * @property [] nameHouseProgram
  * @property [] altNameServiceProgram
- * @property [] tokenMetadataProgram
- * @property [] instructionSysvarAccount
  * @category Instructions
- * @category CreateNftAns
+ * @category RedeemNft
  * @category generated
  */
-export type CreateNftAnsInstructionAccounts = {
+export type RedeemNftInstructionAccounts = {
   owner: web3.PublicKey
+  bnsVault: web3.PublicKey
+  vaultAtaAccount: web3.PublicKey
   tldState: web3.PublicKey
   tldHouse: web3.PublicKey
-  paymentTokenMint: web3.PublicKey
   nameAccount: web3.PublicKey
-  reverseNameAccount: web3.PublicKey
   bnsMintAccount: web3.PublicKey
   bnsMintAtaAccount: web3.PublicKey
   ansMintAccount: web3.PublicKey
   nameClassAccount: web3.PublicKey
   nameParentAccount: web3.PublicKey
-  ansMintAtaAccount: web3.PublicKey
-  nftRecord: web3.PublicKey
-  collectionMint: web3.PublicKey
-  collectionMetadata: web3.PublicKey
-  collectionMasterEditionAccount: web3.PublicKey
-  editionAccount: web3.PublicKey
-  metadataAccount: web3.PublicKey
-  nameHouseAccount: web3.PublicKey
   ataProgram?: web3.PublicKey
   tokenProgram?: web3.PublicKey
   tldHouseProgram: web3.PublicKey
-  nameHouseProgram: web3.PublicKey
   altNameServiceProgram: web3.PublicKey
-  tokenMetadataProgram: web3.PublicKey
   systemProgram?: web3.PublicKey
-  instructionSysvarAccount: web3.PublicKey
+  rent?: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
 
-export const createNftAnsInstructionDiscriminator = [
-  145, 60, 248, 191, 175, 20, 217, 22,
+export const redeemNftInstructionDiscriminator = [
+  113, 9, 91, 16, 166, 235, 118, 133,
 ]
 
 /**
- * Creates a _CreateNftAns_ instruction.
+ * Creates a _RedeemNft_ instruction.
  *
  * @param accounts that will be accessed while the instruction is processed
  * @param args to provide as instruction data to the program
  *
  * @category Instructions
- * @category CreateNftAns
+ * @category RedeemNft
  * @category generated
  */
-export function createCreateNftAnsInstruction(
-  accounts: CreateNftAnsInstructionAccounts,
-  args: CreateNftAnsInstructionArgs,
+export function createRedeemNftInstruction(
+  accounts: RedeemNftInstructionAccounts,
+  args: RedeemNftInstructionArgs,
   programId = new web3.PublicKey('BQqpUU12TqvMm6NRwM9Lv7vKZLWwWzgaZh2Q2qvkmcbi')
 ) {
-  const [data] = createNftAnsStruct.serialize({
-    instructionDiscriminator: createNftAnsInstructionDiscriminator,
+  const [data] = redeemNftStruct.serialize({
+    instructionDiscriminator: redeemNftInstructionDiscriminator,
     ...args,
   })
   const keys: web3.AccountMeta[] = [
@@ -129,6 +108,16 @@ export function createCreateNftAnsInstruction(
       pubkey: accounts.owner,
       isWritable: true,
       isSigner: true,
+    },
+    {
+      pubkey: accounts.bnsVault,
+      isWritable: true,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.vaultAtaAccount,
+      isWritable: true,
+      isSigner: false,
     },
     {
       pubkey: accounts.tldState,
@@ -141,17 +130,7 @@ export function createCreateNftAnsInstruction(
       isSigner: false,
     },
     {
-      pubkey: accounts.paymentTokenMint,
-      isWritable: true,
-      isSigner: false,
-    },
-    {
       pubkey: accounts.nameAccount,
-      isWritable: true,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.reverseNameAccount,
       isWritable: true,
       isSigner: false,
     },
@@ -181,46 +160,6 @@ export function createCreateNftAnsInstruction(
       isSigner: false,
     },
     {
-      pubkey: accounts.ansMintAtaAccount,
-      isWritable: true,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.nftRecord,
-      isWritable: true,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.collectionMint,
-      isWritable: true,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.collectionMetadata,
-      isWritable: true,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.collectionMasterEditionAccount,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.editionAccount,
-      isWritable: true,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.metadataAccount,
-      isWritable: true,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.nameHouseAccount,
-      isWritable: true,
-      isSigner: false,
-    },
-    {
       pubkey: accounts.ataProgram ?? splToken.ASSOCIATED_TOKEN_PROGRAM_ID,
       isWritable: false,
       isSigner: false,
@@ -236,17 +175,7 @@ export function createCreateNftAnsInstruction(
       isSigner: false,
     },
     {
-      pubkey: accounts.nameHouseProgram,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
       pubkey: accounts.altNameServiceProgram,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.tokenMetadataProgram,
       isWritable: false,
       isSigner: false,
     },
@@ -256,7 +185,7 @@ export function createCreateNftAnsInstruction(
       isSigner: false,
     },
     {
-      pubkey: accounts.instructionSysvarAccount,
+      pubkey: accounts.rent ?? web3.SYSVAR_RENT_PUBKEY,
       isWritable: false,
       isSigner: false,
     },

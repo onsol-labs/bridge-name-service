@@ -25,7 +25,6 @@ pub mod bridge_name_service {
         th_bump: u8,
         name_parent_bump: u8,
         duration_rate: u16,
-        mint_bump: u8,
     ) -> Result<()> {
         handle_domain_wrapping(
             ctx,
@@ -37,17 +36,16 @@ pub mod bridge_name_service {
             th_bump,
             name_parent_bump,
             duration_rate,
-            mint_bump,
         )
     }
 
-    pub fn create_nft_ans<'info>(
-        ctx: Context<'_, '_, '_, 'info, CreateDomainNFT<'info>>,
+    pub fn redeem_nft<'info>(
+        ctx: Context<'_, '_, '_, 'info, RedeemNft<'info>>,
         tld: String,
         hashed_name: Vec<u8>,
-        _reverse_acc_hashed_name: Vec<u8>,
+        th_bump: u8,
         name: String,
     ) -> Result<()> {
-        handle_domain_nft_creation(ctx, name, hashed_name, tld)
+        handle_domain_redeeming(ctx, name, hashed_name, tld, th_bump)
     }
 }

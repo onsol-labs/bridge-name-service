@@ -1,4 +1,3 @@
-import bs58 from "bs58";
 import {
   COLLECTION_PREFIX,
   HASH_PREFIX,
@@ -18,6 +17,8 @@ import { createHash } from "crypto";
 import fs from "fs";
 import emojiRegex from "emoji-regex";
 import { SPL_ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID, TOKEN_METADATA_PROGRAM_ID, TOKEN_PROGRAM_ID } from "../constants";
+import { createCreateRenewableNftInstruction, CreateRenewableNftInstructionAccounts, CreateRenewableNftInstructionArgs } from "../name-house/instructions/createRenewableNft";
+import { createCreateRenewableMintInstruction, CreateRenewableMintInstructionAccounts, CreateRenewableMintInstructionArgs } from "../name-house/instructions/createRenewableMint";
 
 //emoji Regex
 const regex = emojiRegex();
@@ -222,3 +223,165 @@ export function getKeypairFromFile(path: any) {
   const keyPairBuffer = Buffer.from(JSON.parse(keypairString));
   return Keypair.fromSecretKey(keyPairBuffer);
 }
+
+
+export async function mintAnsNft(
+  nftName: string,
+  nftOwner: PublicKey,
+  tld: string,
+  mintAccount: PublicKey,
+  mintBump: number,
+) {
+  const [tldHouse, thBump] = findTldHouse(tld);
+
+  const [nameHouseAccount, nameHouseBump] = findNameHouse(tldHouse);
+  // console.log(nameHouseAccount.toBase58());
+  const [collectionMintAccount, collectionMintBump] =
+    findCollectionMint(tldHouse);
+
+  const [parentNameKey] = await getParentNameKeyWithBump(tld);
+  const hashedDomainName = await getHashedName(nftName);
+  const [nameAccount, nameAccountBump] = await getNameAccountKey(
+    hashedDomainName,
+    undefined,
+    parentNameKey,
+  );
+  const createMintArgs: CreateRenewableMintInstructionArgs = {
+    tld: tld,
+    nameHouseBump,
+    mintBump,
+    thBump,
+  };
+  if (!parentNameKey) return;
+  const createMintAccounts: CreateRenewableMintInstructionAccounts = {
+    owner: nftOwner,
+    mintAccount,
+    nameAccount,
+    nameClassAccount: PublicKey.default,
+    nameParentAccount: parentNameKey,
+    tldHouse,
+    nameHouse: nameHouseAccount,
+  };
+  const createMintIx = createCreateRenewableMintInstruction(
+    createMintAccounts,
+    createMintArgs,
+    NAME_HOUSE_PROGRAM_ID
+  );
+
+  const [nftRecord, nftRecordBump] = findNameRecord(
+    nameAccount,
+    nameHouseAccount,
+  );
+
+  const createNftArgs: CreateRenewableNftInstructionArgs = {
+    tld: tld,
+    hashedName: Uint8Array.from(hashedDomainName),
+    nameAccountBump,
+    nftRecordBump,
+  };
+  const mintAtaAccount = getAtaForMint(mintAccount, nftOwner)[0];
+  const reverseHashedName = await getHashedName(nameAccount.toBase58());
+  const [reverseNameAccount] = await getNameAccountKey(
+    reverseHashedName,
+    tldHouse,
+  );
+  const createNftAccounts: CreateRenewableNftInstructionAccounts = {
+    owner: nftOwner,
+    mintAccount,
+    nameAccount,
+    nameClassAccount: PublicKey.default,
+    nameParentAccount: parentNameKey,
+    mintAtaAccount,
+    nftRecord,
+    reverseNameAccount,
+    tldHouse,
+    collectionMint: collectionMintAccount,
+    collectionMetadata: getMetadata(collectionMintAccount),
+    collectionMasterEditionAccount: getMasterEdition(
+      collectionMintAccount,
+    ),
+    editionAccount: getMasterEdition(mintAccount),
+    metadataAccount: getMetadata(mintAccount),
+    nameHouse: nameHouseAccount,
+    splTokenProgram: TOKEN_PROGRAM_ID,
+    tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
+    altNameServiceProgram: ANS_PROGRAM_ID,
+  };
+  const createNftIx = createCreateRenewableNftInstruction(
+    createNftAccounts,
+    createNftArgs,
+    NAME_HOUSE_PROGRAM_ID
+  );
+
+  return [createMintIx, createNftIx];
+}
+
+
+export async function remintAbcNft(
+  nftName: string,
+  nftOwner: PublicKey,
+  tld: string,
+  mintAccount: PublicKey,
+) {
+  const [tldHouse] = findTldHouse(tld);
+
+  const [nameHouseAccount] = findNameHouse(tldHouse);
+  const [collectionMintAccount] = findCollectionMint(tldHouse);
+  const [parentNameKey] = await getParentNameKeyWithBump(tld);
+  const hashedDomainName = await getHashedName(nftName);
+  const [nameAccount, nameAccountBump] = await getNameAccountKey(
+    hashedDomainName,
+    undefined,
+    parentNameKey,
+  );
+
+  const [nftRecord, nftRecordBump] = findNameRecord(
+    nameAccount,
+    nameHouseAccount,
+  );
+
+  const createNftArgs: CreateRenewableNftInstructionArgs = {
+    tld: tld,
+    hashedName: Uint8Array.from(hashedDomainName),
+    nameAccountBump,
+    nftRecordBump,
+  };
+  const mintAtaAccount = getAtaForMint(mintAccount, nftOwner)[0];
+  const reverseHashedName = await getHashedName(nameAccount.toBase58());
+  const [reverseNameAccount] = await getNameAccountKey(
+    reverseHashedName,
+    tldHouse,
+  );
+
+  if (!parentNameKey) return;
+  const createNftAccounts: CreateRenewableNftInstructionAccounts = {
+    owner: nftOwner,
+    mintAccount,
+    nameAccount,
+    nameClassAccount: PublicKey.default,
+    nameParentAccount: parentNameKey,
+    mintAtaAccount,
+    nftRecord,
+    reverseNameAccount,
+    tldHouse,
+    collectionMint: collectionMintAccount,
+    collectionMetadata: getMetadata(collectionMintAccount),
+    collectionMasterEditionAccount: getMasterEdition(
+      collectionMintAccount,
+    ),
+    editionAccount: getMasterEdition(mintAccount),
+    metadataAccount: getMetadata(mintAccount),
+    nameHouse: nameHouseAccount,
+    splTokenProgram: TOKEN_PROGRAM_ID,
+    tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
+    altNameServiceProgram: ANS_PROGRAM_ID,
+  };
+
+  const createNftIx = createCreateRenewableNftInstruction(
+    createNftAccounts,
+    createNftArgs,
+  );
+
+  return [createNftIx];
+}
+

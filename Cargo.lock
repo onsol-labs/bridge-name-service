@@ -478,7 +478,6 @@ dependencies = [
  "anchor-spl",
  "arrayref",
  "mpl-token-metadata",
- "name-house",
  "solana-program",
  "spl-associated-token-account",
  "spl-name-service",
@@ -1181,24 +1180,6 @@ dependencies = [
  "solana-program",
  "spl-token",
  "thiserror",
-]
-
-[[package]]
-name = "name-house"
-version = "0.5.5"
-source = "git+https://github.com/onsol-labs/name_house.git?branch=v0.5.5#b72d5b25a0daa94c2ce1d651d7548f4581498aa6"
-dependencies = [
- "alt-name-service",
- "anchor-lang",
- "anchor-spl",
- "arrayref",
- "mpl-token-metadata",
- "solana-program",
- "spl-associated-token-account",
- "spl-token",
- "thiserror",
- "tld_house",
- "uint",
 ]
 
 [[package]]

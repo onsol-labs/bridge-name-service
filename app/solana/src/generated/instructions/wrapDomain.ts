@@ -23,7 +23,6 @@ export type WrapDomainInstructionArgs = {
   thBump: number
   nameParentBump: number
   durationRate: number
-  mintBump: number
 }
 /**
  * @category Instructions
@@ -45,7 +44,6 @@ export const wrapDomainStruct = new beet.FixableBeetArgsStruct<
     ['thBump', beet.u8],
     ['nameParentBump', beet.u8],
     ['durationRate', beet.u16],
-    ['mintBump', beet.u8],
   ],
   'WrapDomainInstructionArgs'
 )
@@ -64,12 +62,9 @@ export const wrapDomainStruct = new beet.FixableBeetArgsStruct<
  * @property [_writable_] reverseNameAccount
  * @property [_writable_] bnsMintAccount
  * @property [_writable_] bnsMintAtaAccount
- * @property [_writable_] ansMintAccount
  * @property [] nameClassAccount
  * @property [_writable_] nameParentAccount
- * @property [_writable_] nameHouseAccount
  * @property [] tldHouseProgram
- * @property [] nameHouseProgram
  * @property [] altNameServiceProgram
  * @category Instructions
  * @category WrapDomain
@@ -88,17 +83,13 @@ export type WrapDomainInstructionAccounts = {
   reverseNameAccount: web3.PublicKey
   bnsMintAccount: web3.PublicKey
   bnsMintAtaAccount: web3.PublicKey
-  ansMintAccount: web3.PublicKey
   nameClassAccount: web3.PublicKey
   nameParentAccount: web3.PublicKey
-  nameHouseAccount: web3.PublicKey
   ataProgram?: web3.PublicKey
   tokenProgram?: web3.PublicKey
   tldHouseProgram: web3.PublicKey
-  nameHouseProgram: web3.PublicKey
   altNameServiceProgram: web3.PublicKey
   systemProgram?: web3.PublicKey
-  rent?: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
 
@@ -187,22 +178,12 @@ export function createWrapDomainInstruction(
       isSigner: false,
     },
     {
-      pubkey: accounts.ansMintAccount,
-      isWritable: true,
-      isSigner: false,
-    },
-    {
       pubkey: accounts.nameClassAccount,
       isWritable: false,
       isSigner: false,
     },
     {
       pubkey: accounts.nameParentAccount,
-      isWritable: true,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.nameHouseAccount,
       isWritable: true,
       isSigner: false,
     },
@@ -222,22 +203,12 @@ export function createWrapDomainInstruction(
       isSigner: false,
     },
     {
-      pubkey: accounts.nameHouseProgram,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
       pubkey: accounts.altNameServiceProgram,
       isWritable: false,
       isSigner: false,
     },
     {
       pubkey: accounts.systemProgram ?? web3.SystemProgram.programId,
-      isWritable: false,
-      isSigner: false,
-    },
-    {
-      pubkey: accounts.rent ?? web3.SYSVAR_RENT_PUBKEY,
       isWritable: false,
       isSigner: false,
     },

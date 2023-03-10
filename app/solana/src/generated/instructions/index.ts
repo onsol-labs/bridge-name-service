@@ -1,2 +1,2 @@
-export * from './createNftAns'
+export * from './redeemNft'
 export * from './wrapDomain'

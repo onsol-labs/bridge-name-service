@@ -1,3 +1,3 @@
-mod create_nft;
+mod redeem_domain;
 mod wrap_domain;
-pub use {create_nft::*, wrap_domain::*};
+pub use {redeem_domain::*, wrap_domain::*};

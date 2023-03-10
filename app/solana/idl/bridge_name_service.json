@@ -79,14 +79,6 @@
           ]
         },
         {
-          "name": "ansMintAccount",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "The nft mint"
-          ]
-        },
-        {
           "name": "nameClassAccount",
           "isMut": false,
           "isSigner": false
@@ -95,52 +87,6 @@
           "name": "nameParentAccount",
           "isMut": true,
           "isSigner": false
-        },
-        {
-          "name": "ansMintAtaAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "nftRecord",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "collectionMint",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "collectionMetadata",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "collectionMasterEditionAccount",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "editionAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "metadataAccount",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "The metadata account"
-          ]
-        },
-        {
-          "name": "nameHouseAccount",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "The name house account"
-          ]
         },
         {
           "name": "ataProgram",
@@ -164,14 +110,6 @@
           ]
         },
         {
-          "name": "nameHouseProgram",
-          "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "The name house program account"
-          ]
-        },
-        {
           "name": "altNameServiceProgram",
           "isMut": false,
           "isSigner": false,
@@ -180,24 +118,11 @@
           ]
         },
         {
-          "name": "tokenMetadataProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false,
           "docs": [
             "The system program account"
-          ]
-        },
-        {
-          "name": "rent",
-          "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "Rent sysvar account"
           ]
         }
       ],
@@ -233,15 +158,11 @@
         {
           "name": "durationRate",
           "type": "u16"
-        },
-        {
-          "name": "mintBump",
-          "type": "u8"
         }
       ]
     },
     {
-      "name": "createNftAns",
+      "name": "redeemNft",
       "accounts": [
         {
           "name": "owner",
@@ -250,6 +171,16 @@
           "docs": [
             "The fee payer account"
           ]
+        },
+        {
+          "name": "bnsVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "vaultAtaAccount",
+          "isMut": true,
+          "isSigner": false
         },
         {
           "name": "tldState",
@@ -262,21 +193,7 @@
           "isSigner": false
         },
         {
-          "name": "paymentTokenMint",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "Treasury mint account, either native SOL mint or a SPL token mint.",
-            "must exist in treasury manager"
-          ]
-        },
-        {
           "name": "nameAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "reverseNameAccount",
           "isMut": true,
           "isSigner": false
         },
@@ -315,52 +232,6 @@
           "isSigner": false
         },
         {
-          "name": "ansMintAtaAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "nftRecord",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "collectionMint",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "collectionMetadata",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "collectionMasterEditionAccount",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "editionAccount",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "metadataAccount",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "The metadata account"
-          ]
-        },
-        {
-          "name": "nameHouseAccount",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "The name house account"
-          ]
-        },
-        {
           "name": "ataProgram",
           "isMut": false,
           "isSigner": false
@@ -382,25 +253,12 @@
           ]
         },
         {
-          "name": "nameHouseProgram",
-          "isMut": false,
-          "isSigner": false,
-          "docs": [
-            "The name house program account"
-          ]
-        },
-        {
           "name": "altNameServiceProgram",
           "isMut": false,
           "isSigner": false,
           "docs": [
             "The alt name service program account"
           ]
-        },
-        {
-          "name": "tokenMetadataProgram",
-          "isMut": false,
-          "isSigner": false
         },
         {
           "name": "systemProgram",
@@ -411,9 +269,12 @@
           ]
         },
         {
-          "name": "instructionSysvarAccount",
+          "name": "rent",
           "isMut": false,
-          "isSigner": false
+          "isSigner": false,
+          "docs": [
+            "Rent sysvar account"
+          ]
         }
       ],
       "args": [
@@ -426,8 +287,8 @@
           "type": "bytes"
         },
         {
-          "name": "reverseAccHashedName",
-          "type": "bytes"
+          "name": "thBump",
+          "type": "u8"
         },
         {
           "name": "name",
