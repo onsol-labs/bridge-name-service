@@ -1,4 +1,3 @@
-import { isTerraChain } from "@certusone/wormhole-sdk";
 import { Alert } from "@material-ui/lab";
 import { useSelector } from "react-redux";
 import { useHandleNFTTransfer } from "../../hooks/useHandleNFTTransfer";
@@ -15,7 +14,6 @@ import ButtonWithLoader from "../ButtonWithLoader";
 import KeyAndBalance from "../KeyAndBalance";
 import ShowTx from "../ShowTx";
 import StepDescription from "../StepDescription";
-import TerraFeeDenomPicker from "../TerraFeeDenomPicker";
 import TransactionProgress from "../TransactionProgress";
 import WaitingForWalletMessage from "./WaitingForWalletMessage";
 
@@ -43,9 +41,6 @@ function Send() {
         Transfer the NFT to the Wormhole Token Bridge.
       </StepDescription>
       <KeyAndBalance chainId={sourceChain} />
-      {isTerraChain(sourceChain) && (
-        <TerraFeeDenomPicker disabled={disabled} chainId={sourceChain} />
-      )}
       <Alert severity="info" variant="outlined">
         This will initiate the transfer on {CHAINS_BY_ID[sourceChain].name} and
         wait for finalization. If you navigate away from this page before

@@ -1,9 +1,7 @@
 import {
   ChainId,
   CHAIN_ID_ETH,
-  CHAIN_ID_NEAR,
   CHAIN_ID_SOLANA,
-  CHAIN_ID_TERRA2,
   isEVMChain,
   nativeToHexString,
 } from "@certusone/wormhole-sdk";
@@ -118,8 +116,8 @@ function SecondaryAssetInformation({
     return originAddress && chainId === originAssetInfo?.originChain
       ? [originAddress]
       : foreignAssetInfo?.address
-      ? [foreignAssetInfo?.address]
-      : [];
+        ? [foreignAssetInfo?.address]
+        : [];
   }, [foreignAssetInfo, originAssetInfo, chainId]);
   const metadata = useMetadata(chainId, tokenArray);
   console.log("metadata", metadata, chainId, tokenArray);
@@ -150,21 +148,13 @@ function SecondaryAssetInformation({
       <RegisterNowButtonCore
         originChain={originAssetInfo?.originChain || undefined}
         originAsset={
-          // use pre-image for these
-          originAssetInfo?.originChain === CHAIN_ID_TERRA2 ||
-          originAssetInfo?.originChain === CHAIN_ID_NEAR
-            ? originAssetInfo?.originAddress || undefined
-            : nativeToHexString(
-                originAssetInfo?.originAddress || undefined,
-                originAssetInfo?.originChain || CHAIN_ID_SOLANA // this should exist
-              ) || undefined
+          nativeToHexString(
+            originAssetInfo?.originAddress || undefined,
+            originAssetInfo?.originChain || CHAIN_ID_SOLANA // this should exist
+          ) || undefined
         }
         forceAsset={
-          // use pre-image for these
-          originAssetInfo?.originChain === CHAIN_ID_TERRA2 ||
-          originAssetInfo?.originChain === CHAIN_ID_NEAR
-            ? originAssetInfo?.originAddress || undefined
-            : undefined
+          undefined
         }
         targetChain={chainId}
       />
@@ -207,7 +197,7 @@ export default function TokenOriginVerifier() {
   );
 
   const handlePrimaryLookupChainChange = useCallback(
-    (e) => {
+    (e: any) => {
       setPrimaryLookupChain(e.target.value);
       if (secondaryLookupChain === e.target.value) {
         setSecondaryLookupChain(
@@ -218,10 +208,10 @@ export default function TokenOriginVerifier() {
     },
     [secondaryLookupChain]
   );
-  const handleSecondaryLookupChainChange = useCallback((e) => {
+  const handleSecondaryLookupChainChange = useCallback((e: any) => {
     setSecondaryLookupChain(e.target.value);
   }, []);
-  const handlePrimaryLookupAssetChange = useCallback((event) => {
+  const handlePrimaryLookupAssetChange = useCallback((event: any) => {
     setPrimaryLookupAsset(event.target.value);
   }, []);
 

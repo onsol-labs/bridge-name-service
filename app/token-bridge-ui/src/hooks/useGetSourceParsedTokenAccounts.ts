@@ -1,27 +1,8 @@
 import {
   ChainId,
-  CHAIN_ID_ACALA,
-  CHAIN_ID_ALGORAND,
-  CHAIN_ID_APTOS,
-  CHAIN_ID_AURORA,
-  CHAIN_ID_AVAX,
-  CHAIN_ID_BSC,
-  CHAIN_ID_CELO,
   CHAIN_ID_ETH,
-  CHAIN_ID_FANTOM,
-  CHAIN_ID_INJECTIVE,
-  CHAIN_ID_KARURA,
-  CHAIN_ID_KLAYTN,
-  CHAIN_ID_MOONBEAM,
-  CHAIN_ID_NEAR,
-  CHAIN_ID_NEON,
-  CHAIN_ID_OASIS,
-  CHAIN_ID_POLYGON,
   CHAIN_ID_SOLANA,
-  CHAIN_ID_XPLA,
-  ethers_contracts,
   isEVMChain,
-  isTerraChain,
   WSOL_ADDRESS,
   WSOL_DECIMALS,
 } from "@certusone/wormhole-sdk";
@@ -33,32 +14,17 @@ import {
   ParsedAccountData,
   PublicKey,
 } from "@solana/web3.js";
-import { Algodv2 } from "algosdk";
 import axios from "axios";
 import { ethers } from "ethers";
 import { formatUnits } from "ethers/lib/utils";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useAlgorandContext } from "../contexts/AlgorandWalletContext";
 import {
   Provider,
   useEthereumProvider,
 } from "../contexts/EthereumProviderContext";
-import { useNearContext } from "../contexts/NearWalletContext";
 import { useSolanaWallet } from "../contexts/SolanaWalletContext";
-import acalaIcon from "../icons/acala.svg";
-import auroraIcon from "../icons/aurora.svg";
-import avaxIcon from "../icons/avax.svg";
-import bnbIcon from "../icons/bnb.svg";
-import celoIcon from "../icons/celo.svg";
 import ethIcon from "../icons/eth.svg";
-import fantomIcon from "../icons/fantom.svg";
-import karuraIcon from "../icons/karura.svg";
-import klaytnIcon from "../icons/klaytn.svg";
-import neonIcon from "../icons/neon.svg";
-import oasisIcon from "../icons/oasis-network-rose-logo.svg";
-import polygonIcon from "../icons/polygon.svg";
-import moonbeamIcon from "../icons/moonbeam.svg";
 import {
   errorSourceParsedTokenAccounts as errorSourceParsedTokenAccountsNFT,
   fetchSourceParsedTokenAccounts as fetchSourceParsedTokenAccountsNFT,
@@ -87,48 +53,18 @@ import {
   setSourceWalletAddress,
 } from "../store/transferSlice";
 import {
-  ACA_ADDRESS,
-  ACA_DECIMALS,
-  ALGORAND_HOST,
-  ALGO_DECIMALS,
-  COVALENT_GET_TOKENS_URL,
-  BLOCKSCOUT_GET_TOKENS_URL,
-  KAR_ADDRESS,
-  KAR_DECIMALS,
-  NATIVE_NEAR_DECIMALS,
-  NATIVE_NEAR_PLACEHOLDER,
+  GET_TOKENS_URL,
+  CLUSTER,
   SOLANA_HOST,
-  WAVAX_ADDRESS,
-  WAVAX_DECIMALS,
-  WBNB_ADDRESS,
-  WBNB_DECIMALS,
-  CELO_ADDRESS,
-  CELO_DECIMALS,
   WETH_ADDRESS,
-  WETH_AURORA_ADDRESS,
-  WETH_AURORA_DECIMALS,
   WETH_DECIMALS,
-  WFTM_ADDRESS,
-  WFTM_DECIMALS,
-  WKLAY_ADDRESS,
-  WKLAY_DECIMALS,
-  WMATIC_ADDRESS,
-  WMATIC_DECIMALS,
-  WNEON_ADDRESS,
-  WNEON_DECIMALS,
-  WROSE_ADDRESS,
-  WROSE_DECIMALS,
   getDefaultNativeCurrencyAddressEvm,
-  WGLMR_ADDRESS,
-  WGLMR_DECIMALS,
 } from "../utils/consts";
-import { makeNearAccount } from "../utils/near";
 import {
   ExtractedMintInfo,
   extractMintInfo,
   getMultipleAccountsRPC,
 } from "../utils/solana";
-import { fetchSingleMetadata } from "./useAlgoMetadata";
 
 export function createParsedTokenAccount(
   publicKey: string,
@@ -258,313 +194,20 @@ const createNativeEthParsedTokenAccount = (
   return !(provider && signerAddress)
     ? Promise.reject()
     : provider.getBalance(signerAddress).then((balanceInWei) => {
-        const balanceInEth = ethers.utils.formatEther(balanceInWei);
-        return createParsedTokenAccount(
-          signerAddress, //public key
-          WETH_ADDRESS, //Mint key, On the other side this will be WETH, so this is hopefully a white lie.
-          balanceInWei.toString(), //amount, in wei
-          WETH_DECIMALS, //Luckily both ETH and WETH have 18 decimals, so this should not be an issue.
-          parseFloat(balanceInEth), //This loses precision, but is a limitation of the current datamodel. This field is essentially deprecated
-          balanceInEth.toString(), //This is the actual display field, which has full precision.
-          "ETH", //A white lie for display purposes
-          "Ethereum", //A white lie for display purposes
-          ethIcon,
-          true //isNativeAsset
-        );
-      });
-};
-
-const createNativeBscParsedTokenAccount = (
-  provider: Provider,
-  signerAddress: string | undefined
-) => {
-  return !(provider && signerAddress)
-    ? Promise.reject()
-    : provider.getBalance(signerAddress).then((balanceInWei) => {
-        const balanceInEth = ethers.utils.formatEther(balanceInWei);
-        return createParsedTokenAccount(
-          signerAddress, //public key
-          WBNB_ADDRESS, //Mint key, On the other side this will be WBNB, so this is hopefully a white lie.
-          balanceInWei.toString(), //amount, in wei
-          WBNB_DECIMALS, //Luckily both BNB and WBNB have 18 decimals, so this should not be an issue.
-          parseFloat(balanceInEth), //This loses precision, but is a limitation of the current datamodel. This field is essentially deprecated
-          balanceInEth.toString(), //This is the actual display field, which has full precision.
-          "BNB", //A white lie for display purposes
-          "Binance Coin", //A white lie for display purposes
-          bnbIcon,
-          true //isNativeAsset
-        );
-      });
-};
-
-const createNativePolygonParsedTokenAccount = (
-  provider: Provider,
-  signerAddress: string | undefined
-) => {
-  return !(provider && signerAddress)
-    ? Promise.reject()
-    : provider.getBalance(signerAddress).then((balanceInWei) => {
-        const balanceInEth = ethers.utils.formatEther(balanceInWei);
-        return createParsedTokenAccount(
-          signerAddress, //public key
-          WMATIC_ADDRESS, //Mint key, On the other side this will be WMATIC, so this is hopefully a white lie.
-          balanceInWei.toString(), //amount, in wei
-          WMATIC_DECIMALS, //Luckily both MATIC and WMATIC have 18 decimals, so this should not be an issue.
-          parseFloat(balanceInEth), //This loses precision, but is a limitation of the current datamodel. This field is essentially deprecated
-          balanceInEth.toString(), //This is the actual display field, which has full precision.
-          "MATIC", //A white lie for display purposes
-          "Matic", //A white lie for display purposes
-          polygonIcon,
-          true //isNativeAsset
-        );
-      });
-};
-
-const createNativeAvaxParsedTokenAccount = (
-  provider: Provider,
-  signerAddress: string | undefined
-) => {
-  return !(provider && signerAddress)
-    ? Promise.reject()
-    : provider.getBalance(signerAddress).then((balanceInWei) => {
-        const balanceInEth = ethers.utils.formatEther(balanceInWei);
-        return createParsedTokenAccount(
-          signerAddress, //public key
-          WAVAX_ADDRESS, //Mint key, On the other side this will be wavax, so this is hopefully a white lie.
-          balanceInWei.toString(), //amount, in wei
-          WAVAX_DECIMALS,
-          parseFloat(balanceInEth), //This loses precision, but is a limitation of the current datamodel. This field is essentially deprecated
-          balanceInEth.toString(), //This is the actual display field, which has full precision.
-          "AVAX", //A white lie for display purposes
-          "Avalanche", //A white lie for display purposes
-          avaxIcon,
-          true //isNativeAsset
-        );
-      });
-};
-
-const createNativeOasisParsedTokenAccount = (
-  provider: Provider,
-  signerAddress: string | undefined
-) => {
-  return !(provider && signerAddress)
-    ? Promise.reject()
-    : provider.getBalance(signerAddress).then((balanceInWei) => {
-        const balanceInEth = ethers.utils.formatEther(balanceInWei);
-        return createParsedTokenAccount(
-          signerAddress, //public key
-          WROSE_ADDRESS, //Mint key, On the other side this will be wavax, so this is hopefully a white lie.
-          balanceInWei.toString(), //amount, in wei
-          WROSE_DECIMALS,
-          parseFloat(balanceInEth), //This loses precision, but is a limitation of the current datamodel. This field is essentially deprecated
-          balanceInEth.toString(), //This is the actual display field, which has full precision.
-          "ROSE", //A white lie for display purposes
-          "Rose", //A white lie for display purposes
-          oasisIcon,
-          true //isNativeAsset
-        );
-      });
-};
-
-const createNativeAuroraParsedTokenAccount = (
-  provider: Provider,
-  signerAddress: string | undefined
-) => {
-  return !(provider && signerAddress)
-    ? Promise.reject()
-    : provider.getBalance(signerAddress).then((balanceInWei) => {
-        const balanceInEth = ethers.utils.formatEther(balanceInWei);
-        return createParsedTokenAccount(
-          signerAddress, //public key
-          WETH_AURORA_ADDRESS, //Mint key, On the other side this will be wavax, so this is hopefully a white lie.
-          balanceInWei.toString(), //amount, in wei
-          WETH_AURORA_DECIMALS,
-          parseFloat(balanceInEth), //This loses precision, but is a limitation of the current datamodel. This field is essentially deprecated
-          balanceInEth.toString(), //This is the actual display field, which has full precision.
-          "ETH", //A white lie for display purposes
-          "Aurora ETH", //A white lie for display purposes
-          auroraIcon,
-          true //isNativeAsset
-        );
-      });
-};
-
-const createNativeFantomParsedTokenAccount = (
-  provider: Provider,
-  signerAddress: string | undefined
-) => {
-  return !(provider && signerAddress)
-    ? Promise.reject()
-    : provider.getBalance(signerAddress).then((balanceInWei) => {
-        const balanceInEth = ethers.utils.formatEther(balanceInWei);
-        return createParsedTokenAccount(
-          signerAddress, //public key
-          WFTM_ADDRESS, //Mint key, On the other side this will be wavax, so this is hopefully a white lie.
-          balanceInWei.toString(), //amount, in wei
-          WFTM_DECIMALS,
-          parseFloat(balanceInEth), //This loses precision, but is a limitation of the current datamodel. This field is essentially deprecated
-          balanceInEth.toString(), //This is the actual display field, which has full precision.
-          "FTM", //A white lie for display purposes
-          "Fantom", //A white lie for display purposes
-          fantomIcon,
-          true //isNativeAsset
-        );
-      });
-};
-
-const createNativeKaruraParsedTokenAccount = (
-  provider: Provider,
-  signerAddress: string | undefined
-) => {
-  return !(provider && signerAddress)
-    ? Promise.reject()
-    : ethers_contracts.TokenImplementation__factory.connect(
-        KAR_ADDRESS,
-        provider
-      )
-        .balanceOf(signerAddress)
-        .then((balance) => {
-          const balanceInEth = ethers.utils.formatUnits(balance, KAR_DECIMALS);
-          return createParsedTokenAccount(
-            signerAddress, //public key
-            KAR_ADDRESS, //Mint key, On the other side this will be wavax, so this is hopefully a white lie.
-            balance.toString(), //amount, in wei
-            KAR_DECIMALS,
-            parseFloat(balanceInEth), //This loses precision, but is a limitation of the current datamodel. This field is essentially deprecated
-            balanceInEth.toString(), //This is the actual display field, which has full precision.
-            "KAR", //A white lie for display purposes
-            "KAR", //A white lie for display purposes
-            karuraIcon,
-            false //isNativeAsset
-          );
-        });
-};
-
-const createNativeAcalaParsedTokenAccount = (
-  provider: Provider,
-  signerAddress: string | undefined
-) => {
-  return !(provider && signerAddress)
-    ? Promise.reject()
-    : ethers_contracts.TokenImplementation__factory.connect(
-        ACA_ADDRESS,
-        provider
-      )
-        .balanceOf(signerAddress)
-        .then((balance) => {
-          const balanceInEth = ethers.utils.formatUnits(balance, ACA_DECIMALS);
-          return createParsedTokenAccount(
-            signerAddress, //public key
-            ACA_ADDRESS, //Mint key, On the other side this will be wavax, so this is hopefully a white lie.
-            balance.toString(), //amount, in wei
-            ACA_DECIMALS,
-            parseFloat(balanceInEth), //This loses precision, but is a limitation of the current datamodel. This field is essentially deprecated
-            balanceInEth.toString(), //This is the actual display field, which has full precision.
-            "ACA", //A white lie for display purposes
-            "ACA", //A white lie for display purposes
-            acalaIcon,
-            false //isNativeAsset
-          );
-        });
-};
-
-const createNativeKlaytnParsedTokenAccount = (
-  provider: Provider,
-  signerAddress: string | undefined
-) => {
-  return !(provider && signerAddress)
-    ? Promise.reject()
-    : provider.getBalance(signerAddress).then((balanceInWei) => {
-        const balanceInEth = ethers.utils.formatEther(balanceInWei);
-        return createParsedTokenAccount(
-          signerAddress, //public key
-          WKLAY_ADDRESS, //Mint key, On the other side this will be wklay, so this is hopefully a white lie.
-          balanceInWei.toString(), //amount, in wei
-          WKLAY_DECIMALS,
-          parseFloat(balanceInEth), //This loses precision, but is a limitation of the current datamodel. This field is essentially deprecated
-          balanceInEth.toString(), //This is the actual display field, which has full precision.
-          "KLAY", //A white lie for display purposes
-          "KLAY", //A white lie for display purposes
-          klaytnIcon,
-          true //isNativeAsset
-        );
-      });
-};
-
-const createNativeCeloParsedTokenAccount = (
-  provider: Provider,
-  signerAddress: string | undefined
-) => {
-  // Celo has a "native asset" ERC-20
-  // https://docs.celo.org/developer-guide/celo-for-eth-devs
-  return !(provider && signerAddress)
-    ? Promise.reject()
-    : ethers_contracts.TokenImplementation__factory.connect(
-        CELO_ADDRESS,
-        provider
-      )
-        .balanceOf(signerAddress)
-        .then((balance) => {
-          const balanceInEth = ethers.utils.formatUnits(balance, CELO_DECIMALS);
-          return createParsedTokenAccount(
-            signerAddress, //public key
-            CELO_ADDRESS, //Mint key, On the other side this will be wavax, so this is hopefully a white lie.
-            balance.toString(), //amount, in wei
-            CELO_DECIMALS,
-            parseFloat(balanceInEth), //This loses precision, but is a limitation of the current datamodel. This field is essentially deprecated
-            balanceInEth.toString(), //This is the actual display field, which has full precision.
-            "CELO", //A white lie for display purposes
-            "CELO", //A white lie for display purposes
-            celoIcon,
-            false //isNativeAsset
-          );
-        });
-};
-
-const createNativeNeonParsedTokenAccount = (
-  provider: Provider,
-  signerAddress: string | undefined
-) => {
-  return !(provider && signerAddress)
-    ? Promise.reject()
-    : provider.getBalance(signerAddress).then((balanceInWei) => {
-        const balanceInEth = ethers.utils.formatEther(balanceInWei);
-        return createParsedTokenAccount(
-          signerAddress, //public key
-          WNEON_ADDRESS, //Mint key, On the other side this will be wneon, so this is hopefully a white lie.
-          balanceInWei.toString(), //amount, in wei
-          WNEON_DECIMALS,
-          parseFloat(balanceInEth), //This loses precision, but is a limitation of the current datamodel. This field is essentially deprecated
-          balanceInEth.toString(), //This is the actual display field, which has full precision.
-          "NEON", //A white lie for display purposes
-          "NEON", //A white lie for display purposes
-          neonIcon,
-          true //isNativeAsset
-        );
-      });
-};
-
-const createNativeMoonbeamParsedTokenAccount = (
-  provider: Provider,
-  signerAddress: string | undefined
-) => {
-  return !(provider && signerAddress)
-    ? Promise.reject()
-    : provider.getBalance(signerAddress).then((balanceInWei) => {
-        const balanceInEth = ethers.utils.formatEther(balanceInWei);
-        return createParsedTokenAccount(
-          signerAddress, //public key
-          WGLMR_ADDRESS, //Mint key, On the other side this will be wneon, so this is hopefully a white lie.
-          balanceInWei.toString(), //amount, in wei
-          WGLMR_DECIMALS,
-          parseFloat(balanceInEth), //This loses precision, but is a limitation of the current datamodel. This field is essentially deprecated
-          balanceInEth.toString(), //This is the actual display field, which has full precision.
-          "GLMR", //A white lie for display purposes
-          "GLMR", //A white lie for display purposes
-          moonbeamIcon,
-          true //isNativeAsset
-        );
-      });
+      const balanceInEth = ethers.utils.formatEther(balanceInWei);
+      return createParsedTokenAccount(
+        signerAddress, //public key
+        WETH_ADDRESS, //Mint key, On the other side this will be WETH, so this is hopefully a white lie.
+        balanceInWei.toString(), //amount, in wei
+        WETH_DECIMALS, //Luckily both ETH and WETH have 18 decimals, so this should not be an issue.
+        parseFloat(balanceInEth), //This loses precision, but is a limitation of the current datamodel. This field is essentially deprecated
+        balanceInEth.toString(), //This is the actual display field, which has full precision.
+        "ETH", //A white lie for display purposes
+        "Ethereum", //A white lie for display purposes
+        ethIcon,
+        true //isNativeAsset
+      );
+    });
 };
 
 const createNFTParsedTokenAccountFromCovalent = (
@@ -652,7 +295,7 @@ const getEthereumAccountsCovalent = async (
   try {
     const output = [] as AlchemyData[];
     const response = await axios.get(url);
-    const tokens = response.data.ownedNfts; 
+    const tokens = response.data.ownedNfts;
     // console.log(tokens)
 
     if (tokens instanceof Array && tokens.length) {
@@ -667,7 +310,7 @@ const getEthereumAccountsCovalent = async (
             ? item.id.tokenMetadata.tokenType?.includes("ERC721")
             : item.supports_erc?.includes("erc20"))
         ) {
-          output.push({ 
+          output.push({
             contract_name: item.contractMetadata.name ? item.contractMetadata.name : ".eth",
             contract_address: item.contract.address,
             logo_url: item.media[0].thumbnail,
@@ -684,8 +327,8 @@ const getEthereumAccountsCovalent = async (
               },
               token_url: item.metadata.url,
             }]
-            
-           } as AlchemyData);
+
+          } as AlchemyData);
         }
       }
     }
@@ -712,7 +355,7 @@ export const getEthereumAccountsBlockscout = async (
           item.decimals !== undefined &&
           item.contractAddress &&
           item.contractAddress.toLowerCase() !==
-            getDefaultNativeCurrencyAddressEvm(chainId).toLowerCase() && // native balance comes from querying token bridge
+          getDefaultNativeCurrencyAddressEvm(chainId).toLowerCase() && // native balance comes from querying token bridge
           item.balance &&
           item.balance !== "0" &&
           (nft ? item.type?.includes("ERC-721") : item.type?.includes("ERC-20"))
@@ -791,114 +434,6 @@ const getSolanaParsedTokenAccounts = async (
   }
 };
 
-const getAlgorandParsedTokenAccounts = async (
-  walletAddress: string,
-  dispatch: Dispatch,
-  nft: boolean
-) => {
-  dispatch(
-    nft ? fetchSourceParsedTokenAccountsNFT() : fetchSourceParsedTokenAccounts()
-  );
-  try {
-    const algodClient = new Algodv2(
-      ALGORAND_HOST.algodToken,
-      ALGORAND_HOST.algodServer,
-      ALGORAND_HOST.algodPort
-    );
-    const accountInfo = await algodClient
-      .accountInformation(walletAddress)
-      .do();
-    const parsedTokenAccounts: ParsedTokenAccount[] = [];
-    for (const asset of accountInfo.assets) {
-      const assetId = asset["asset-id"];
-      const amount = asset.amount;
-      const metadata = await fetchSingleMetadata(assetId, algodClient);
-      const isNFT: boolean = amount === 1 && metadata.decimals === 0;
-      if (((nft && isNFT) || (!nft && !isNFT)) && amount > 0) {
-        parsedTokenAccounts.push(
-          createParsedTokenAccount(
-            walletAddress,
-            assetId.toString(),
-            amount,
-            metadata.decimals,
-            parseFloat(formatUnits(amount, metadata.decimals)),
-            formatUnits(amount, metadata.decimals).toString(),
-            metadata.symbol,
-            metadata.tokenName,
-            undefined,
-            false
-          )
-        );
-      }
-    }
-    if (nft) {
-      dispatch(receiveSourceParsedTokenAccountsNFT(parsedTokenAccounts));
-      return;
-    }
-    // The ALGOs account is prepended for the non NFT case
-    parsedTokenAccounts.unshift(
-      createParsedTokenAccount(
-        walletAddress, //publicKey
-        "0", //asset ID
-        accountInfo.amount, //amount
-        ALGO_DECIMALS,
-        parseFloat(formatUnits(accountInfo.amount, ALGO_DECIMALS)),
-        formatUnits(accountInfo.amount, ALGO_DECIMALS).toString(),
-        "ALGO",
-        "Algo",
-        undefined, //TODO logo
-        true
-      )
-    );
-    dispatch(receiveSourceParsedTokenAccounts(parsedTokenAccounts));
-  } catch (e) {
-    console.error(e);
-    dispatch(
-      nft
-        ? errorSourceParsedTokenAccountsNFT("Failed to load NFT metadata")
-        : errorSourceParsedTokenAccounts("Failed to load token metadata.")
-    );
-  }
-};
-
-const getNearParsedTokenAccounts = async (
-  walletAddress: string,
-  dispatch: Dispatch,
-  nft: boolean
-) => {
-  dispatch(
-    nft ? fetchSourceParsedTokenAccountsNFT() : fetchSourceParsedTokenAccounts()
-  );
-  try {
-    if (nft) {
-      dispatch(receiveSourceParsedTokenAccountsNFT([]));
-      return;
-    }
-    const account = await makeNearAccount(walletAddress);
-    const balance = await account.getAccountBalance();
-    const nativeNear = createParsedTokenAccount(
-      walletAddress, //publicKey
-      NATIVE_NEAR_PLACEHOLDER, //the app doesn't like when this isn't truthy
-      balance.available, //amount
-      NATIVE_NEAR_DECIMALS,
-      parseFloat(formatUnits(balance.available, NATIVE_NEAR_DECIMALS)),
-      formatUnits(balance.available, NATIVE_NEAR_DECIMALS).toString(),
-      "NEAR",
-      "Near",
-      undefined, //TODO logo
-      true
-    );
-    dispatch(receiveSourceParsedTokenAccounts([nativeNear]));
-  } catch (e) {
-    console.error(e);
-    dispatch(
-      nft
-        ? errorSourceParsedTokenAccountsNFT("Failed to load NFT metadata")
-        : errorSourceParsedTokenAccounts("Failed to load token metadata.")
-    );
-  }
-};
-
 /**
  * Fetches the balance of an asset for the connected wallet
  * This should handle every type of chain in the future, but only reads the Transfer state.
@@ -918,8 +453,6 @@ function useGetAvailableTokens(nft: boolean = false) {
   const solanaWallet = useSolanaWallet();
   const solPK = solanaWallet?.publicKey;
   const { provider, signerAddress } = useEthereumProvider();
-  const { accounts: algoAccounts } = useAlgorandContext();
-  const { accountId: nearAccountId } = useNearContext();
 
   const [covalent, setCovalent] = useState<any>(undefined);
   const [covalentLoading, setCovalentLoading] = useState(false);
@@ -948,12 +481,8 @@ function useGetAvailableTokens(nft: boolean = false) {
   const currentSourceWalletAddress: string | undefined = isEVMChain(lookupChain)
     ? signerAddress
     : lookupChain === CHAIN_ID_SOLANA
-    ? solPK?.toString()
-    : lookupChain === CHAIN_ID_ALGORAND
-    ? algoAccounts[0]?.address
-    : lookupChain === CHAIN_ID_NEAR
-    ? nearAccountId || undefined
-    : undefined;
+      ? solPK?.toString()
+      : undefined;
 
   const resetSourceAccounts = useCallback(() => {
     dispatch(
@@ -1010,13 +539,13 @@ function useGetAvailableTokens(nft: boolean = false) {
       }
     }
 
-    return () => {};
+    return () => { };
   }, [dispatch, solanaWallet, lookupChain, solPK, tokenAccounts, nft]);
 
   //Solana Mint Accounts lookup
   useEffect(() => {
     if (lookupChain !== CHAIN_ID_SOLANA || !tokenAccounts.data?.length) {
-      return () => {};
+      return () => { };
     }
 
     let cancelled = false;
@@ -1100,425 +629,21 @@ function useGetAvailableTokens(nft: boolean = false) {
     };
   }, [lookupChain, provider, signerAddress, nft, ethNativeAccount]);
 
-  //Binance Smart Chain native asset load
-  useEffect(() => {
-    let cancelled = false;
-    if (
-      signerAddress &&
-      lookupChain === CHAIN_ID_BSC &&
-      !ethNativeAccount &&
-      !nft
-    ) {
-      setEthNativeAccountLoading(true);
-      createNativeBscParsedTokenAccount(provider, signerAddress).then(
-        (result) => {
-          console.log("create native account returned with value", result);
-          if (!cancelled) {
-            setEthNativeAccount(result);
-            setEthNativeAccountLoading(false);
-            setEthNativeAccountError("");
-          }
-        },
-        (error) => {
-          if (!cancelled) {
-            setEthNativeAccount(undefined);
-            setEthNativeAccountLoading(false);
-            setEthNativeAccountError("Unable to retrieve your BNB balance.");
-          }
-        }
-      );
-    }
-
-    return () => {
-      cancelled = true;
-    };
-  }, [lookupChain, provider, signerAddress, nft, ethNativeAccount]);
-
-  //Polygon native asset load
-  useEffect(() => {
-    let cancelled = false;
-    if (
-      signerAddress &&
-      lookupChain === CHAIN_ID_POLYGON &&
-      !ethNativeAccount &&
-      !nft
-    ) {
-      setEthNativeAccountLoading(true);
-      createNativePolygonParsedTokenAccount(provider, signerAddress).then(
-        (result) => {
-          console.log("create native account returned with value", result);
-          if (!cancelled) {
-            setEthNativeAccount(result);
-            setEthNativeAccountLoading(false);
-            setEthNativeAccountError("");
-          }
-        },
-        (error) => {
-          if (!cancelled) {
-            setEthNativeAccount(undefined);
-            setEthNativeAccountLoading(false);
-            setEthNativeAccountError("Unable to retrieve your MATIC balance.");
-          }
-        }
-      );
-    }
-
-    return () => {
-      cancelled = true;
-    };
-  }, [lookupChain, provider, signerAddress, nft, ethNativeAccount]);
-
-  //TODO refactor all these into an isEVM effect
-  //avax native asset load
-  useEffect(() => {
-    let cancelled = false;
-    if (
-      signerAddress &&
-      lookupChain === CHAIN_ID_AVAX &&
-      !ethNativeAccount &&
-      !nft
-    ) {
-      setEthNativeAccountLoading(true);
-      createNativeAvaxParsedTokenAccount(provider, signerAddress).then(
-        (result) => {
-          console.log("create native account returned with value", result);
-          if (!cancelled) {
-            setEthNativeAccount(result);
-            setEthNativeAccountLoading(false);
-            setEthNativeAccountError("");
-          }
-        },
-        (error) => {
-          if (!cancelled) {
-            setEthNativeAccount(undefined);
-            setEthNativeAccountLoading(false);
-            setEthNativeAccountError("Unable to retrieve your AVAX balance.");
-          }
-        }
-      );
-    }
-
-    return () => {
-      cancelled = true;
-    };
-  }, [lookupChain, provider, signerAddress, nft, ethNativeAccount]);
-
-  useEffect(() => {
-    let cancelled = false;
-    if (
-      signerAddress &&
-      lookupChain === CHAIN_ID_OASIS &&
-      !ethNativeAccount &&
-      !nft
-    ) {
-      setEthNativeAccountLoading(true);
-      createNativeOasisParsedTokenAccount(provider, signerAddress).then(
-        (result) => {
-          console.log("create native account returned with value", result);
-          if (!cancelled) {
-            setEthNativeAccount(result);
-            setEthNativeAccountLoading(false);
-            setEthNativeAccountError("");
-          }
-        },
-        (error) => {
-          if (!cancelled) {
-            setEthNativeAccount(undefined);
-            setEthNativeAccountLoading(false);
-            setEthNativeAccountError("Unable to retrieve your Oasis balance.");
-          }
-        }
-      );
-    }
-
-    return () => {
-      cancelled = true;
-    };
-  }, [lookupChain, provider, signerAddress, nft, ethNativeAccount]);
-
-  useEffect(() => {
-    let cancelled = false;
-    if (
-      signerAddress &&
-      lookupChain === CHAIN_ID_AURORA &&
-      !ethNativeAccount &&
-      !nft
-    ) {
-      setEthNativeAccountLoading(true);
-      createNativeAuroraParsedTokenAccount(provider, signerAddress).then(
-        (result) => {
-          console.log("create native account returned with value", result);
-          if (!cancelled) {
-            setEthNativeAccount(result);
-            setEthNativeAccountLoading(false);
-            setEthNativeAccountError("");
-          }
-        },
-        (error) => {
-          if (!cancelled) {
-            setEthNativeAccount(undefined);
-            setEthNativeAccountLoading(false);
-            setEthNativeAccountError("Unable to retrieve your Fantom balance.");
-          }
-        }
-      );
-    }
-
-    return () => {
-      cancelled = true;
-    };
-  }, [lookupChain, provider, signerAddress, nft, ethNativeAccount]);
-
-  useEffect(() => {
-    let cancelled = false;
-    if (
-      signerAddress &&
-      lookupChain === CHAIN_ID_FANTOM &&
-      !ethNativeAccount &&
-      !nft
-    ) {
-      setEthNativeAccountLoading(true);
-      createNativeFantomParsedTokenAccount(provider, signerAddress).then(
-        (result) => {
-          console.log("create native account returned with value", result);
-          if (!cancelled) {
-            setEthNativeAccount(result);
-            setEthNativeAccountLoading(false);
-            setEthNativeAccountError("");
-          }
-        },
-        (error) => {
-          if (!cancelled) {
-            setEthNativeAccount(undefined);
-            setEthNativeAccountLoading(false);
-            setEthNativeAccountError("Unable to retrieve your Fantom balance.");
-          }
-        }
-      );
-    }
-
-    return () => {
-      cancelled = true;
-    };
-  }, [lookupChain, provider, signerAddress, nft, ethNativeAccount]);
-
-  useEffect(() => {
-    let cancelled = false;
-    if (
-      signerAddress &&
-      lookupChain === CHAIN_ID_KARURA &&
-      !ethNativeAccount &&
-      !nft
-    ) {
-      setEthNativeAccountLoading(true);
-      createNativeKaruraParsedTokenAccount(provider, signerAddress).then(
-        (result) => {
-          console.log("create native account returned with value", result);
-          if (!cancelled) {
-            setEthNativeAccount(result);
-            setEthNativeAccountLoading(false);
-            setEthNativeAccountError("");
-          }
-        },
-        (error) => {
-          if (!cancelled) {
-            setEthNativeAccount(undefined);
-            setEthNativeAccountLoading(false);
-            setEthNativeAccountError("Unable to retrieve your Karura balance.");
-          }
-        }
-      );
-    }
-
-    return () => {
-      cancelled = true;
-    };
-  }, [lookupChain, provider, signerAddress, nft, ethNativeAccount]);
-
-  useEffect(() => {
-    let cancelled = false;
-    if (
-      signerAddress &&
-      lookupChain === CHAIN_ID_ACALA &&
-      !ethNativeAccount &&
-      !nft
-    ) {
-      setEthNativeAccountLoading(true);
-      createNativeAcalaParsedTokenAccount(provider, signerAddress).then(
-        (result) => {
-          console.log("create native account returned with value", result);
-          if (!cancelled) {
-            setEthNativeAccount(result);
-            setEthNativeAccountLoading(false);
-            setEthNativeAccountError("");
-          }
-        },
-        (error) => {
-          if (!cancelled) {
-            setEthNativeAccount(undefined);
-            setEthNativeAccountLoading(false);
-            setEthNativeAccountError("Unable to retrieve your Acala balance.");
-          }
-        }
-      );
-    }
-
-    return () => {
-      cancelled = true;
-    };
-  }, [lookupChain, provider, signerAddress, nft, ethNativeAccount]);
-
-  useEffect(() => {
-    let cancelled = false;
-    if (
-      signerAddress &&
-      lookupChain === CHAIN_ID_KLAYTN &&
-      !ethNativeAccount &&
-      !nft
-    ) {
-      setEthNativeAccountLoading(true);
-      createNativeKlaytnParsedTokenAccount(provider, signerAddress).then(
-        (result) => {
-          console.log("create native account returned with value", result);
-          if (!cancelled) {
-            setEthNativeAccount(result);
-            setEthNativeAccountLoading(false);
-            setEthNativeAccountError("");
-          }
-        },
-        (error) => {
-          if (!cancelled) {
-            setEthNativeAccount(undefined);
-            setEthNativeAccountLoading(false);
-            setEthNativeAccountError("Unable to retrieve your Klaytn balance.");
-          }
-        }
-      );
-    }
-
-    return () => {
-      cancelled = true;
-    };
-  }, [lookupChain, provider, signerAddress, nft, ethNativeAccount]);
-
-  useEffect(() => {
-    let cancelled = false;
-    if (
-      signerAddress &&
-      lookupChain === CHAIN_ID_CELO &&
-      !ethNativeAccount &&
-      !nft
-    ) {
-      setEthNativeAccountLoading(true);
-      createNativeCeloParsedTokenAccount(provider, signerAddress).then(
-        (result) => {
-          console.log("create native account returned with value", result);
-          if (!cancelled) {
-            setEthNativeAccount(result);
-            setEthNativeAccountLoading(false);
-            setEthNativeAccountError("");
-          }
-        },
-        (error) => {
-          if (!cancelled) {
-            setEthNativeAccount(undefined);
-            setEthNativeAccountLoading(false);
-            setEthNativeAccountError("Unable to retrieve your Celo balance.");
-          }
-        }
-      );
-    }
-
-    return () => {
-      cancelled = true;
-    };
-  }, [lookupChain, provider, signerAddress, nft, ethNativeAccount]);
-
-  useEffect(() => {
-    let cancelled = false;
-    if (
-      signerAddress &&
-      lookupChain === CHAIN_ID_NEON &&
-      !ethNativeAccount &&
-      !nft
-    ) {
-      setEthNativeAccountLoading(true);
-      createNativeNeonParsedTokenAccount(provider, signerAddress).then(
-        (result) => {
-          console.log("create native account returned with value", result);
-          if (!cancelled) {
-            setEthNativeAccount(result);
-            setEthNativeAccountLoading(false);
-            setEthNativeAccountError("");
-          }
-        },
-        (error) => {
-          if (!cancelled) {
-            setEthNativeAccount(undefined);
-            setEthNativeAccountLoading(false);
-            setEthNativeAccountError("Unable to retrieve your Neon balance.");
-          }
-        }
-      );
-    }
-
-    return () => {
-      cancelled = true;
-    };
-  }, [lookupChain, provider, signerAddress, nft, ethNativeAccount]);
-
-  useEffect(() => {
-    let cancelled = false;
-    if (
-      signerAddress &&
-      lookupChain === CHAIN_ID_MOONBEAM &&
-      !ethNativeAccount &&
-      !nft
-    ) {
-      setEthNativeAccountLoading(true);
-      createNativeMoonbeamParsedTokenAccount(provider, signerAddress).then(
-        (result) => {
-          console.log("create native account returned with value", result);
-          if (!cancelled) {
-            setEthNativeAccount(result);
-            setEthNativeAccountLoading(false);
-            setEthNativeAccountError("");
-          }
-        },
-        (error) => {
-          if (!cancelled) {
-            setEthNativeAccount(undefined);
-            setEthNativeAccountLoading(false);
-            setEthNativeAccountError(
-              "Unable to retrieve your Moonbeam balance."
-            );
-          }
-        }
-      );
-    }
-
-    return () => {
-      cancelled = true;
-    };
-  }, [lookupChain, provider, signerAddress, nft, ethNativeAccount]);
-
   //Ethereum covalent or blockscout accounts load
   useEffect(() => {
-    //const testWallet = "0xf60c2ea62edbfe808163751dd0d8693dcb30019c";
+    // const testWallet = "0xf60c2ea62edbfe808163751dd0d8693dcb30019c";
     // const nftTestWallet1 = "0x3f304c6721f35ff9af00fd32650c8e0a982180ab";
     // const nftTestWallet2 = "0x98ed231428088eb440e8edb5cc8d66dcf913b86e";
     // const nftTestWallet3 = "0xb1fadf677a7e9b90e9d4f31c8ffb3dc18c138c6f";
-    // const nftBscTestWallet1 = "0x5f464a652bd1991df0be37979b93b3306d64a909";
 
     let cancelled = false;
     const walletAddress = signerAddress;
     if (walletAddress && isEVMChain(lookupChain) && !covalent) {
-      let url = COVALENT_GET_TOKENS_URL(lookupChain, walletAddress, nft);
+      let url = GET_TOKENS_URL(CLUSTER, lookupChain, walletAddress, nft);
       let getAccounts;
       if (url) {
         getAccounts = getEthereumAccountsCovalent;
       } else {
-        url = BLOCKSCOUT_GET_TOKENS_URL(lookupChain, walletAddress);
         getAccounts = getEthereumAccountsBlockscout;
       }
       if (!url) {
@@ -1541,26 +666,26 @@ function useGetAvailableTokens(nft: boolean = false) {
             dispatch(
               nft
                 ? receiveSourceParsedTokenAccountsNFT(
-                    accounts.reduce((arr, current) => {
-                      if (current.nft_data) {
-                        current.nft_data.forEach((x) =>
-                          arr.push(
-                            createNFTParsedTokenAccountFromCovalent(
-                              walletAddress,
-                              current,
-                              x
-                            )
+                  accounts.reduce((arr, current) => {
+                    if (current.nft_data) {
+                      current.nft_data.forEach((x) =>
+                        arr.push(
+                          createNFTParsedTokenAccountFromCovalent(
+                            walletAddress,
+                            current,
+                            x
                           )
-                        );
-                      }
-                      return arr;
-                    }, [] as NFTParsedTokenAccount[])
-                  )
+                        )
+                      );
+                    }
+                    return arr;
+                  }, [] as NFTParsedTokenAccount[])
+                )
                 : receiveSourceParsedTokenAccounts(
-                    accounts.map((x) =>
-                      createParsedTokenAccountFromCovalent(walletAddress, x)
-                    )
+                  accounts.map((x) =>
+                    createParsedTokenAccountFromCovalent(walletAddress, x)
                   )
+                )
             );
         },
         () => {
@@ -1568,11 +693,11 @@ function useGetAvailableTokens(nft: boolean = false) {
             dispatch(
               nft
                 ? errorSourceParsedTokenAccountsNFT(
-                    "Cannot load your Ethereum NFTs at the moment."
-                  )
+                  "Cannot load your Ethereum NFTs at the moment."
+                )
                 : errorSourceParsedTokenAccounts(
-                    "Cannot load your Ethereum tokens at the moment."
-                  )
+                  "Cannot load your Ethereum tokens at the moment."
+                )
             );
           !cancelled &&
             setCovalentError("Cannot load your Ethereum tokens at the moment.");
@@ -1585,38 +710,6 @@ function useGetAvailableTokens(nft: boolean = false) {
       };
     }
   }, [lookupChain, provider, signerAddress, dispatch, nft, covalent]);
-
-  //Terra accounts load
-  //At present, we don't have any mechanism for doing this.
-  useEffect(() => {}, []);
-  //Algorand accounts load
-  useEffect(() => {
-    if (lookupChain === CHAIN_ID_ALGORAND && currentSourceWalletAddress) {
-      if (
-        !(tokenAccounts.data || tokenAccounts.isFetching || tokenAccounts.error)
-      ) {
-        getAlgorandParsedTokenAccounts(
-          currentSourceWalletAddress,
-          dispatch,
-          nft
-        );
-      }
-    }
-
-    return () => {};
-  }, [dispatch, lookupChain, currentSourceWalletAddress, tokenAccounts, nft]);
-  //Near accounts load
-  useEffect(() => {
-    if (lookupChain === CHAIN_ID_NEAR && currentSourceWalletAddress) {
-      if (
-        !(tokenAccounts.data || tokenAccounts.isFetching || tokenAccounts.error)
-      ) {
-        getNearParsedTokenAccounts(currentSourceWalletAddress, dispatch, nft);
-      }
-    }
-
-    return () => {};
-  }, [dispatch, lookupChain, currentSourceWalletAddress, tokenAccounts, nft]);
 
   const ethAccounts = useMemo(() => {
     const output = { ...tokenAccounts };
@@ -1634,17 +727,17 @@ function useGetAvailableTokens(nft: boolean = false) {
 
   return lookupChain === CHAIN_ID_SOLANA
     ? {
-        tokenAccounts,
-        mintAccounts: {
-          data: solanaMintAccounts,
-          isFetching: solanaMintAccountsLoading,
-          error: solanaMintAccountsError,
-          receivedAt: null, //TODO
-        },
-        resetAccounts: resetSourceAccounts,
-      }
+      tokenAccounts,
+      mintAccounts: {
+        data: solanaMintAccounts,
+        isFetching: solanaMintAccountsLoading,
+        error: solanaMintAccountsError,
+        receivedAt: null, //TODO
+      },
+      resetAccounts: resetSourceAccounts,
+    }
     : isEVMChain(lookupChain)
-    ? {
+      ? {
         tokenAccounts: ethAccounts,
         covalent: {
           data: covalent,
@@ -1654,33 +747,7 @@ function useGetAvailableTokens(nft: boolean = false) {
         },
         resetAccounts: resetSourceAccounts,
       }
-    : isTerraChain(lookupChain)
-    ? {
-        resetAccounts: resetSourceAccounts,
-      }
-    : lookupChain === CHAIN_ID_XPLA
-    ? {
-        resetAccounts: resetSourceAccounts,
-      }
-    : lookupChain === CHAIN_ID_APTOS
-    ? {
-        resetAccounts: resetSourceAccounts,
-      }
-    : lookupChain === CHAIN_ID_ALGORAND
-    ? {
-        tokenAccounts,
-        resetAccounts: resetSourceAccounts,
-      }
-    : lookupChain === CHAIN_ID_INJECTIVE
-    ? {
-        resetAccounts: resetSourceAccounts,
-      }
-    : lookupChain === CHAIN_ID_NEAR
-    ? {
-        tokenAccounts,
-        resetAccounts: resetSourceAccounts,
-      }
-    : undefined;
+      : undefined;
 }
 
 export default useGetAvailableTokens;

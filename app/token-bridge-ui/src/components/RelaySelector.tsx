@@ -32,14 +32,14 @@ export default function RelaySelector({
   );
 
   const onChangeWrapper = useCallback(
-    (event) => {
+    (event: any) => {
       console.log(event, "event in selector");
       event.target.value
         ? onChange(
-            availableRelayers?.data?.relayers?.find(
-              (x) => x.url === event.target.value
-            ) || null
-          )
+          availableRelayers?.data?.relayers?.find(
+            (x) => x.url === event.target.value
+          ) || null
+        )
         : onChange(null);
     },
     [onChange, availableRelayers]
@@ -74,8 +74,8 @@ export default function RelaySelector({
       {availableRelayers.data?.relayers?.length
         ? selector
         : availableRelayers.isFetching
-        ? loader
-        : error}
+          ? loader
+          : error}
     </div>
   );
 }

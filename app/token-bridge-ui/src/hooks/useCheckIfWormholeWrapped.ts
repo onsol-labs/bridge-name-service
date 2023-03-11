@@ -1,20 +1,9 @@
 import {
   ChainId,
-  CHAIN_ID_ALGORAND,
-  CHAIN_ID_APTOS,
-  CHAIN_ID_INJECTIVE,
-  CHAIN_ID_NEAR,
   CHAIN_ID_SOLANA,
-  CHAIN_ID_XPLA,
-  getOriginalAssetAlgorand,
-  getOriginalAssetAptos,
-  getOriginalAssetCosmWasm,
   getOriginalAssetEth,
-  getOriginalAssetInjective,
-  getOriginalAssetNear,
   getOriginalAssetSol,
   isEVMChain,
-  isTerraChain,
   uint8ArrayToHex,
   WormholeWrappedInfo,
 } from "@certusone/wormhole-sdk";
@@ -23,12 +12,9 @@ import {
   getOriginalAssetSol as getOriginalAssetSolNFT,
 } from "@certusone/wormhole-sdk/lib/esm/nft_bridge";
 import { Connection } from "@solana/web3.js";
-import { LCDClient } from "@terra-money/terra.js";
-import { Algodv2 } from "algosdk";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useEthereumProvider } from "../contexts/EthereumProviderContext";
-import { useNearContext } from "../contexts/NearWalletContext";
 import { setSourceWormholeWrappedInfo as setNFTSourceWormholeWrappedInfo } from "../store/nftSlice";
 import {
   selectNFTIsRecovery,
@@ -41,22 +27,12 @@ import {
 } from "../store/selectors";
 import { setSourceWormholeWrappedInfo as setTransferSourceWormholeWrappedInfo } from "../store/transferSlice";
 import {
-  ALGORAND_HOST,
-  ALGORAND_TOKEN_BRIDGE_ID,
   getNFTBridgeAddressForChain,
-  getTerraConfig,
   getTokenBridgeAddressForChain,
-  NATIVE_NEAR_PLACEHOLDER,
-  NEAR_TOKEN_BRIDGE_ACCOUNT,
   SOLANA_HOST,
   SOL_NFT_BRIDGE_ADDRESS,
   SOL_TOKEN_BRIDGE_ADDRESS,
-  XPLA_LCD_CLIENT_CONFIG,
 } from "../utils/consts";
-import { LCDClient as XplaLCDClient } from "@xpla/xpla.js";
-import { getInjectiveWasmClient } from "../utils/injective";
-import { getAptosClient } from "../utils/aptos";
-import { makeNearProvider } from "../utils/near";
 
 export interface StateSafeWormholeWrappedInfo {
   isWrapped: boolean;
@@ -91,7 +67,6 @@ function useCheckIfWormholeWrapped(nft?: boolean) {
     ? setNFTSourceWormholeWrappedInfo
     : setTransferSourceWormholeWrappedInfo;
   const { provider } = useEthereumProvider();
-  const { accountId: nearAccountId } = useNearContext();
   const isRecovery = useSelector(
     nft ? selectNFTIsRecovery : selectTransferIsRecovery
   );
@@ -144,93 +119,6 @@ function useCheckIfWormholeWrapped(nft?: boolean) {
           }
         } catch (e) {}
       }
-      if (isTerraChain(sourceChain) && sourceAsset) {
-        try {
-          const lcd = new LCDClient(getTerraConfig(sourceChain));
-          const wrappedInfo = makeStateSafe(
-            await getOriginalAssetCosmWasm(lcd, sourceAsset, sourceChain)
-          );
-          if (!cancelled) {
-            dispatch(setSourceWormholeWrappedInfo(wrappedInfo));
-          }
-        } catch (e) {}
-      }
-      if (sourceChain === CHAIN_ID_XPLA && sourceAsset) {
-        try {
-          const lcd = new XplaLCDClient(XPLA_LCD_CLIENT_CONFIG);
-          const wrappedInfo = makeStateSafe(
-            await getOriginalAssetCosmWasm(lcd, sourceAsset, sourceChain)
-          );
-          if (!cancelled) {
-            dispatch(setSourceWormholeWrappedInfo(wrappedInfo));
-          }
-        } catch (e) {}
-      }
-      if (sourceChain === CHAIN_ID_APTOS && sourceAsset) {
-        try {
-          const wrappedInfo = makeStateSafe(
-            await getOriginalAssetAptos(
-              getAptosClient(),
-              getTokenBridgeAddressForChain(CHAIN_ID_APTOS),
-              sourceAsset
-            )
-          );
-          if (!cancelled) {
-            dispatch(setSourceWormholeWrappedInfo(wrappedInfo));
-          }
-        } catch (e) {
-          console.error(e);
-        }
-      }
-      if (sourceChain === CHAIN_ID_ALGORAND && sourceAsset) {
-        try {
-          const algodClient = new Algodv2(
-            ALGORAND_HOST.algodToken,
-            ALGORAND_HOST.algodServer,
-            ALGORAND_HOST.algodPort
-          );
-          const wrappedInfo = makeStateSafe(
-            await getOriginalAssetAlgorand(
-              algodClient,
-              ALGORAND_TOKEN_BRIDGE_ID,
-              BigInt(sourceAsset)
-            )
-          );
-          if (!cancelled) {
-            dispatch(setSourceWormholeWrappedInfo(wrappedInfo));
-          }
-        } catch (e) {}
-      }
-      if (sourceChain === CHAIN_ID_INJECTIVE && sourceAsset) {
-        try {
-          const client = getInjectiveWasmClient();
-          const wrappedInfo = makeStateSafe(
-            await getOriginalAssetInjective(sourceAsset, client)
-          );
-          if (!cancelled) {
-            dispatch(setSourceWormholeWrappedInfo(wrappedInfo));
-          }
-        } catch (e) {}
-      }
-      if (
-        sourceChain === CHAIN_ID_NEAR &&
-        nearAccountId &&
-        sourceAsset !== undefined
-      ) {
-        try {
-          const provider = makeNearProvider();
-          const wrappedInfo = makeStateSafe(
-            await getOriginalAssetNear(
-              provider,
-              NEAR_TOKEN_BRIDGE_ACCOUNT,
-              sourceAsset === NATIVE_NEAR_PLACEHOLDER ? "" : sourceAsset
-            )
-          );
-          if (!cancelled) {
-            dispatch(setSourceWormholeWrappedInfo(wrappedInfo));
-          }
-        } catch (e) {}
-      }
     })();
     return () => {
       cancelled = true;
@@ -244,7 +132,6 @@ function useCheckIfWormholeWrapped(nft?: boolean) {
     nft,
     setSourceWormholeWrappedInfo,
     tokenId,
-    nearAccountId,
   ]);
 }
 

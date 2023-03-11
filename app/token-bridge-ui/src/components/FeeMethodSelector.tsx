@@ -1,10 +1,6 @@
 import {
-  CHAIN_ID_ACALA,
-  CHAIN_ID_KARURA,
-  CHAIN_ID_TERRA,
   hexToNativeAssetString,
   isEVMChain,
-  isTerraChain,
 } from "@certusone/wormhole-sdk";
 import {
   Card,
@@ -18,7 +14,6 @@ import { parseUnits } from "ethers/lib/utils";
 import { useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import SmartAddress from "../components/SmartAddress";
-import { useAcalaRelayerInfo } from "../hooks/useAcalaRelayerInfo";
 import useRelayerInfo from "../hooks/useRelayerInfo";
 import { GasEstimateSummary } from "../hooks/useTransactionFees";
 import {
@@ -99,14 +94,9 @@ function FeeMethodSelector() {
         transferAmount,
         Math.min(sourceDecimals, 8)
       ).toString();
-    } catch (e) {}
+    } catch (e) { }
   }
   const sourceSymbol = sourceParsedTokenAccount?.symbol;
-  const acalaRelayerInfo = useAcalaRelayerInfo(
-    targetChain,
-    vaaNormalizedAmount,
-    originChain ? hexToNativeAssetString(originAsset, originChain) : undefined
-  );
   const sourceChain = useSelector(selectTransferSourceChain);
   const dispatch = useDispatch();
   const relayerSelected = !!useSelector(selectTransferUseRelayer);
@@ -118,17 +108,6 @@ function FeeMethodSelector() {
     relayerInfo.data.isRelayable &&
     relayerInfo.data.feeFormatted &&
     relayerInfo.data.feeUsd;
-
-  const targetIsAcala =
-    targetChain === CHAIN_ID_ACALA || targetChain === CHAIN_ID_KARURA;
-  const acalaRelayerEligible = acalaRelayerInfo.data?.shouldRelay;
-
-  const chooseAcalaRelayer = useCallback(() => {
-    if (targetIsAcala && acalaRelayerEligible) {
-      dispatch(setUseRelayer(true));
-      dispatch(setRelayerFee(undefined));
-    }
-  }, [dispatch, targetIsAcala, acalaRelayerEligible]);
 
   const chooseRelayer = useCallback(() => {
     if (relayerEligible) {
@@ -143,13 +122,7 @@ function FeeMethodSelector() {
   }, [dispatch]);
 
   useEffect(() => {
-    if (targetIsAcala) {
-      if (acalaRelayerEligible) {
-        chooseAcalaRelayer();
-      } else {
-        chooseManual();
-      }
-    } else if (relayerInfo.data?.isRelayable === true) {
+    if (relayerInfo.data?.isRelayable === true) {
       chooseRelayer();
     } else if (relayerInfo.data?.isRelayable === false) {
       chooseManual();
@@ -159,57 +132,7 @@ function FeeMethodSelector() {
     relayerInfo,
     chooseRelayer,
     chooseManual,
-    targetIsAcala,
-    acalaRelayerEligible,
-    chooseAcalaRelayer,
   ]);
-
-  const acalaRelayerContent = (
-    <Card
-      className={
-        classes.optionCardBase +
-        " " +
-        (relayerSelected ? classes.optionCardSelected : "") +
-        " " +
-        (acalaRelayerEligible ? classes.optionCardSelectable : "")
-      }
-      onClick={chooseAcalaRelayer}
-    >
-      <div className={classes.alignCenterContainer}>
-        <Checkbox
-          checked={relayerSelected}
-          disabled={!acalaRelayerEligible}
-          onClick={chooseAcalaRelayer}
-          className={classes.inlineBlock}
-        />
-        <div className={clsx(classes.inlineBlock, classes.alignLeft)}>
-          {acalaRelayerEligible ? (
-            <div>
-              <Typography variant="body1">
-                {CHAINS_BY_ID[targetChain].name}
-              </Typography>
-              <Typography variant="body2" color="textSecondary">
-                {CHAINS_BY_ID[targetChain].name} pays gas for you &#127881;
-              </Typography>
-            </div>
-          ) : (
-            <>
-              <Typography color="textSecondary" variant="body2">
-                {"Automatic redeem is unavailable for this token."}
-              </Typography>
-              <div />
-            </>
-          )}
-        </div>
-      </div>
-      {acalaRelayerEligible ? (
-        <>
-          <div></div>
-          <div></div>
-        </>
-      ) : null}
-    </Card>
-  );
 
   const relayerContent = (
     <Card
@@ -234,9 +157,8 @@ function FeeMethodSelector() {
             <div>
               <Typography variant="body1">Automatic Payment</Typography>
               <Typography variant="body2" color="textSecondary">
-                {`Pay with additional ${
-                  sourceSymbol ? sourceSymbol : "tokens"
-                } and use a relayer`}
+                {`Pay with additional ${sourceSymbol ? sourceSymbol : "tokens"
+                  } and use a relayer`}
               </Typography>
             </div>
           ) : (
@@ -296,15 +218,11 @@ function FeeMethodSelector() {
         <div className={clsx(classes.inlineBlock, classes.alignLeft)}>
           <Typography variant="body1">{"Manual Payment"}</Typography>
           <Typography variant="body2" color="textSecondary">
-            {`Pay with your own ${
-              isTerraChain(targetChain)
-                ? "funds"
-                : getDefaultNativeCurrencySymbol(targetChain)
-            } on ${CHAINS_BY_ID[targetChain]?.name || "target chain"}`}
+            {`Pay with your own ${getDefaultNativeCurrencySymbol(targetChain)} on ${CHAINS_BY_ID[targetChain]?.name || "target chain"}`}
           </Typography>
         </div>
       </div>
-      {(isEVMChain(targetChain) || targetChain === CHAIN_ID_TERRA) && (
+      {(isEVMChain(targetChain)) && (
         <GasEstimateSummary
           methodType="transfer"
           chainId={targetChain}
@@ -323,7 +241,7 @@ function FeeMethodSelector() {
       >
         How would you like to pay the target chain fees?
       </Typography>
-      {targetIsAcala ? acalaRelayerContent : relayerContent}
+      {relayerContent}
       {manualRedeemContent}
     </div>
   );

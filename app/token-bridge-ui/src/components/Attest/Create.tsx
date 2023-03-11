@@ -1,4 +1,3 @@
-import { isTerraChain } from "@certusone/wormhole-sdk";
 import { CircularProgress, makeStyles } from "@material-ui/core";
 import { useSelector } from "react-redux";
 import useFetchForeignAsset from "../../hooks/useFetchForeignAsset";
@@ -11,7 +10,6 @@ import {
 } from "../../store/selectors";
 import ButtonWithLoader from "../ButtonWithLoader";
 import KeyAndBalance from "../KeyAndBalance";
-import TerraFeeDenomPicker from "../TerraFeeDenomPicker";
 import WaitingForWalletMessage from "./WaitingForWalletMessage";
 
 const useStyles = makeStyles((theme) => ({
@@ -45,9 +43,6 @@ function Create() {
   return (
     <>
       <KeyAndBalance chainId={targetChain} />
-      {isTerraChain(targetChain) && (
-        <TerraFeeDenomPicker disabled={disabled} chainId={targetChain} />
-      )}
       {foreignAssetInfo.isFetching ? (
         <>
           <div className={classes.spacer} />

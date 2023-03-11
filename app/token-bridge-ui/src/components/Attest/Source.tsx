@@ -33,13 +33,13 @@ function Source() {
   const shouldLockFields = useSelector(selectAttestShouldLockFields);
   console.log('attest source: ', sourceAsset)
   const handleSourceChange = useCallback(
-    (event) => {
+    (event:any) => {
       dispatch(setSourceChain(event.target.value));
     },
     [dispatch]
   );
   const handleAssetChange = useCallback(
-    (event) => {
+    (event:any) => {
       dispatch(setSourceAsset(event.target.value));
     },
     [dispatch]

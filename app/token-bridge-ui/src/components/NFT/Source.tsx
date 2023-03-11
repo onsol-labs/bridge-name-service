@@ -42,7 +42,7 @@ function Source() {
   const shouldLockFields = useSelector(selectNFTShouldLockFields);
   const { isReady, statusMessage } = useIsWalletReady(sourceChain);
   const handleSourceChange = useCallback(
-    (event) => {
+    (event:any) => {
       dispatch(setSourceChain(event.target.value));
     },
     [dispatch]
@@ -57,7 +57,7 @@ function Source() {
     <>
       <StepDescription>
         <div style={{ display: "flex", alignItems: "center" }}>
-          Select an NFT to send through the Wormhole NFT Bridge.
+          Select an Domain to send through the Wormhole NFT Bridge.
           <div style={{ flexGrow: 1 }} />
           <div>
             <Button
@@ -81,7 +81,7 @@ function Source() {
         disabled={shouldLockFields}
         chains={CHAINS_WITH_NFT_SUPPORT}
       />
-      {isEVMChain(sourceChain) ? (
+      {/* {isEVMChain(sourceChain) ? (
         <Alert severity="info" variant="outlined">
           Only NFTs which implement ERC-721 are supported.
         </Alert>
@@ -90,7 +90,7 @@ function Source() {
         <Alert severity="info" variant="outlined">
           Only NFTs with a supply of 1 are supported.
         </Alert>
-      ) : null}
+      ) : null} */}
       <KeyAndBalance chainId={sourceChain} />
       {isReady || uiAmountString ? (
         <div className={classes.transferField}>

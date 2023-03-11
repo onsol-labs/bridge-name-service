@@ -1,72 +1,29 @@
 import {
   ChainId,
-  CHAIN_ID_ALGORAND,
-  CHAIN_ID_APTOS,
-  CHAIN_ID_INJECTIVE,
-  CHAIN_ID_KLAYTN,
   CHAIN_ID_SOLANA,
-  CHAIN_ID_XPLA,
-  createNonce,
-  getEmitterAddressAlgorand,
   getEmitterAddressEth,
-  getEmitterAddressInjective,
-  getEmitterAddressNear,
   getEmitterAddressSolana,
-  getEmitterAddressTerra,
-  getEmitterAddressXpla,
   hexToUint8Array,
   isEVMChain,
-  isTerraChain,
-  parseSequenceFromLogAlgorand,
   parseSequenceFromLogEth,
-  parseSequenceFromLogInjective,
-  parseSequenceFromLogNear,
   parseSequenceFromLogSolana,
-  parseSequenceFromLogTerra,
-  parseSequenceFromLogXpla,
-  TerraChainId,
-  transferFromAlgorand,
   transferFromEth,
   transferFromEthNative,
-  transferFromInjective,
   transferFromSolana,
-  transferFromTerra,
-  transferFromXpla,
   transferNativeSol,
-  transferNearFromNear,
-  transferTokenFromNear,
   uint8ArrayToHex,
 } from "@certusone/wormhole-sdk";
-import { transferTokens } from "@certusone/wormhole-sdk/lib/esm/aptos/api/tokenBridge";
-import { WalletStrategy } from "@injectivelabs/wallet-ts";
-import { CHAIN_ID_NEAR } from "@certusone/wormhole-sdk/lib/esm";
 import { Alert } from "@material-ui/lab";
-import { Wallet } from "@near-wallet-selector/core";
 import { WalletContextState } from "@solana/wallet-adapter-react";
 import { Connection } from "@solana/web3.js";
-import {
-  ConnectedWallet,
-  useConnectedWallet,
-} from "@terra-money/wallet-provider";
-import {
-  ConnectedWallet as XplaConnectedWallet,
-  useConnectedWallet as useXplaConnectedWallet,
-} from "@xpla/wallet-provider";
-import algosdk from "algosdk";
-import { Types } from "aptos";
 import { Signer } from "ethers";
 import { parseUnits, zeroPad } from "ethers/lib/utils";
 import { useSnackbar } from "notistack";
 import { useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useAlgorandContext } from "../contexts/AlgorandWalletContext";
-import { useAptosContext } from "../contexts/AptosWalletContext";
 import { useEthereumProvider } from "../contexts/EthereumProviderContext";
-import { useInjectiveContext } from "../contexts/InjectiveWalletContext";
-import { useNearContext } from "../contexts/NearWalletContext";
 import { useSolanaWallet } from "../contexts/SolanaWalletContext";
 import {
-  selectTerraFeeDenom,
   selectTransferAmount,
   selectTransferIsSendComplete,
   selectTransferIsSending,
@@ -85,36 +42,16 @@ import {
   setSignedVAAHex,
   setTransferTx,
 } from "../store/transferSlice";
-import { signSendAndConfirmAlgorand } from "../utils/algorand";
 import {
-  getAptosClient,
-  getEmitterAddressAndSequenceFromResult,
-  waitForSignAndSubmitTransaction,
-} from "../utils/aptos";
-import {
-  ALGORAND_BRIDGE_ID,
-  ALGORAND_HOST,
-  ALGORAND_TOKEN_BRIDGE_ID,
   getBridgeAddressForChain,
   getTokenBridgeAddressForChain,
-  NATIVE_NEAR_PLACEHOLDER,
-  NEAR_CORE_BRIDGE_ACCOUNT,
-  NEAR_TOKEN_BRIDGE_ACCOUNT,
   SOLANA_HOST,
   SOL_BRIDGE_ADDRESS,
   SOL_TOKEN_BRIDGE_ADDRESS,
 } from "../utils/consts";
 import { getSignedVAAWithRetry } from "../utils/getSignedVAAWithRetry";
-import { broadcastInjectiveTx } from "../utils/injective";
-import {
-  makeNearAccount,
-  makeNearProvider,
-  signAndSendTransactions,
-} from "../utils/near";
 import parseError from "../utils/parseError";
 import { signSendAndConfirm } from "../utils/solana";
-import { postWithFees, waitForTerraExecution } from "../utils/terra";
-import { postWithFeesXpla, waitForXplaExecution } from "../utils/xpla";
 import useTransferTargetAddressHex from "./useTransferTargetAddress";
 
 async function fetchSignedVAA(
@@ -157,123 +94,6 @@ function handleError(e: any, enqueueSnackbar: any, dispatch: any) {
   dispatch(setIsVAAPending(false));
 }
 
-async function algo(
-  dispatch: any,
-  enqueueSnackbar: any,
-  senderAddr: string,
-  tokenAddress: string,
-  decimals: number,
-  amount: string,
-  recipientChain: ChainId,
-  recipientAddress: Uint8Array,
-  chainId: ChainId,
-  relayerFee?: string
-) {
-  dispatch(setIsSending(true));
-  try {
-    const baseAmountParsed = parseUnits(amount, decimals);
-    const feeParsed = parseUnits(relayerFee || "0", decimals);
-    const transferAmountParsed = baseAmountParsed.add(feeParsed);
-    const algodClient = new algosdk.Algodv2(
-      ALGORAND_HOST.algodToken,
-      ALGORAND_HOST.algodServer,
-      ALGORAND_HOST.algodPort
-    );
-    const txs = await transferFromAlgorand(
-      algodClient,
-      ALGORAND_TOKEN_BRIDGE_ID,
-      ALGORAND_BRIDGE_ID,
-      senderAddr,
-      BigInt(tokenAddress),
-      transferAmountParsed.toBigInt(),
-      uint8ArrayToHex(recipientAddress),
-      recipientChain,
-      feeParsed.toBigInt()
-    );
-    const result = await signSendAndConfirmAlgorand(algodClient, txs);
-    const sequence = parseSequenceFromLogAlgorand(result);
-    dispatch(
-      setTransferTx({
-        id: txs[txs.length - 1].tx.txID(),
-        block: result["confirmed-round"],
-      })
-    );
-    enqueueSnackbar(null, {
-      content: <Alert severity="success">Transaction confirmed</Alert>,
-    });
-    const emitterAddress = getEmitterAddressAlgorand(ALGORAND_TOKEN_BRIDGE_ID);
-    await fetchSignedVAA(
-      chainId,
-      emitterAddress,
-      sequence,
-      enqueueSnackbar,
-      dispatch
-    );
-  } catch (e) {
-    handleError(e, enqueueSnackbar, dispatch);
-  }
-}
-
-async function aptos(
-  dispatch: any,
-  enqueueSnackbar: any,
-  tokenAddress: string,
-  decimals: number,
-  amount: string,
-  recipientChain: ChainId,
-  recipientAddress: Uint8Array,
-  chainId: ChainId,
-  signAndSubmitTransaction: (
-    transaction: Types.TransactionPayload,
-    options?: any
-  ) => Promise<{
-    hash: string;
-  }>,
-  relayerFee?: string
-) {
-  dispatch(setIsSending(true));
-  const tokenBridgeAddress = getTokenBridgeAddressForChain(CHAIN_ID_APTOS);
-  try {
-    const baseAmountParsed = parseUnits(amount, decimals);
-    const feeParsed = parseUnits(relayerFee || "0", decimals);
-    const transferAmountParsed = baseAmountParsed.add(feeParsed);
-    const transferPayload = transferTokens(
-      tokenBridgeAddress,
-      tokenAddress,
-      transferAmountParsed.toString(),
-      recipientChain,
-      recipientAddress,
-      feeParsed.toString(),
-      createNonce().readUInt32LE(0)
-    );
-    const hash = await waitForSignAndSubmitTransaction(
-      transferPayload,
-      signAndSubmitTransaction
-    );
-    dispatch(setTransferTx({ id: hash, block: 1 }));
-    enqueueSnackbar(null, {
-      content: <Alert severity="success">Transaction confirmed</Alert>,
-    });
-    const result = (await getAptosClient().waitForTransactionWithResult(
-      hash
-    )) as Types.UserTransaction;
-    const { emitterAddress, sequence } =
-      getEmitterAddressAndSequenceFromResult(result);
-    await fetchSignedVAA(
-      chainId,
-      emitterAddress,
-      sequence,
-      enqueueSnackbar,
-      dispatch
-    );
-  } catch (e) {
-    enqueueSnackbar(null, {
-      content: <Alert severity="error">{parseError(e)}</Alert>,
-    });
-    dispatch(setIsSending(false));
-  }
-}
-
 async function evm(
   dispatch: any,
   enqueueSnackbar: any,
@@ -292,31 +112,27 @@ async function evm(
     const baseAmountParsed = parseUnits(amount, decimals);
     const feeParsed = parseUnits(relayerFee || "0", decimals);
     const transferAmountParsed = baseAmountParsed.add(feeParsed);
-    // Klaytn requires specifying gasPrice
-    const overrides =
-      chainId === CHAIN_ID_KLAYTN
-        ? { gasPrice: (await signer.getGasPrice()).toString() }
-        : {};
+    const overrides = {};
     const receipt = isNative
       ? await transferFromEthNative(
-          getTokenBridgeAddressForChain(chainId),
-          signer,
-          transferAmountParsed,
-          recipientChain,
-          recipientAddress,
-          feeParsed,
-          overrides
-        )
+        getTokenBridgeAddressForChain(chainId),
+        signer,
+        transferAmountParsed,
+        recipientChain,
+        recipientAddress,
+        feeParsed,
+        overrides
+      )
       : await transferFromEth(
-          getTokenBridgeAddressForChain(chainId),
-          signer,
-          tokenAddress,
-          transferAmountParsed,
-          recipientChain,
-          recipientAddress,
-          feeParsed,
-          overrides
-        );
+        getTokenBridgeAddressForChain(chainId),
+        signer,
+        tokenAddress,
+        transferAmountParsed,
+        recipientChain,
+        recipientAddress,
+        feeParsed,
+        overrides
+      );
     dispatch(
       setTransferTx({ id: receipt.transactionHash, block: receipt.blockNumber })
     );
@@ -330,76 +146,6 @@ async function evm(
     const emitterAddress = getEmitterAddressEth(
       getTokenBridgeAddressForChain(chainId)
     );
-    await fetchSignedVAA(
-      chainId,
-      emitterAddress,
-      sequence,
-      enqueueSnackbar,
-      dispatch
-    );
-  } catch (e) {
-    handleError(e, enqueueSnackbar, dispatch);
-  }
-}
-
-async function near(
-  dispatch: any,
-  enqueueSnackbar: any,
-  wallet: Wallet,
-  senderAddr: string,
-  tokenAddress: string,
-  decimals: number,
-  amount: string,
-  recipientChain: ChainId,
-  recipientAddress: Uint8Array,
-  chainId: ChainId,
-  relayerFee?: string
-) {
-  dispatch(setIsSending(true));
-  try {
-    const baseAmountParsed = parseUnits(amount, decimals);
-    const feeParsed = parseUnits(relayerFee || "0", decimals);
-    const transferAmountParsed = baseAmountParsed.add(feeParsed);
-    const account = await makeNearAccount(senderAddr);
-    const msgs =
-      tokenAddress === NATIVE_NEAR_PLACEHOLDER
-        ? [
-            await transferNearFromNear(
-              makeNearProvider(),
-              NEAR_CORE_BRIDGE_ACCOUNT,
-              NEAR_TOKEN_BRIDGE_ACCOUNT,
-              transferAmountParsed.toBigInt(),
-              recipientAddress,
-              recipientChain,
-              feeParsed.toBigInt()
-            ),
-          ]
-        : await transferTokenFromNear(
-            makeNearProvider(),
-            account.accountId,
-            NEAR_CORE_BRIDGE_ACCOUNT,
-            NEAR_TOKEN_BRIDGE_ACCOUNT,
-            tokenAddress,
-            transferAmountParsed.toBigInt(),
-            recipientAddress,
-            recipientChain,
-            feeParsed.toBigInt()
-          );
-    const receipt = await signAndSendTransactions(account, wallet, msgs);
-    const sequence = parseSequenceFromLogNear(receipt);
-    dispatch(
-      setTransferTx({
-        id: receipt.transaction_outcome.id,
-        block: 0,
-      })
-    );
-    if (sequence === null) {
-      throw new Error("Unable to parse sequence from log");
-    }
-    enqueueSnackbar(null, {
-      content: <Alert severity="success">Transaction confirmed</Alert>,
-    });
-    const emitterAddress = getEmitterAddressNear(NEAR_TOKEN_BRIDGE_ACCOUNT);
     await fetchSignedVAA(
       chainId,
       emitterAddress,
@@ -439,30 +185,30 @@ async function solana(
       : undefined;
     const promise = isNative
       ? transferNativeSol(
-          connection,
-          SOL_BRIDGE_ADDRESS,
-          SOL_TOKEN_BRIDGE_ADDRESS,
-          payerAddress,
-          transferAmountParsed.toBigInt(),
-          targetAddress,
-          targetChain,
-          feeParsed.toBigInt()
-        )
+        connection,
+        SOL_BRIDGE_ADDRESS,
+        SOL_TOKEN_BRIDGE_ADDRESS,
+        payerAddress,
+        transferAmountParsed.toBigInt(),
+        targetAddress,
+        targetChain,
+        feeParsed.toBigInt()
+      )
       : transferFromSolana(
-          connection,
-          SOL_BRIDGE_ADDRESS,
-          SOL_TOKEN_BRIDGE_ADDRESS,
-          payerAddress,
-          fromAddress,
-          mintAddress,
-          transferAmountParsed.toBigInt(),
-          targetAddress,
-          targetChain,
-          originAddress,
-          originChain,
-          undefined,
-          feeParsed.toBigInt()
-        );
+        connection,
+        SOL_BRIDGE_ADDRESS,
+        SOL_TOKEN_BRIDGE_ADDRESS,
+        payerAddress,
+        fromAddress,
+        mintAddress,
+        transferAmountParsed.toBigInt(),
+        targetAddress,
+        targetChain,
+        originAddress,
+        originChain,
+        undefined,
+        feeParsed.toBigInt()
+      );
     const transaction = await promise;
     const txid = await signSendAndConfirm(wallet, connection, transaction);
     enqueueSnackbar(null, {
@@ -489,175 +235,6 @@ async function solana(
   }
 }
 
-async function terra(
-  dispatch: any,
-  enqueueSnackbar: any,
-  wallet: ConnectedWallet,
-  asset: string,
-  amount: string,
-  decimals: number,
-  targetChain: ChainId,
-  targetAddress: Uint8Array,
-  feeDenom: string,
-  chainId: TerraChainId,
-  relayerFee?: string
-) {
-  dispatch(setIsSending(true));
-  try {
-    const baseAmountParsed = parseUnits(amount, decimals);
-    const feeParsed = parseUnits(relayerFee || "0", decimals);
-    const transferAmountParsed = baseAmountParsed.add(feeParsed);
-    const tokenBridgeAddress = getTokenBridgeAddressForChain(chainId);
-    const msgs = await transferFromTerra(
-      wallet.terraAddress,
-      tokenBridgeAddress,
-      asset,
-      transferAmountParsed.toString(),
-      targetChain,
-      targetAddress,
-      feeParsed.toString()
-    );
-
-    const result = await postWithFees(
-      wallet,
-      msgs,
-      "Wormhole - Initiate Transfer",
-      [feeDenom],
-      chainId
-    );
-
-    const info = await waitForTerraExecution(result, chainId);
-    dispatch(setTransferTx({ id: info.txhash, block: info.height }));
-    enqueueSnackbar(null, {
-      content: <Alert severity="success">Transaction confirmed</Alert>,
-    });
-    const sequence = parseSequenceFromLogTerra(info);
-    if (!sequence) {
-      throw new Error("Sequence not found");
-    }
-    const emitterAddress = await getEmitterAddressTerra(tokenBridgeAddress);
-    await fetchSignedVAA(
-      chainId,
-      emitterAddress,
-      sequence,
-      enqueueSnackbar,
-      dispatch
-    );
-  } catch (e) {
-    handleError(e, enqueueSnackbar, dispatch);
-  }
-}
-
-async function xpla(
-  dispatch: any,
-  enqueueSnackbar: any,
-  wallet: XplaConnectedWallet,
-  asset: string,
-  amount: string,
-  decimals: number,
-  targetChain: ChainId,
-  targetAddress: Uint8Array,
-  relayerFee?: string
-) {
-  dispatch(setIsSending(true));
-  try {
-    const baseAmountParsed = parseUnits(amount, decimals);
-    const feeParsed = parseUnits(relayerFee || "0", decimals);
-    const transferAmountParsed = baseAmountParsed.add(feeParsed);
-    const tokenBridgeAddress = getTokenBridgeAddressForChain(CHAIN_ID_XPLA);
-    const msgs = await transferFromXpla(
-      wallet.xplaAddress,
-      tokenBridgeAddress,
-      asset,
-      transferAmountParsed.toString(),
-      targetChain,
-      targetAddress,
-      feeParsed.toString()
-    );
-
-    const result = await postWithFeesXpla(
-      wallet,
-      msgs,
-      "Wormhole - Initiate Transfer"
-    );
-
-    const info = await waitForXplaExecution(result);
-    dispatch(setTransferTx({ id: info.txhash, block: info.height }));
-    enqueueSnackbar(null, {
-      content: <Alert severity="success">Transaction confirmed</Alert>,
-    });
-    const sequence = parseSequenceFromLogXpla(info);
-    if (!sequence) {
-      throw new Error("Sequence not found");
-    }
-    const emitterAddress = await getEmitterAddressXpla(tokenBridgeAddress);
-    await fetchSignedVAA(
-      CHAIN_ID_XPLA,
-      emitterAddress,
-      sequence,
-      enqueueSnackbar,
-      dispatch
-    );
-  } catch (e) {
-    handleError(e, enqueueSnackbar, dispatch);
-  }
-}
-
-async function injective(
-  dispatch: any,
-  enqueueSnackbar: any,
-  wallet: WalletStrategy,
-  walletAddress: string,
-  asset: string,
-  amount: string,
-  decimals: number,
-  targetChain: ChainId,
-  targetAddress: Uint8Array,
-  relayerFee?: string
-) {
-  dispatch(setIsSending(true));
-  try {
-    const baseAmountParsed = parseUnits(amount, decimals);
-    const feeParsed = parseUnits(relayerFee || "0", decimals);
-    const transferAmountParsed = baseAmountParsed.add(feeParsed);
-    const tokenBridgeAddress =
-      getTokenBridgeAddressForChain(CHAIN_ID_INJECTIVE);
-    const msgs = await transferFromInjective(
-      walletAddress,
-      tokenBridgeAddress,
-      asset,
-      transferAmountParsed.toString(),
-      targetChain,
-      targetAddress,
-      feeParsed.toString()
-    );
-    const tx = await broadcastInjectiveTx(
-      wallet,
-      walletAddress,
-      msgs,
-      "Wormhole - Initiate Transfer"
-    );
-    dispatch(setTransferTx({ id: tx.txHash, block: tx.height }));
-    enqueueSnackbar(null, {
-      content: <Alert severity="success">Transaction confirmed</Alert>,
-    });
-    const sequence = parseSequenceFromLogInjective(tx);
-    if (!sequence) {
-      throw new Error("Sequence not found");
-    }
-    const emitterAddress = await getEmitterAddressInjective(tokenBridgeAddress);
-    await fetchSignedVAA(
-      CHAIN_ID_INJECTIVE,
-      emitterAddress,
-      sequence,
-      enqueueSnackbar,
-      dispatch
-    );
-  } catch (e) {
-    handleError(e, enqueueSnackbar, dispatch);
-  }
-}
-
 export function useHandleTransfer() {
   const dispatch = useDispatch();
   const { enqueueSnackbar } = useSnackbar();
@@ -674,14 +251,6 @@ export function useHandleTransfer() {
   const { signer } = useEthereumProvider();
   const solanaWallet = useSolanaWallet();
   const solPK = solanaWallet?.publicKey;
-  const terraWallet = useConnectedWallet();
-  const terraFeeDenom = useSelector(selectTerraFeeDenom);
-  const xplaWallet = useXplaConnectedWallet();
-  const { accounts: algoAccounts } = useAlgorandContext();
-  const { account: aptosAccount, signAndSubmitTransaction } = useAptosContext();
-  const aptosAddress = aptosAccount?.address?.toString();
-  const { wallet: injWallet, address: injAddress } = useInjectiveContext();
-  const { accountId: nearAccountId, wallet } = useNearContext();
   const sourceParsedTokenAccount = useSelector(
     selectTransferSourceParsedTokenAccount
   );
@@ -738,123 +307,6 @@ export function useHandleTransfer() {
         originChain,
         relayerFee
       );
-    } else if (
-      isTerraChain(sourceChain) &&
-      !!terraWallet &&
-      !!sourceAsset &&
-      decimals !== undefined &&
-      !!targetAddress
-    ) {
-      terra(
-        dispatch,
-        enqueueSnackbar,
-        terraWallet,
-        sourceAsset,
-        amount,
-        decimals,
-        targetChain,
-        targetAddress,
-        terraFeeDenom,
-        sourceChain,
-        relayerFee
-      );
-    } else if (
-      sourceChain === CHAIN_ID_XPLA &&
-      !!xplaWallet &&
-      !!sourceAsset &&
-      decimals !== undefined &&
-      !!targetAddress
-    ) {
-      xpla(
-        dispatch,
-        enqueueSnackbar,
-        xplaWallet,
-        sourceAsset,
-        amount,
-        decimals,
-        targetChain,
-        targetAddress,
-        relayerFee
-      );
-    } else if (
-      sourceChain === CHAIN_ID_ALGORAND &&
-      algoAccounts[0] &&
-      !!sourceAsset &&
-      decimals !== undefined &&
-      !!targetAddress
-    ) {
-      algo(
-        dispatch,
-        enqueueSnackbar,
-        algoAccounts[0].address,
-        sourceAsset,
-        decimals,
-        amount,
-        targetChain,
-        targetAddress,
-        sourceChain,
-        relayerFee
-      );
-    } else if (
-      sourceChain === CHAIN_ID_APTOS &&
-      aptosAddress &&
-      !!sourceAsset &&
-      decimals !== undefined &&
-      !!targetAddress
-    ) {
-      aptos(
-        dispatch,
-        enqueueSnackbar,
-        sourceAsset,
-        decimals,
-        amount,
-        targetChain,
-        targetAddress,
-        sourceChain,
-        signAndSubmitTransaction,
-        relayerFee
-      );
-    } else if (
-      sourceChain === CHAIN_ID_INJECTIVE &&
-      injWallet &&
-      injAddress &&
-      !!sourceAsset &&
-      decimals !== undefined &&
-      !!targetAddress
-    ) {
-      injective(
-        dispatch,
-        enqueueSnackbar,
-        injWallet,
-        injAddress,
-        sourceAsset,
-        amount,
-        decimals,
-        targetChain,
-        targetAddress,
-        relayerFee
-      );
-    } else if (
-      sourceChain === CHAIN_ID_NEAR &&
-      nearAccountId &&
-      wallet &&
-      !!sourceAsset &&
-      decimals !== undefined &&
-      !!targetAddress
-    ) {
-      near(
-        dispatch,
-        enqueueSnackbar,
-        wallet,
-        nearAccountId,
-        sourceAsset,
-        decimals,
-        amount,
-        targetChain,
-        targetAddress,
-        sourceChain,
-        relayerFee
-      );
     } else {
     }
   }, [
@@ -865,7 +317,6 @@ export function useHandleTransfer() {
     relayerFee,
     solanaWallet,
     solPK,
-    terraWallet,
     sourceTokenPublicKey,
     sourceAsset,
     amount,
@@ -875,15 +326,6 @@ export function useHandleTransfer() {
     originAsset,
     originChain,
     isNative,
-    terraFeeDenom,
-    algoAccounts,
-    xplaWallet,
-    aptosAddress,
-    signAndSubmitTransaction,
-    injWallet,
-    injAddress,
-    nearAccountId,
-    wallet,
   ]);
   return useMemo(
     () => ({

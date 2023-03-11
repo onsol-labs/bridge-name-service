@@ -1,12 +1,6 @@
 import {
-  CHAIN_ID_ALGORAND,
-  CHAIN_ID_APTOS,
-  CHAIN_ID_INJECTIVE,
-  CHAIN_ID_NEAR,
   CHAIN_ID_SOLANA,
-  CHAIN_ID_XPLA,
   isEVMChain,
-  isTerraChain,
 } from "@certusone/wormhole-sdk";
 import { TextField, Typography } from "@material-ui/core";
 import { useCallback } from "react";
@@ -28,15 +22,9 @@ import {
   setSourceParsedTokenAccount as setTransferSourceParsedTokenAccount,
   setSourceWalletAddress as setTransferSourceWalletAddress,
 } from "../../store/transferSlice";
-import AlgoTokenPicker from "./AlgoTokenPicker";
-import AptosTokenPicker from "./AptosTokenPicker";
 import EvmTokenPicker from "./EvmTokenPicker";
-import NearTokenPicker from "./NearTokenPicker";
 import RefreshButtonWrapper from "./RefreshButtonWrapper";
 import SolanaTokenPicker from "./SolanaTokenPicker";
-import TerraTokenPicker from "./TerraTokenPicker";
-import XplaTokenPicker from "./XplaTokenPicker";
-import InjectiveTokenPicker from "./InjectiveTokenPicker";
 
 type TokenSelectorProps = {
   disabled: boolean;
@@ -83,13 +71,12 @@ export const TokenSelector = (props: TokenSelectorProps) => {
   );
 
   const maps = useGetSourceParsedTokens(nft);
-  const resetAccountWrapper = maps?.resetAccounts || (() => {}); //This should never happen.
+  const resetAccountWrapper = maps?.resetAccounts || (() => { }); //This should never happen.
 
   //This is only for errors so bad that we shouldn't even mount the component
   const fatalError =
     !isEVMChain(lookupChain) &&
-    !isTerraChain(lookupChain) &&
-    maps?.tokenAccounts?.error; //Terra & EVM chains can proceed because they have advanced mode
+    maps?.tokenAccounts?.error; // EVM chains can proceed because they have advanced mode
 
   const content = fatalError ? (
     <RefreshButtonWrapper callback={resetAccountWrapper}>
@@ -114,55 +101,6 @@ export const TokenSelector = (props: TokenSelectorProps) => {
       resetAccounts={maps?.resetAccounts}
       chainId={lookupChain}
       nft={nft}
-    />
-  ) : isTerraChain(lookupChain) ? (
-    <TerraTokenPicker
-      value={sourceParsedTokenAccount || null}
-      disabled={disabled}
-      onChange={handleOnChange}
-      resetAccounts={maps?.resetAccounts}
-      tokenAccounts={maps?.tokenAccounts}
-      chainId={lookupChain}
-    />
-  ) : lookupChain === CHAIN_ID_XPLA ? (
-    <XplaTokenPicker
-      value={sourceParsedTokenAccount || null}
-      disabled={disabled}
-      onChange={handleOnChange}
-      resetAccounts={maps?.resetAccounts}
-      tokenAccounts={maps?.tokenAccounts}
-    />
-  ) : lookupChain === CHAIN_ID_APTOS ? (
-    <AptosTokenPicker
-      value={sourceParsedTokenAccount || null}
-      disabled={disabled}
-      onChange={handleOnChange}
-      resetAccounts={maps?.resetAccounts}
-      tokenAccounts={maps?.tokenAccounts}
-    />
-  ) : lookupChain === CHAIN_ID_ALGORAND ? (
-    <AlgoTokenPicker
-      value={sourceParsedTokenAccount || null}
-      disabled={disabled}
-      onChange={handleOnChange}
-      resetAccounts={maps?.resetAccounts}
-      tokenAccounts={maps?.tokenAccounts}
-    />
-  ) : lookupChain === CHAIN_ID_INJECTIVE ? (
-    <InjectiveTokenPicker
-      value={sourceParsedTokenAccount || null}
-      disabled={disabled}
-      onChange={handleOnChange}
-      resetAccounts={maps?.resetAccounts}
-      tokenAccounts={maps?.tokenAccounts}
-    />
-  ) : lookupChain === CHAIN_ID_NEAR ? (
-    <NearTokenPicker
-      value={sourceParsedTokenAccount || null}
-      disabled={disabled}
-      onChange={handleOnChange}
-      resetAccounts={maps?.resetAccounts}
-      tokenAccounts={maps?.tokenAccounts}
     />
   ) : (
     <TextField

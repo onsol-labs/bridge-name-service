@@ -16,7 +16,6 @@ import { GasEstimateSummary } from "../../hooks/useTransactionFees";
 import { incrementStep, setTargetChain } from "../../store/nftSlice";
 import {
   selectNFTIsTargetComplete,
-  selectNFTOriginAsset,
   selectNFTOriginChain,
   selectNFTOriginTokenId,
   selectNFTShouldLockFields,
@@ -84,7 +83,7 @@ function Target() {
   const { statusMessage } = useIsWalletReady(targetChain);
   useSyncTargetAddress(!shouldLockFields, true);
   const handleTargetChange = useCallback(
-    (event) => {
+    (event: any) => {
       dispatch(setTargetChain(event.target.value));
     },
     [dispatch]

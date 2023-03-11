@@ -1,4 +1,4 @@
-import { CHAIN_ID_SOLANA, isTerraChain } from "@certusone/wormhole-sdk";
+import { CHAIN_ID_SOLANA } from "@certusone/wormhole-sdk";
 import { Alert } from "@material-ui/lab";
 import { Link, makeStyles } from "@material-ui/core";
 import { useMemo } from "react";
@@ -17,7 +17,6 @@ import KeyAndBalance from "../KeyAndBalance";
 import TransactionProgress from "../TransactionProgress";
 import WaitingForWalletMessage from "./WaitingForWalletMessage";
 import { SOLANA_TOKEN_METADATA_PROGRAM_URL } from "../../utils/consts";
-import TerraFeeDenomPicker from "../TerraFeeDenomPicker";
 
 const useStyles = makeStyles((theme) => ({
   alert: {
@@ -63,9 +62,6 @@ function Send() {
   return (
     <>
       <KeyAndBalance chainId={sourceChain} />
-      {isTerraChain(sourceChain) && (
-        <TerraFeeDenomPicker disabled={disabled} chainId={sourceChain} />
-      )}
       <ButtonWithLoader
         disabled={!isReady || disabled}
         onClick={handleClick}
