@@ -18,7 +18,7 @@ import {
 import { arrayify } from "@ethersproject/bytes";
 import { Alert } from "@material-ui/lab";
 import { WalletContextState } from "@solana/wallet-adapter-react";
-import { Connection } from "@solana/web3.js";
+import { Connection, Transaction, PublicKey } from "@solana/web3.js";
 import { Signer } from "ethers";
 import { useSnackbar } from "notistack";
 import { useCallback, useMemo } from "react";
@@ -38,6 +38,7 @@ import { getMetadataAddress } from "../utils/metaplex";
 import parseError from "../utils/parseError";
 import { signSendAndConfirm } from "../utils/solana";
 import useNFTSignedVAA from "./useNFTSignedVAA";
+import { createNftAns, wrapDomain } from "../solana/handleInstructions";
 
 async function evm(
   dispatch: any,
@@ -87,7 +88,6 @@ async function solana(
       signedVAA
     );
     const claimInfo = await connection.getAccountInfo(claimAddress);
-    console.log(claimAddress.toBase58())
     let txid;
     if (!claimInfo) {
       await postVaaSolanaWithRetry(
@@ -115,7 +115,7 @@ async function solana(
       const { originChain, originAddress, tokenId } = parseNFTPayload(
         Buffer.from(new Uint8Array(parsedVAA.payload))
       );
-      console.log(originChain, originAddress, tokenId)
+      // console.log(originChain, originAddress, tokenId)
       const mintAddress = await getForeignAssetSol(
         SOL_NFT_BRIDGE_ADDRESS,
         originChain as ChainId,
@@ -134,6 +134,20 @@ async function solana(
         );
         txid = await signSendAndConfirm(wallet, connection, transaction);
       }
+      const { instructions, domainName } = await wrapDomain(tokenId.toHexString(), new PublicKey(payerAddress))
+      const transaction = new Transaction().add(...instructions);
+
+      const { blockhash } = await connection.getLatestBlockhash('finalized');
+      transaction.recentBlockhash = blockhash;
+      transaction.feePayer = new PublicKey(payerAddress);
+      txid = await signSendAndConfirm(wallet, connection, transaction);
+      const createAnsNftIx = await createNftAns(connection, domainName, new PublicKey(payerAddress));
+      const txn = new Transaction().add(...createAnsNftIx);
+
+      const { blockhash: newerBlockhash } = await connection.getLatestBlockhash('finalized');
+      txn.recentBlockhash = newerBlockhash;
+      txn.feePayer = new PublicKey(payerAddress);
+      txid = await signSendAndConfirm(wallet, connection, txn);
     }
     dispatch(setRedeemTx({ id: txid || "", block: 1 }));
     enqueueSnackbar(null, {
@@ -155,7 +169,7 @@ export function useHandleNFTRedeem() {
   const solPK = solanaWallet?.publicKey;
   const { signer } = useEthereumProvider();
   const signedVAA = useNFTSignedVAA();
-  console.log(signedVAA?.toString())
+  // console.log(signedVAA?.toString())
 
   const isRedeeming = useSelector(selectNFTIsRedeeming);
   const handleRedeemClick = useCallback(() => {

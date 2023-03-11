@@ -2,7 +2,7 @@ import axios from 'axios';
 import { Transaction } from '@solana/web3.js';
 import { BigNumber } from '@ethersproject/bignumber';
 import { BinaryReader } from 'borsh';
-import { createWrapDomainInstruction, WrapDomainInstructionAccounts, WrapDomainInstructionArgs } from './generated/instructions/wrapDomain';
+import { createWrapDomainInstruction, WrapDomainInstructionAccounts, WrapDomainInstructionArgs } from './bridge-name-service/generated/instructions/wrapDomain';
 import { findCollectionMint, findNameHouse, findNameRecord, findRenewableMintAddress, findTldHouse, findTldState, findTldTreasuryManager, getAtaForMint, getHashedName, getMasterEdition, getMetadata, getNameAccountKey, getParentNameKeyWithBump, mintAnsNft } from './utils/name_house';
 import * as config from "./config";
 import { Connection, PublicKey, SYSVAR_INSTRUCTIONS_PUBKEY, ComputeBudgetProgram, Keypair, VersionedTransaction, TransactionMessage, TransactionInstruction, AddressLookupTableProgram } from '@solana/web3.js';

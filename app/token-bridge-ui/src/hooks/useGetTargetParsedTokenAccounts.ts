@@ -25,7 +25,7 @@ function useGetTargetParsedTokenAccounts() {
   const dispatch = useDispatch();
   const targetChain = useSelector(selectTransferTargetChain);
   const targetAsset = useSelector(selectTransferTargetAsset);
-  console.log('targetAsset: ', targetAsset)
+  // console.log('targetAsset: ', targetAsset)
   const targetAssetArrayed = useMemo(
     () => (targetAsset ? [targetAsset] : []),
     [targetAsset]
@@ -59,7 +59,7 @@ function useGetTargetParsedTokenAccounts() {
     if (targetChain === CHAIN_ID_SOLANA && solPK) {
       let mint;
       try {
-        console.log('targetAsset', targetAsset)
+        // console.log('targetAsset', targetAsset)
         mint = new PublicKey(targetAsset);
       } catch (e) {
         return;
