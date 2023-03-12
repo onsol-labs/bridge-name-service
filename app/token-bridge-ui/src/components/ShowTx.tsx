@@ -14,13 +14,13 @@ export default function ShowTx({
   chainId: ChainId;
   tx: Transaction;
 }) {
-  const showExplorerLink = CLUSTER === "devnet" && chainId === CHAIN_ID_SOLANA;
+  const showExplorerLink = CLUSTER === "testnet" && chainId === CHAIN_ID_SOLANA;
   const explorerAddress =
     chainId === CHAIN_ID_ETH
-      ? `https://${CLUSTER === "devnet" ? "goerli." : ""}etherscan.io/tx/${tx?.id
+      ? `https://${CLUSTER === "testnet" ? "goerli." : ""}etherscan.io/tx/${tx?.id
       }`
       : chainId === CHAIN_ID_SOLANA
-        ? `https://solscan.io/tx/${tx?.id}${CLUSTER === "devnet"
+        ? `https://solscan.io/tx/${tx?.id}${CLUSTER === "testnet"
           ? "?cluster=devnet"
           : ""
         }`

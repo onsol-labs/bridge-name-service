@@ -29,7 +29,7 @@ export default function WaitingForWalletMessage() {
       {targetChain === CHAIN_ID_SOLANA && isRedeeming
         ? "Note: there will be several transactions"
         : isEVMChain(sourceChain) && isSending
-          ? "Note: there will be two transactions"
+          ? "Note: there will be several transactions"
           : null}
     </Typography>
   ) : null;

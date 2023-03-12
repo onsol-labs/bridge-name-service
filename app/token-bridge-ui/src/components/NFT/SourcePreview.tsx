@@ -17,12 +17,12 @@ export default function SourcePreview() {
   const explainerContent =
     sourceChain && sourceParsedTokenAccount ? (
       <>
-        <span>You will transfer 1 NFT of</span>
+        <span>You will transfer 1 </span>
         <SmartAddress
           chainId={sourceChain}
           parsedTokenAccount={sourceParsedTokenAccount}
         />
-        <span>from</span>
+        <span>Domain from</span>
         <SmartAddress
           chainId={sourceChain}
           address={sourceParsedTokenAccount?.publicKey}

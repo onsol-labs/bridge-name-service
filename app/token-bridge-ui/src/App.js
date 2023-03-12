@@ -51,7 +51,7 @@ function App() {
               margin="dense"
             >
               <MenuItem value="mainnet">Mainnet</MenuItem>
-              <MenuItem value="devnet">Devnet</MenuItem>
+              <MenuItem value="testnet">Devnet</MenuItem>
             </Select>
           </Toolbar>
         </AppBar>

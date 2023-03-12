@@ -203,7 +203,7 @@ export default function NFTViewer({
             maxWidth: "100%",
             width: 400,
             margin: `${theme.spacing(1)} auto`,
-            padding: 8,
+            padding: "8px",
             position: "relative",
             zIndex: 1,
             transition: "background-position 1s, transform 0.25s",
@@ -249,8 +249,8 @@ export default function NFTViewer({
         >
           <CardContent sx={{
             background: "transparent",
-            paddingTop: 4,
-            paddingBottom: 2,
+            paddingTop: 2,
+            paddingBottom: 1,
             display: "flex",
           }}>
             {metadata.nftName ? (
@@ -292,8 +292,8 @@ export default function NFTViewer({
           </CardMedia>
           <CardContent sx={{
             background: "transparent",
-            paddingTop: 4,
-            paddingBottom: 2,
+            paddingTop: 2,
+            paddingBottom: 1,
             "&:last-child": {
               //override rule
               paddingBottom: 2,
