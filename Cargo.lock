@@ -61,7 +61,7 @@ dependencies = [
 [[package]]
 name = "alt-name-service"
 version = "0.5.0"
-source = "git+https://github.com/onsol-labs/alternative-name-service.git?branch=v0.5.0#4d0674e4e864988ee4c70bcd631be1ba7b74ef8a"
+source = "git+https://github.com/onsol-labs/alternative-name-service.git?branch=v0.5.0#ce6aa5a39cde6d7ff7a647bad0e76374b7fd830d"
 dependencies = [
  "anchor-lang",
  "num-derive",
@@ -478,8 +478,6 @@ dependencies = [
  "anchor-spl",
  "arrayref",
  "mpl-token-metadata",
- "name-house",
- "nft-bridge-cpi",
  "solana-program",
  "spl-associated-token-account",
  "spl-name-service",
@@ -1182,23 +1180,6 @@ dependencies = [
  "solana-program",
  "spl-token",
  "thiserror",
-]
-
-[[package]]
-name = "name-house"
-version = "0.5.5"
-source = "git+https://github.com/onsol-labs/name_house.git?branch=v0.5.5#21699569dc7adca7a8201325e678602d0cc0ae06"
-dependencies = [
- "alt-name-service",
- "anchor-lang",
- "anchor-spl",
- "arrayref",
- "mpl-token-metadata",
- "solana-program",
- "spl-associated-token-account",
- "spl-token",
- "thiserror",
- "tld_house",
 ]
 
 [[package]]
@@ -2026,7 +2007,7 @@ dependencies = [
 [[package]]
 name = "tld_house"
 version = "0.5.5"
-source = "git+https://github.com/onsol-labs/tld-house.git?branch=v0.5.5#8b6b56e2ee152185e74324d2cf038f010448206c"
+source = "git+https://github.com/onsol-labs/tld-house.git?branch=v0.5.5#6aa311128e82b132cac764de5a014567c6d8f46d"
 dependencies = [
  "alt-name-service",
  "anchor-lang",
@@ -2076,9 +2057,9 @@ checksum = "497961ef93d974e23eb6f433eb5fe1b7930b659f06d12dec6fc44a8f554c0bba"
 
 [[package]]
 name = "uint"
-version = "0.9.1"
+version = "0.9.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6470ab50f482bde894a037a57064480a246dbfdd5960bd65a44824693f08da5f"
+checksum = "76f64bba2c53b04fcab63c01a7d7427eadc821e3bc48c34dc9ba29c501164b52"
 dependencies = [
  "byteorder",
  "crunchy",

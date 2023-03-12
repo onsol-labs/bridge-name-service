@@ -1,0 +1,383 @@
+{
+  "version": "0.1.0",
+  "name": "bridge_name_service",
+  "instructions": [
+    {
+      "name": "wrapDomain",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true,
+          "docs": [
+            "The fee payer account"
+          ]
+        },
+        {
+          "name": "bnsVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "vaultAtaAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tldState",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tldHouse",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "treasuryManager",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "paymentTokenMint",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Treasury mint account, either native SOL mint or a SPL token mint.",
+            "must exist in treasury manager"
+          ]
+        },
+        {
+          "name": "nameAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "reverseNameAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "bnsMintAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The nft mint"
+          ]
+        },
+        {
+          "name": "bnsMintAtaAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The nft mint"
+          ]
+        },
+        {
+          "name": "nameClassAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "nameParentAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "ataProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "The SPL token program account"
+          ]
+        },
+        {
+          "name": "tldHouseProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "The tld house program account"
+          ]
+        },
+        {
+          "name": "altNameServiceProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "The alt name service program account"
+          ]
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "The system program account"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "tld",
+          "type": "string"
+        },
+        {
+          "name": "hashedName",
+          "type": "bytes"
+        },
+        {
+          "name": "reverseAccHashedName",
+          "type": "bytes"
+        },
+        {
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "name": "space",
+          "type": "u32"
+        },
+        {
+          "name": "thBump",
+          "type": "u8"
+        },
+        {
+          "name": "nameParentBump",
+          "type": "u8"
+        },
+        {
+          "name": "durationRate",
+          "type": "u16"
+        }
+      ]
+    },
+    {
+      "name": "redeemNft",
+      "accounts": [
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": true,
+          "docs": [
+            "The fee payer account"
+          ]
+        },
+        {
+          "name": "bnsVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "vaultAtaAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tldState",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tldHouse",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "nameAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "bnsMintAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The nft mint"
+          ]
+        },
+        {
+          "name": "bnsMintAtaAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The nft mint"
+          ]
+        },
+        {
+          "name": "ansMintAccount",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "The nft mint"
+          ]
+        },
+        {
+          "name": "nameClassAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "nameParentAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "ataProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "The SPL token program account"
+          ]
+        },
+        {
+          "name": "tldHouseProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "The tld house program account"
+          ]
+        },
+        {
+          "name": "altNameServiceProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "The alt name service program account"
+          ]
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "The system program account"
+          ]
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Rent sysvar account"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "tld",
+          "type": "string"
+        },
+        {
+          "name": "hashedName",
+          "type": "bytes"
+        },
+        {
+          "name": "thBump",
+          "type": "u8"
+        },
+        {
+          "name": "name",
+          "type": "string"
+        }
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "PublicKeyMismatch",
+      "msg": "PublicKeyMismatch"
+    },
+    {
+      "code": 6001,
+      "name": "InvalidSeed",
+      "msg": "Invalid hash name seed length"
+    },
+    {
+      "code": 6002,
+      "name": "WrongNameAccount",
+      "msg": "Wrong name account"
+    },
+    {
+      "code": 6003,
+      "name": "WrongAccountOwner",
+      "msg": "Wrong account owner"
+    },
+    {
+      "code": 6004,
+      "name": "NotRentExempt",
+      "msg": "NotRentExempt"
+    },
+    {
+      "code": 6005,
+      "name": "MetadataDoesntExist",
+      "msg": "Metadata does not exist"
+    },
+    {
+      "code": 6006,
+      "name": "UninitializedAccount",
+      "msg": "Uninitialized Account"
+    },
+    {
+      "code": 6007,
+      "name": "DerivedKeyInvalid",
+      "msg": "Invalid Derived Key"
+    },
+    {
+      "code": 6008,
+      "name": "InvalidAccountData",
+      "msg": "Invalid Account Data"
+    },
+    {
+      "code": 6009,
+      "name": "MintMismatch",
+      "msg": "NFT Mint Mismatch"
+    },
+    {
+      "code": 6010,
+      "name": "InvalidNFTAmount",
+      "msg": "Invalid NFT Amount"
+    },
+    {
+      "code": 6011,
+      "name": "CollectionAlreadyCreated",
+      "msg": "Collection Already Created"
+    },
+    {
+      "code": 6012,
+      "name": "DataTypeMismatch",
+      "msg": "Data type mismatch"
+    },
+    {
+      "code": 6013,
+      "name": "NFTRecordInactive",
+      "msg": "NFT record inactive"
+    },
+    {
+      "code": 6014,
+      "name": "InvalidFeePayer",
+      "msg": "Fee payer is not an authority"
+    }
+  ],
+  "metadata": {
+    "address": "BQqpUU12TqvMm6NRwM9Lv7vKZLWwWzgaZh2Q2qvkmcbi",
+    "origin": "anchor",
+    "binaryVersion": "0.26.0",
+    "libVersion": "0.26.0"
+  }
+}

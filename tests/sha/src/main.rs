@@ -36,29 +36,29 @@ fn main() {
     println!("u256: {}", u256_result);
     // println!("raw bytes len: {}", hashed_bns_name.len());
 
-    let nft_bridge = Pubkey::from_str("2rHhojZ7hpu1zA91nvZmT8TqWWvMcKmmNBCr2mKTtMq4").unwrap();
-    let chain_id = 2_u16;
-    // let token_address =
-    //     hex::decode("000000000000000000000000Eefa53A14d3D8f5dA253F0E0CbCf6B66e07F03fD").unwrap();
-    let token_address = vec![
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 238, 250, 83, 161, 77, 61, 143, 93, 162, 83, 240, 224,
-        203, 207, 107, 102, 224, 127, 3, 253,
-    ];
-    // println!("token_address: {:?}", token_address);
+    // let nft_bridge = Pubkey::from_str("2rHhojZ7hpu1zA91nvZmT8TqWWvMcKmmNBCr2mKTtMq4").unwrap();
+    // let chain_id = 2_u16;
+    // // let token_address =
+    // //     hex::decode("000000000000000000000000Eefa53A14d3D8f5dA253F0E0CbCf6B66e07F03fD").unwrap();
+    // let token_address = vec![
+    //     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 238, 250, 83, 161, 77, 61, 143, 93, 162, 83, 240, 224,
+    //     203, 207, 107, 102, 224, 127, 3, 253,
+    // ];
+    // // println!("token_address: {:?}", token_address);
 
-    // println!("decoded = {:x}", decoded.unwrap().as_slice().as_ref());
-    let mut token_id = vec![0u8; 32];
-    u256_result.to_big_endian(&mut token_id);
+    // // println!("decoded = {:x}", decoded.unwrap().as_slice().as_ref());
+    // let mut token_id = vec![0u8; 32];
+    // u256_result.to_big_endian(&mut token_id);
 
-    let seeds = vec![
-        String::from("wrapped").as_bytes().to_vec(),
-        chain_id.to_be_bytes().to_vec(),
-        token_address,
-        token_id,
-    ];
-    let s: Vec<&[u8]> = seeds.iter().map(|item| item.as_slice()).collect();
-    let seed_slice = s.as_slice();
-    let (mint_account, _) = Pubkey::find_program_address(&seed_slice, &nft_bridge);
+    // let seeds = vec![
+    //     String::from("wrapped").as_bytes().to_vec(),
+    //     chain_id.to_be_bytes().to_vec(),
+    //     token_address,
+    //     token_id,
+    // ];
+    // let s: Vec<&[u8]> = seeds.iter().map(|item| item.as_slice()).collect();
+    // let seed_slice = s.as_slice();
+    // let (mint_account, _) = Pubkey::find_program_address(&seed_slice, &nft_bridge);
 
-    println!("{mint_account:} expected: 8xaKF8nWzoAbH8Hv7s9pdhKvpYgcMJ4TXhf8tHd2Gdq6")
+    // println!("{mint_account:} expected: 8xaKF8nWzoAbH8Hv7s9pdhKvpYgcMJ4TXhf8tHd2Gdq6")
 }

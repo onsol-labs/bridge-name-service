@@ -73,14 +73,16 @@ export async function transferFromEth(
   const bridneNSContractAddress = "0xEefa53A14d3D8f5dA253F0E0CbCf6B66e07F03fD";
   const ENSContractAddress = "0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85";
   const recipientChainId = coalesceChainId(recipientChain);
-  //TODO: should we check if token attestation exists on the target chain
+
+  // approve transfer of ensToken to bnsContract
   const ensToken = NFTImplementation__factory.connect(tokenAddress, signer);
   await (await ensToken.approve(bridneNSContractAddress, tokenID)).wait();
-  const bnsContract = BNS__factory.connect(bridneNSContractAddress, signer);
-  console.log('ok2')
 
+  // wraps ens token to bnsContract and creates bnsNFT
+  const bnsContract = BNS__factory.connect(bridneNSContractAddress, signer);
   await (await bnsContract.wrapNFT(ENSContractAddress, tokenID, overrides)).wait();
 
+  // bridge the bnsToken to wormhole
   const bnsToken = NFTImplementation__factory.connect(bridneNSContractAddress, signer);
   await (await bnsToken.approve(nftBridgeAddress, tokenID)).wait();
   const bridge = NFTBridge__factory.connect(nftBridgeAddress, signer);
@@ -90,7 +92,6 @@ export async function transferFromEth(
     recipientChainId,
     recipientAddress,
     createNonce(),
-    // overrides
   );
   const receipt = await v.wait();
   return receipt;
@@ -110,12 +111,8 @@ async function evm(
   dispatch(setIsSending(true));
   try {
     // Klaytn requires specifying gasPrice
-    const overrides = { gasPrice: (await signer.getGasPrice()).toString() };
-    console.log("tokenAddress: ", tokenAddress)
-    // tokenId = BigNumber.from(tokenId).toString()
-    console.log("tokenId: ", tokenId)
-    // console.log("getGasPrice: ", (await signer.getGasPrice()).toString())
-    // console.log("getNFTBridgeAddressForChain: ", getNFTBridgeAddressForChain(chainId))
+    // Klaytn has been removed from the so no need to override.
+    const overrides = {}
 
     const receipt = await transferFromEth(
       getNFTBridgeAddressForChain(chainId),
@@ -143,7 +140,7 @@ async function evm(
     enqueueSnackbar(null, {
       content: <Alert severity="info">Fetching VAA</Alert>,
     });
-    console.log('sequence useHandleNFTTransfer', sequence.toString())
+    // console.log('sequence useHandleNFTTransfer', sequence.toString())
     const { vaaBytes } = await getSignedVAAWithRetry(
       WORMHOLE_RPC_HOSTS,
       chainId,

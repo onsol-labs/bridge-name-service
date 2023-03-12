@@ -10,6 +10,12 @@ import { SolanaWalletProvider } from "./contexts/SolanaWalletContext.tsx";
 import ErrorBoundary from "./ErrorBoundary";
 import { theme } from "./muiTheme";
 import { store } from "./store";
+if (!window.localStorage) {
+  window.localStorage = require('localstorage-polyfill');
+}
+if (module.hot) {
+  module.hot.accept();
+}
 
 ReactDOM.render(
   <ErrorBoundary>

@@ -245,7 +245,7 @@ export default function TokenPicker({
       try {
         //Covalent balances tend to be stale, so we make an attempt to correct it at selection time.
         if (getAddress && !option.isNativeAsset) {
-          console.log('getting addy')
+          // console.log('getting addy')
           newOption = await getAddress(option.mintKey, option.nftName ?? "null", option.symbol ?? "null", option.uri ?? "null", option.tokenId,);
           newOption = {
             ...option,
@@ -254,7 +254,7 @@ export default function TokenPicker({
             logo: option.logo || newOption.logo,
             uri: option.uri || newOption.uri,
           } as NFTParsedTokenAccount;
-          console.log('newOption: ', newOption)
+          // console.log('newOption: ', newOption)
         } else {
           newOption = option;
         }
