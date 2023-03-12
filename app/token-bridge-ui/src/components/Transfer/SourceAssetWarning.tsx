@@ -1,16 +1,4 @@
 import { ChainId, isEVMChain } from "@certusone/wormhole-sdk";
-import { makeStyles } from "@material-ui/core";
-
-const useStyles = makeStyles((theme) => ({
-  container: {
-    marginTop: theme.spacing(2),
-    marginBottom: theme.spacing(2),
-  },
-  alert: {
-    marginTop: theme.spacing(1),
-    marginBottom: theme.spacing(1),
-  },
-}));
 
 export default function SourceAssetWarning({
   sourceChain,
@@ -32,7 +20,7 @@ export default function SourceAssetWarning({
 
   return (
     <>
-      { null}
+      {null}
     </>
   );
 }

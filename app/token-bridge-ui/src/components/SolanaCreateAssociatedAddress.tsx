@@ -6,8 +6,8 @@ import {
   hexToNativeString,
   hexToUint8Array,
 } from "@certusone/wormhole-sdk";
-import { Button, Typography } from "@material-ui/core";
-import { Alert } from "@material-ui/lab";
+import { Button, Typography } from "@mui/material";
+import { Alert } from "@mui/material";
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   Token,

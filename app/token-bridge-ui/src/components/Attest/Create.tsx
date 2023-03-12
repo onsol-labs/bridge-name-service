@@ -1,4 +1,4 @@
-import { CircularProgress, makeStyles } from "@material-ui/core";
+import { CircularProgress, Box } from "@mui/material";
 import { useSelector } from "react-redux";
 import useFetchForeignAsset from "../../hooks/useFetchForeignAsset";
 import { useHandleCreateWrapped } from "../../hooks/useHandleCreateWrapped";
@@ -12,19 +12,7 @@ import ButtonWithLoader from "../ButtonWithLoader";
 import KeyAndBalance from "../KeyAndBalance";
 import WaitingForWalletMessage from "./WaitingForWalletMessage";
 
-const useStyles = makeStyles((theme) => ({
-  alignCenter: {
-    margin: "0 auto",
-    display: "block",
-    textAlign: "center",
-  },
-  spacer: {
-    height: theme.spacing(2),
-  },
-}));
-
 function Create() {
-  const classes = useStyles();
   const targetChain = useSelector(selectAttestTargetChain);
   const originAsset = useSelector(selectAttestSourceAsset);
   const originChain = useSelector(selectAttestSourceChain);
@@ -45,8 +33,12 @@ function Create() {
       <KeyAndBalance chainId={targetChain} />
       {foreignAssetInfo.isFetching ? (
         <>
-          <div className={classes.spacer} />
-          <CircularProgress className={classes.alignCenter} />
+          <Box sx={{ height: 2 }} />
+          <CircularProgress sx={{
+            margin: "0 auto",
+            display: "block",
+            textAlign: "center"
+          }} />
         </>
       ) : (
         <>

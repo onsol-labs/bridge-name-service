@@ -6,10 +6,9 @@ import {
   Card,
   Checkbox,
   Chip,
-  makeStyles,
   Typography,
-} from "@material-ui/core";
-import clsx from "clsx";
+  Box,
+} from "@mui/material";
 import { parseUnits } from "ethers/lib/utils";
 import { useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -28,56 +27,7 @@ import {
 import { setRelayerFee, setUseRelayer } from "../store/transferSlice";
 import { CHAINS_BY_ID, getDefaultNativeCurrencySymbol } from "../utils/consts";
 
-const useStyles = makeStyles((theme) => ({
-  feeSelectorContainer: {
-    marginTop: "2rem",
-    textAlign: "center",
-  },
-  title: {
-    margin: theme.spacing(2),
-  },
-  optionCardBase: {
-    display: "flex",
-    margin: theme.spacing(2),
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: theme.spacing(1),
-    "& > *": {
-      margin: ".5rem",
-    },
-    border: "1px solid ",
-  },
-  alignCenterContainer: {
-    alignItems: "center",
-    display: "flex",
-    "& > *": {
-      margin: "0rem 1rem 0rem 1rem",
-    },
-  },
-  optionCardSelectable: {
-    "&:hover": {
-      cursor: "pointer",
-      boxShadow: "inset 0 0 100px 100px rgba(255, 255, 255, 0.1)",
-    },
-  },
-  optionCardSelected: {
-    border: "1px solid ",
-  },
-  inlineBlock: {
-    display: "inline-block",
-  },
-  alignLeft: {
-    textAlign: "left",
-  },
-  betaLabel: {
-    background: "linear-gradient(20deg, #f44b1b 0%, #eeb430 100%)",
-    marginLeft: theme.spacing(1),
-    fontSize: "120%",
-  },
-}));
-
 function FeeMethodSelector() {
-  const classes = useStyles();
   const originAsset = useSelector(selectTransferOriginAsset);
   const originChain = useSelector(selectTransferOriginChain);
   const targetChain = useSelector(selectTransferTargetChain);
@@ -136,23 +86,51 @@ function FeeMethodSelector() {
 
   const relayerContent = (
     <Card
-      className={
-        classes.optionCardBase +
-        " " +
-        (relayerSelected ? classes.optionCardSelected : "") +
-        " " +
-        (relayerEligible ? classes.optionCardSelectable : "")
-      }
+
+      sx={(theme) => ({
+        ...{
+          display: "flex",
+          margin: theme.spacing(2),
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: theme.spacing(1),
+          "& > *": {
+            margin: ".5rem",
+          },
+          border: "1px solid ",
+        },
+        ...(relayerSelected && {
+          border: "1px solid "
+        }),
+        ...(relayerEligible && {
+          "&:hover": {
+            cursor: "pointer",
+            boxShadow: "inset 0 0 100px 100px rgba(255, 255, 255, 0.1)",
+          },
+        }),
+      })}
+
       onClick={chooseRelayer}
     >
-      <div className={classes.alignCenterContainer}>
+      <Box
+        sx={{
+          alignItems: "center",
+          display: "flex",
+          "& > *": {
+            margin: "0rem 1rem 0rem 1rem",
+          },
+        }}>
         <Checkbox
           checked={relayerSelected}
           disabled={!relayerEligible}
           onClick={chooseRelayer}
-          className={classes.inlineBlock}
+          sx={{ display: "inline-block", }}
         />
-        <div className={clsx(classes.inlineBlock, classes.alignLeft)}>
+        <Box
+          sx={{
+            textAlign: "left",
+            display: "inline-block",
+          }}>
           {relayerEligible ? (
             <div>
               <Typography variant="body1">Automatic Payment</Typography>
@@ -169,17 +147,22 @@ function FeeMethodSelector() {
               <div />
             </>
           )}
-        </div>
-      </div>
+        </Box>
+      </Box>
       {/* TODO fixed number of decimals on these strings */}
       {relayerEligible ? (
         <>
           <div>
-            <Chip label="Beta" className={classes.betaLabel} />
+            <Chip label="Beta"
+              sx={(theme) => ({
+                background: "linear-gradient(20deg, #f44b1b 0%, #eeb430 100%)",
+                marginLeft: theme.spacing(1),
+                fontSize: "120%",
+              })} />
           </div>
           <div>
             <div>
-              <Typography className={classes.inlineBlock}>
+              <Typography sx={{ display: "inline-block", }}>
                 {/* Transfers are max 8 decimals */}
                 {parseFloat(relayerInfo.data?.feeFormatted || "0").toFixed(
                   Math.min(sourceParsedTokenAccount?.decimals || 8, 8)
@@ -200,28 +183,52 @@ function FeeMethodSelector() {
 
   const manualRedeemContent = (
     <Card
-      className={
-        classes.optionCardBase +
-        " " +
-        classes.optionCardSelectable +
-        " " +
-        (!relayerSelected ? classes.optionCardSelected : "")
-      }
+      sx={(theme) => ({
+        ...{
+          display: "flex",
+          margin: theme.spacing(2),
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: theme.spacing(1),
+          "& > *": {
+            margin: ".5rem",
+          },
+          border: "1px solid ",
+        },
+        ...({
+          border: "1px solid "
+        }),
+        ...(relayerEligible && {
+          "&:hover": {
+            cursor: "pointer",
+            boxShadow: "inset 0 0 100px 100px rgba(255, 255, 255, 0.1)",
+          },
+        }),
+      })}
       onClick={chooseManual}
     >
-      <div className={classes.alignCenterContainer}>
+      <Box sx={{
+        alignItems: "center",
+        display: "flex",
+        "& > *": {
+          margin: "0rem 1rem 0rem 1rem",
+        },
+      }}>
         <Checkbox
           checked={!relayerSelected}
           onClick={chooseManual}
-          className={classes.inlineBlock}
+          sx={{ display: "inline-block", }}
         />
-        <div className={clsx(classes.inlineBlock, classes.alignLeft)}>
+        <Box sx={{
+          textAlign: "left",
+          display: "inline-block",
+        }}>
           <Typography variant="body1">{"Manual Payment"}</Typography>
           <Typography variant="body2" color="textSecondary">
             {`Pay with your own ${getDefaultNativeCurrencySymbol(targetChain)} on ${CHAINS_BY_ID[targetChain]?.name || "target chain"}`}
           </Typography>
-        </div>
-      </div>
+        </Box>
+      </Box>
       {(isEVMChain(targetChain)) && (
         <GasEstimateSummary
           methodType="transfer"
@@ -233,9 +240,14 @@ function FeeMethodSelector() {
   );
 
   return (
-    <div className={classes.feeSelectorContainer}>
+    <Box sx={{
+      marginTop: "2rem",
+      textAlign: "center",
+    }}>
       <Typography
-        className={classes.title}
+        sx={(theme) => ({
+          margin: theme.spacing(2),
+        })}
         variant="subtitle2"
         color="textSecondary"
       >
@@ -243,7 +255,7 @@ function FeeMethodSelector() {
       </Typography>
       {relayerContent}
       {manualRedeemContent}
-    </div>
+    </Box >
   );
 }
 

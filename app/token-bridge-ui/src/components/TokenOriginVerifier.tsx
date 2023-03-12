@@ -9,12 +9,12 @@ import {
   Card,
   CircularProgress,
   Container,
-  makeStyles,
   MenuItem,
   TextField,
   Typography,
-} from "@material-ui/core";
-import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
+  Box
+} from "@mui/material";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import { useCallback, useMemo, useState } from "react";
 import useFetchForeignAsset, {
   ForeignAssetInfo,
@@ -28,33 +28,6 @@ import KeyAndBalance from "./KeyAndBalance";
 import SmartAddress from "./SmartAddress";
 import { RegisterNowButtonCore } from "./Transfer/RegisterNowButton";
 
-const useStyles = makeStyles((theme) => ({
-  flexBox: {
-    display: "flex",
-    width: "100%",
-    justifyContent: "center",
-    "& > *": {
-      margin: theme.spacing(2),
-    },
-  },
-  mainCard: {
-    padding: "32px 32px 16px",
-  },
-  spacer: {
-    height: theme.spacing(3),
-  },
-  centered: {
-    textAlign: "center",
-  },
-  arrowIcon: {
-    margin: "0 auto",
-    fontSize: "70px",
-  },
-  resultContainer: {
-    margin: theme.spacing(2),
-  },
-}));
-
 function PrimaryAssetInformation({
   lookupChain,
   lookupAsset,
@@ -67,7 +40,6 @@ function PrimaryAssetInformation({
   originAsset: string;
   showLoader: boolean;
 }) {
-  const classes = useStyles();
   const tokenArray = useMemo(() => [originAsset], [originAsset]);
   const metadata = useMetadata(originChain, tokenArray);
   console.log("metadata", metadata, originChain, tokenArray);
@@ -80,7 +52,14 @@ function PrimaryAssetInformation({
   const wrapped = (
     <div>
       <Typography>{`This is a wrapped asset! Here is the original token: `}</Typography>
-      <div className={classes.flexBox}>
+      <Box sx={(theme) => ({
+        display: "flex",
+        width: "100%",
+        justifyContent: "center",
+        "& > *": {
+          margin: theme.spacing(2),
+        },
+      })}>
         <Typography>{`Chain: ${CHAINS_BY_ID[originChain].name}`}</Typography>
         <div>
           <Typography component="div">
@@ -94,7 +73,7 @@ function PrimaryAssetInformation({
             />
           </Typography>
         </div>
-      </div>
+      </Box>
     </div>
   );
   return lookupChain === originChain ? nativeContent : wrapped;
@@ -109,7 +88,6 @@ function SecondaryAssetInformation({
   foreignAssetInfo?: ForeignAssetInfo;
   originAssetInfo?: OriginalAssetInfo;
 }) {
-  const classes = useStyles();
   const tokenArray: string[] = useMemo(() => {
     //Saved to a variable to help typescript cope
     const originAddress = originAssetInfo?.originAddress;
@@ -126,7 +104,7 @@ function SecondaryAssetInformation({
   return !originAssetInfo ? null : chainId === originAssetInfo.originChain ? (
     <div>
       <Typography>{`Transferring to ${CHAINS_BY_ID[chainId].name} will unwrap the token:`}</Typography>
-      <div className={classes.resultContainer}>
+      <Box sx={(theme) => ({ margin: theme.spacing(2) })}>
         <SmartAddress
           chainId={chainId}
           address={originAssetInfo.originAddress || undefined}
@@ -140,7 +118,7 @@ function SecondaryAssetInformation({
           }
           isAsset
         />
-      </div>
+      </Box>
     </div>
   ) : !foreignAssetInfo ? null : foreignAssetInfo.doesExist === false ? (
     <div>
@@ -162,7 +140,7 @@ function SecondaryAssetInformation({
   ) : (
     <div>
       <Typography>When bridged, this asset becomes: </Typography>
-      <div className={classes.resultContainer}>
+      <Box sx={(theme) => ({ margin: theme.spacing(2) })}>
         <SmartAddress
           chainId={chainId}
           address={foreignAssetInfo.address || undefined}
@@ -176,13 +154,12 @@ function SecondaryAssetInformation({
           }
           isAsset
         />
-      </div>
-    </div>
+      </Box>
+    </div >
   );
 }
 
 export default function TokenOriginVerifier() {
-  const classes = useStyles();
 
   const [primaryLookupChain, setPrimaryLookupChain] = useState(CHAIN_ID_SOLANA);
   const [primaryLookupAsset, setPrimaryLookupAsset] = useState("");
@@ -263,7 +240,7 @@ export default function TokenOriginVerifier() {
       <Typography variant="body1" color="textSecondary">
         Enter a token from any supported chain to get started.
       </Typography>
-      <div className={classes.spacer} />
+      <Box sx={(theme) => ({ height: theme.spacing(3) })} />
       <TextField
         select
         variant="outlined"
@@ -287,14 +264,14 @@ export default function TokenOriginVerifier() {
         value={primaryLookupAsset}
         onChange={handlePrimaryLookupAssetChange}
       />
-      <div className={classes.centered}>
+      <Box sx={{ textAlign: "center" }}>
         {isEVMChain(primaryLookupChain) ? (
           <KeyAndBalance chainId={primaryLookupChain} />
         ) : null}
         {primaryError ? (
           <Typography color="error">{primaryError}</Typography>
         ) : null}
-        <div className={classes.spacer} />
+        <Box sx={(theme) => ({ height: theme.spacing(3) })} />
         {originInfo.isFetching ? (
           <CircularProgress />
         ) : originInfo.data?.originChain && originInfo.data.originAddress ? (
@@ -306,7 +283,7 @@ export default function TokenOriginVerifier() {
             showLoader={originInfo.isFetching}
           />
         ) : null}
-      </div>
+      </Box>
     </>
   );
 
@@ -316,7 +293,7 @@ export default function TokenOriginVerifier() {
       <Typography variant="body1" color="textSecondary">
         Select a chain to see the result of bridging this token.
       </Typography>
-      <div className={classes.spacer} />
+      <Box sx={(theme) => ({ height: theme.spacing(3) })} />
       <TextField
         select
         variant="outlined"
@@ -332,14 +309,14 @@ export default function TokenOriginVerifier() {
           </MenuItem>
         ))}
       </TextField>
-      <div className={classes.centered}>
+      <Box sx={{ textAlign: "center" }}>
         {isEVMChain(secondaryLookupChain) ? (
           <KeyAndBalance chainId={secondaryLookupChain} />
         ) : null}
         {secondaryError ? (
           <Typography color="error">{secondaryError}</Typography>
         ) : null}
-        <div className={classes.spacer} />
+        <Box sx={(theme) => ({ height: theme.spacing(3) })} />
         {foreignAssetInfo.isFetching ? (
           <CircularProgress />
         ) : originInfo.data?.originChain && originInfo.data.originAddress ? (
@@ -349,23 +326,26 @@ export default function TokenOriginVerifier() {
             chainId={secondaryLookupChain}
           />
         ) : null}
-      </div>
+      </Box>
     </>
   ) : null;
 
   const content = (
     <div>
-      <Container maxWidth="md" className={classes.centered}>
+      <Container maxWidth="md" sx={{ textAlign: "center" }}>
         <HeaderText white>Token Origin Verifier</HeaderText>
       </Container>
       <Container maxWidth="sm">
-        <Card className={classes.mainCard}>{primaryContent}</Card>
+        <Card sx={{ padding: "32px 32px 16px" }}>{primaryContent}</Card>
         {secondaryContent ? (
           <>
-            <div className={classes.centered}>
-              <ArrowDropDownIcon className={classes.arrowIcon} />
-            </div>
-            <Card className={classes.mainCard}>{secondaryContent}</Card>
+            <Box sx={{ textAlign: "center" }}>
+              <ArrowDropDownIcon sx={{
+                margin: "0 auto",
+                fontSize: "70px",
+              }} />
+            </Box>
+            <Card sx={{ padding: "32px 32px 16px" }}>{secondaryContent}</Card>
           </>
         ) : null}
       </Container>

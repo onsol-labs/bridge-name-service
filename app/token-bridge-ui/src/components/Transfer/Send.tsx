@@ -1,6 +1,6 @@
 import { isEVMChain } from "@certusone/wormhole-sdk";
-import { Checkbox, FormControlLabel } from "@material-ui/core";
-import { Alert } from "@material-ui/lab";
+import { Checkbox, FormControlLabel } from "@mui/material";
+import { Alert } from "@mui/material";
 import { ethers } from "ethers";
 import { formatUnits, parseUnits } from "ethers/lib/utils";
 import { useCallback, useMemo, useState } from "react";

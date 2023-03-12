@@ -1,4 +1,4 @@
-import { makeStyles, Typography } from "@material-ui/core";
+import { Typography } from "@mui/material";
 import { useSelector } from "react-redux";
 import {
   selectAttestSourceChain,
@@ -6,21 +6,7 @@ import {
 } from "../../store/selectors";
 import ShowTx from "../ShowTx";
 
-const useStyles = makeStyles((theme) => ({
-  description: {
-    textAlign: "center",
-  },
-  tx: {
-    marginTop: theme.spacing(1),
-    textAlign: "center",
-  },
-  viewButton: {
-    marginTop: theme.spacing(1),
-  },
-}));
-
 export default function SendPreview() {
-  const classes = useStyles();
   const sourceChain = useSelector(selectAttestSourceChain);
   const attestTx = useSelector(selectAttestAttestTx);
 
@@ -31,7 +17,7 @@ export default function SendPreview() {
       <Typography
         component="div"
         variant="subtitle2"
-        className={classes.description}
+        sx={{ textAlign: "center" }}
       >
         {explainerString}
       </Typography>

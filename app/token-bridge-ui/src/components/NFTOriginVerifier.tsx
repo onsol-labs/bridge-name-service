@@ -16,13 +16,13 @@ import {
   Card,
   CircularProgress,
   Container,
-  makeStyles,
   MenuItem,
   TextField,
   Typography,
-} from "@material-ui/core";
-import { Launch } from "@material-ui/icons";
-import { Alert } from "@material-ui/lab";
+  Box
+} from "@mui/material";
+import { Launch } from "@mui/icons-material";
+import { Alert } from "@mui/material";
 import { Connection } from "@solana/web3.js";
 import { useCallback, useEffect, useState } from "react";
 import { useEthereumProvider } from "../contexts/EthereumProviderContext";
@@ -46,27 +46,7 @@ import HeaderText from "./HeaderText";
 import KeyAndBalance from "./KeyAndBalance";
 import NFTViewer from "./TokenSelectors/NFTViewer";
 
-const useStyles = makeStyles((theme) => ({
-  mainCard: {
-    padding: "32px 32px 16px",
-  },
-  originHeader: {
-    marginTop: theme.spacing(4),
-  },
-  viewButtonWrapper: {
-    textAlign: "center",
-  },
-  viewButton: {
-    marginTop: theme.spacing(1),
-  },
-  loaderWrapper: {
-    margin: theme.spacing(2),
-    textAlign: "center",
-  },
-}));
-
 export default function NFTOriginVerifier() {
-  const classes = useStyles();
   const { provider, signerAddress } = useEthereumProvider();
   const [lookupChain, setLookupChain] = useState<ChainId>(CHAIN_ID_ETH);
   const { isReady, statusMessage } = useIsWalletReady(lookupChain);
@@ -80,13 +60,13 @@ export default function NFTOriginVerifier() {
     WormholeWrappedNFTInfo | undefined
   >(undefined);
   const [isLoading, setIsLoading] = useState(false);
-  const handleChainChange = useCallback((event:any) => {
+  const handleChainChange = useCallback((event: any) => {
     setLookupChain(event.target.value);
   }, []);
-  const handleAssetChange = useCallback((event:any) => {
+  const handleAssetChange = useCallback((event: any) => {
     setLookupAsset(event.target.value);
   }, []);
-  const handleTokenIdChange = useCallback((event:any) => {
+  const handleTokenIdChange = useCallback((event: any) => {
     setLookupTokenId(event.target.value);
   }, []);
   useEffect(() => {
@@ -215,7 +195,9 @@ export default function NFTOriginVerifier() {
         <HeaderText white>NFT Origin Verifier</HeaderText>
       </Container>
       <Container maxWidth="sm">
-        <Card className={classes.mainCard}>
+        <Card sx={{
+          padding: "32px 32px 16px",
+        }}>
           <Alert severity="info" variant="outlined">
             This page allows you to find where a Wormhole-bridged NFT was
             originally minted so you can verify its authenticity.
@@ -262,9 +244,12 @@ export default function NFTOriginVerifier() {
             </Typography>
           ) : null}
           {isLoading ? (
-            <div className={classes.loaderWrapper}>
+            <Box sx={{
+              margin: 1,
+              textAlign: "center"
+            }}>
               <CircularProgress />
-            </div>
+            </Box>
           ) : null}
           {parsedTokenAccount ? (
             <NFTViewer value={parsedTokenAccount} chainId={lookupChain} />
@@ -274,7 +259,9 @@ export default function NFTOriginVerifier() {
               <Typography
                 variant="h5"
                 gutterBottom
-                className={classes.originHeader}
+                sx={{
+                  marginTop: 4,
+                }}
               >
                 Origin Info
               </Typography>
@@ -289,14 +276,16 @@ export default function NFTOriginVerifier() {
                   Token ID: {originInfo.tokenId}
                 </Typography>
               )}
-              <div className={classes.viewButtonWrapper}>
+              <Box sx={{
+                textAlign: "center",
+              }}>
                 {originInfo.chainId === CHAIN_ID_SOLANA ? (
                   <Button
                     href={`https://solscan.io/token/${readableAddress}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     startIcon={<Launch />}
-                    className={classes.viewButton}
+                    sx={{ marginTop: 1 }}
                     variant="outlined"
                   >
                     View on Solscan
@@ -307,17 +296,17 @@ export default function NFTOriginVerifier() {
                     target="_blank"
                     rel="noopener noreferrer"
                     startIcon={<Launch />}
-                    className={classes.viewButton}
+                    sx={{ marginTop: 1 }}
                     variant="outlined"
                   >
                     View on OpenSea
                   </Button>
                 )}
-              </div>
+              </Box>
             </>
           ) : null}
         </Card>
       </Container>
-    </div>
+    </div >
   );
 }

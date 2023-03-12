@@ -5,8 +5,8 @@ import {
 } from "@certusone/wormhole-sdk";
 import { Provider } from "@ethersproject/abstract-provider";
 import { formatUnits } from "@ethersproject/units";
-import { Typography } from "@material-ui/core";
-import { LocalGasStation } from "@material-ui/icons";
+import { Typography } from "@mui/material";
+import { LocalGasStation } from "@mui/icons-material";
 import { Connection, PublicKey } from "@solana/web3.js";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useEthereumProvider } from "../contexts/EthereumProviderContext";

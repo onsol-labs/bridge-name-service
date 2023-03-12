@@ -1,18 +1,5 @@
-import { Button, makeStyles, Tooltip } from "@material-ui/core";
-import { LinkOff } from "@material-ui/icons";
-
-const useStyles = makeStyles((theme) => ({
-  button: {
-    display: "flex",
-    margin: `${theme.spacing(1)}px auto`,
-    width: "100%",
-    maxWidth: 400,
-  },
-  icon: {
-    height: 24,
-    width: 24,
-  },
-}));
+import { Button, Tooltip, Box } from "@mui/material";
+import { LinkOff } from "@mui/icons-material";
 
 const ToggleConnectedButton = ({
   connect,
@@ -27,19 +14,26 @@ const ToggleConnectedButton = ({
   pk: string;
   walletIcon?: string;
 }) => {
-  const classes = useStyles();
   const is0x = pk.startsWith("0x");
   return connected ? (
     <Tooltip title={pk}>
       <Button
-        color="default"
+        color="primary"
         variant="outlined"
         size="small"
         onClick={disconnect}
-        className={classes.button}
+        sx={{
+          display: "flex",
+          margin: `1px auto`,
+          width: "100%",
+          maxWidth: 400,
+        }}
         startIcon={
           walletIcon ? (
-            <img className={classes.icon} src={walletIcon} alt="Wallet" />
+            <Box component="img" sx={{
+              height: 24,
+              width: 24,
+            }} src={walletIcon} alt="Wallet" />
           ) : (
             <LinkOff />
           )
@@ -55,7 +49,12 @@ const ToggleConnectedButton = ({
       variant="contained"
       size="small"
       onClick={connect}
-      className={classes.button}
+      sx={{
+        display: "flex",
+        margin: `1px auto`,
+        width: "100%",
+        maxWidth: 400,
+      }}
     >
       Connect
     </Button>

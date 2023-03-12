@@ -5,8 +5,8 @@ import {
   DialogContent,
   DialogTitle,
   Typography,
-} from "@material-ui/core";
-import { ArrowDownward } from "@material-ui/icons";
+} from "@mui/material";
+import { ArrowDownward } from "@mui/icons-material";
 import { useSelector } from "react-redux";
 import {
   selectTransferSourceChain,

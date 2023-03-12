@@ -7,9 +7,9 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
-  makeStyles,
-} from "@material-ui/core";
-import CloseIcon from "@material-ui/icons/Close";
+  Box,
+} from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 import { useCallback } from "react";
 import {
   Connection,
@@ -18,24 +18,6 @@ import {
 } from "../contexts/EthereumProviderContext";
 import { getEvmChainId } from "../utils/consts";
 import { EVM_RPC_MAP } from "../utils/metaMaskChainParameters";
-
-const useStyles = makeStyles((theme) => ({
-  flexTitle: {
-    display: "flex",
-    alignItems: "center",
-    "& > div": {
-      flexGrow: 1,
-      marginRight: theme.spacing(4),
-    },
-    "& > button": {
-      marginRight: theme.spacing(-1),
-    },
-  },
-  icon: {
-    height: 24,
-    width: 24,
-  },
-}));
 
 const WalletOptions = ({
   connection,
@@ -46,7 +28,6 @@ const WalletOptions = ({
   connect: (connectType: ConnectType) => void;
   onClose: () => void;
 }) => {
-  const classes = useStyles();
 
   const handleClick = useCallback(() => {
     connect(connection.connectType);
@@ -56,10 +37,14 @@ const WalletOptions = ({
   return (
     <ListItem button onClick={handleClick}>
       <ListItemIcon>
-        <img
+        <Box
+          component="img"
           src={connection.icon}
           alt={connection.name}
-          className={classes.icon}
+          sx={{
+            height: 24,
+            width: 24,
+          }}
         />
       </ListItemIcon>
       <ListItemText>{connection.name}</ListItemText>
@@ -77,7 +62,6 @@ const EvmConnectWalletDialog = ({
   chainId: ChainId;
 }) => {
   const { availableConnections, connect } = useEthereumProvider();
-  const classes = useStyles();
 
   const availableWallets = availableConnections
     .filter((connection) => {
@@ -105,12 +89,22 @@ const EvmConnectWalletDialog = ({
   return (
     <Dialog open={isOpen} onClose={onClose}>
       <DialogTitle>
-        <div className={classes.flexTitle}>
+        <Box sx={{
+          display: "flex",
+          alignItems: "center",
+          "& > div": {
+            flexGrow: 1,
+            marginRight: 4,
+          },
+          "& > button": {
+            marginRight: -1,
+          },
+        }}>
           <div>Select your wallet</div>
-          <IconButton onClick={onClose}>
+          <IconButton onClick={onClose} size="large">
             <CloseIcon />
           </IconButton>
-        </div>
+        </Box>
       </DialogTitle>
       <List>{availableWallets}</List>
     </Dialog>

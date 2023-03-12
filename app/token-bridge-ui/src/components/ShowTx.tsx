@@ -3,19 +3,9 @@ import {
   CHAIN_ID_ETH,
   CHAIN_ID_SOLANA,
 } from "@certusone/wormhole-sdk";
-import { Button, makeStyles, Typography } from "@material-ui/core";
+import { Button, Typography, Box } from "@mui/material";
 import { Transaction } from "../store/transferSlice";
 import { CLUSTER, getExplorerName } from "../utils/consts";
-
-const useStyles = makeStyles((theme) => ({
-  tx: {
-    marginTop: theme.spacing(1),
-    textAlign: "center",
-  },
-  viewButton: {
-    marginTop: theme.spacing(1),
-  },
-}));
 
 export default function ShowTx({
   chainId,
@@ -24,7 +14,6 @@ export default function ShowTx({
   chainId: ChainId;
   tx: Transaction;
 }) {
-  const classes = useStyles();
   const showExplorerLink = CLUSTER === "devnet" && chainId === CHAIN_ID_SOLANA;
   const explorerAddress =
     chainId === CHAIN_ID_ETH
@@ -39,7 +28,10 @@ export default function ShowTx({
   const explorerName = getExplorerName(chainId);
 
   return (
-    <div className={classes.tx}>
+    <Box sx={{
+      marginTop: 1,
+      textAlign: "center",
+    }}>
       <Typography noWrap component="div" variant="body2">
         {tx.id}
       </Typography>
@@ -50,11 +42,11 @@ export default function ShowTx({
           rel="noopener noreferrer"
           size="small"
           variant="outlined"
-          className={classes.viewButton}
+          sx={{ marginTop: 1 }}
         >
           View on {explorerName}
         </Button>
       ) : null}
-    </div>
+    </Box>
   );
 }

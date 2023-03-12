@@ -3,7 +3,7 @@ import {
   InputAdornment,
   TextField,
   TextFieldProps,
-} from "@material-ui/core";
+} from "@mui/material";
 
 export default function NumberTextField({
   onMaxClick,

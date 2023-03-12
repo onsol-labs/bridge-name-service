@@ -16,7 +16,7 @@ import {
   redeemOnSolana,
 } from "@certusone/wormhole-sdk/lib/esm/nft_bridge";
 import { arrayify } from "@ethersproject/bytes";
-import { Alert } from "@material-ui/lab";
+import { Alert } from "@mui/material";
 import { WalletContextState } from "@solana/wallet-adapter-react";
 import { Connection, Transaction, PublicKey } from "@solana/web3.js";
 import { Signer } from "ethers";

@@ -1,5 +1,5 @@
-import { CssBaseline } from "@material-ui/core";
-import { ThemeProvider } from "@material-ui/core/styles";
+import CssBaseline from "@mui/material/CssBaseline";
+import { ThemeProvider, StyledEngineProvider } from "@mui/material/styles";
 import { SnackbarProvider } from "notistack";
 import ReactDOM from "react-dom";
 import { Provider } from "react-redux";
@@ -18,23 +18,25 @@ if (module.hot) {
 }
 
 ReactDOM.render(
-  <ErrorBoundary>
-    <Provider store={store}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <ErrorBoundary>
-          <SnackbarProvider maxSnack={3}>
-            <SolanaWalletProvider>
-              <EthereumProviderProvider>
-                <BrowserRouter>
-                  <App />
-                </BrowserRouter>
-              </EthereumProviderProvider>
-            </SolanaWalletProvider>
-          </SnackbarProvider>
-        </ErrorBoundary>
-      </ThemeProvider>
-    </Provider>
-  </ErrorBoundary>,
+  <StyledEngineProvider injectFirst>
+    <ThemeProvider theme={theme}>
+      <ErrorBoundary>
+        <Provider store={store}>
+          <CssBaseline />
+          <ErrorBoundary>
+            <SnackbarProvider maxSnack={3}>
+              <SolanaWalletProvider>
+                <EthereumProviderProvider>
+                  <BrowserRouter>
+                    <App />
+                  </BrowserRouter>
+                </EthereumProviderProvider>
+              </SolanaWalletProvider>
+            </SnackbarProvider>
+          </ErrorBoundary>
+        </Provider>
+      </ErrorBoundary>
+    </ThemeProvider >
+  </StyledEngineProvider>,
   document.getElementById("root")
 );

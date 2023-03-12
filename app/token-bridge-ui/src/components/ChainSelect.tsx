@@ -1,34 +1,21 @@
 import {
   ListItemIcon,
   ListItemText,
-  makeStyles,
   MenuItem,
   OutlinedTextFieldProps,
   TextField,
-} from "@material-ui/core";
+  Box
+} from "@mui/material";
 import clsx from "clsx";
 import { ChainInfo } from "../utils/consts";
 
-const useStyles = makeStyles((theme) => ({
-  select: {
-    "& .MuiSelect-root": {
-      display: "flex",
-      alignItems: "center",
-    },
-  },
-  listItemIcon: {
-    minWidth: 40,
-  },
-  icon: {
-    height: 24,
-    maxWidth: 24,
-  },
-}));
-
-const createChainMenuItem = ({ id, name, logo }: ChainInfo, classes: any) => (
+const createChainMenuItem = ({ id, name, logo }: ChainInfo) => (
   <MenuItem key={id} value={id}>
-    <ListItemIcon className={classes.listItemIcon}>
-      <img src={logo} alt={name} className={classes.icon} />
+    <ListItemIcon sx={{ minWidth: 40 }}>
+      <Box component="img" src={logo} alt={name} sx={{
+        height: 24,
+        maxWidth: 24,
+      }} />
     </ListItemIcon>
     <ListItemText>{name}</ListItemText>
   </MenuItem>
@@ -39,11 +26,21 @@ interface ChainSelectProps extends OutlinedTextFieldProps {
 }
 
 export default function ChainSelect({ chains, ...rest }: ChainSelectProps) {
-  const classes = useStyles();
 
   return (
-    <TextField {...rest} className={clsx(classes.select, rest.className)}>
-      {chains.map((chain) => createChainMenuItem(chain, classes))}
+    <TextField {...rest}
+      sx={({
+        ...{
+          "& .MuiSelect-root": {
+            display: "flex",
+            alignItems: "center",
+          }
+        },
+      })
+      }
+    // className={clsx(classes.select, rest.className)}
+    >
+      {chains.map((chain) => createChainMenuItem(chain))}
     </TextField>
   );
 }

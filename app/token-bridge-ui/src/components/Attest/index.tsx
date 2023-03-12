@@ -4,8 +4,8 @@ import {
   StepButton,
   StepContent,
   Stepper,
-} from "@material-ui/core";
-import { Alert } from "@material-ui/lab";
+} from "@mui/material";
+import { Alert } from "@mui/material";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setStep } from "../../store/attestSlice";

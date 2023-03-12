@@ -10,11 +10,11 @@ import {
   CircularProgress,
   FormControlLabel,
   Link,
-  makeStyles,
   Tooltip,
   Typography,
-} from "@material-ui/core";
-import { Alert } from "@material-ui/lab";
+  Box
+} from "@mui/material";
+import { Alert } from "@mui/material";
 import { useCallback, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import useGetIsTransferCompleted from "../../hooks/useGetIsTransferCompleted";
@@ -41,17 +41,6 @@ import AddToMetamask from "./AddToMetamask";
 import RedeemPreview from "./RedeemPreview";
 import WaitingForWalletMessage from "./WaitingForWalletMessage";
 
-const useStyles = makeStyles((theme) => ({
-  alert: {
-    marginTop: theme.spacing(1),
-    marginBottom: theme.spacing(1),
-  },
-  centered: {
-    margin: theme.spacing(4, 0, 2),
-    textAlign: "center",
-  },
-}));
-
 function Redeem() {
   const {
     handleClick,
@@ -77,7 +66,6 @@ function Redeem() {
       useRelayer ? false : true,
       useRelayer ? 5000 : undefined
     );
-  const classes = useStyles();
   const dispatch = useDispatch();
   const { isReady, statusMessage } = useIsWalletReady(targetChain);
   //TODO better check, probably involving a hook & the VAA
@@ -110,14 +98,24 @@ function Redeem() {
       {!isReady &&
         isEVMChain(targetChain) &&
         !isTransferCompleted ? (
-        <Typography className={classes.centered}>
+        <Typography sx={{
+          marginTop: 4,
+          mx: 0,
+          marginBottom: 2,
+          textAlign: "center",
+        }}>
           {"Please connect your wallet to check for transfer completion."}
         </Typography>
       ) : null}
 
       {(!isEVMChain(targetChain) || isReady) &&
         !isTransferCompleted ? (
-        <div className={classes.centered}>
+        <Box sx={{
+          marginTop: 4,
+          mx: 0,
+          marginBottom: 2,
+          textAlign: "center",
+        }}>
           <CircularProgress style={{ marginBottom: 16 }} />
           <Typography>
             {"Waiting for a relayer to process your transfer."}
@@ -132,7 +130,7 @@ function Redeem() {
               Manually redeem instead
             </Button>
           </Tooltip>
-        </div>
+        </Box>
       ) : null}
 
       {isTransferCompleted ? (
@@ -183,7 +181,12 @@ function Redeem() {
       </>
 
       {useRelayer && !isTransferCompleted ? (
-        <div className={classes.centered}>
+        <Box sx={{
+          marginTop: 4,
+          mx: 0,
+          marginBottom: 2,
+          textAlign: "center",
+        }}>
           <Button
             onClick={handleSwitchToRelayViewClick}
             size="small"
@@ -192,12 +195,15 @@ function Redeem() {
           >
             Return to relayer view
           </Button>
-        </div>
+        </Box>
       ) : null}
 
       {isRecovery && isReady && isTransferCompleted ? (
         <>
-          <Alert severity="info" variant="outlined" className={classes.alert}>
+          <Alert severity="info" variant="outlined" sx={{
+            marginTop: 1,
+            marginBottom: 1,
+          }}>
             These tokens have already been redeemed.{" "}
             {!isEVMChain(targetChain) && howToAddTokensUrl ? (
               <Link

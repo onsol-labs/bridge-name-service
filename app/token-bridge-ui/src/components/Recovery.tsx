@@ -23,13 +23,12 @@ import {
   CircularProgress,
   Container,
   Divider,
-  makeStyles,
   MenuItem,
   TextField,
   Typography,
-} from "@material-ui/core";
-import { ExpandMore } from "@material-ui/icons";
-import { Alert } from "@material-ui/lab";
+} from "@mui/material";
+import { ExpandMore } from "@mui/icons-material";
+import { Alert } from "@mui/material";
 import { Connection } from "@solana/web3.js";
 import axios from "axios";
 import { ethers } from "ethers";
@@ -61,22 +60,6 @@ import ChainSelect from "./ChainSelect";
 import KeyAndBalance from "./KeyAndBalance";
 import RelaySelector from "./RelaySelector";
 import PendingVAAWarning from "./Transfer/PendingVAAWarning";
-
-const useStyles = makeStyles((theme) => ({
-  mainCard: {
-    padding: "32px 32px 16px",
-  },
-  advancedContainer: {
-    padding: theme.spacing(2, 0),
-  },
-  relayAlert: {
-    marginTop: theme.spacing(2),
-    marginBottom: theme.spacing(2),
-    "& > .MuiAlert-message": {
-      width: "100%",
-    },
-  },
-}));
 
 async function fetchSignedVAA(
   chainId: ChainId,
@@ -154,7 +137,6 @@ function RelayerRecovery({
   signedVaa: string;
   onClick: () => void;
 }) {
-  const classes = useStyles();
   const relayerInfo = useRelayersAvailable(true);
   const [selectedRelayer, setSelectedRelayer] = useState<Relayer | null>(null);
   const [isAttemptingToSchedule, setIsAttemptingToSchedule] = useState(false);
@@ -216,7 +198,13 @@ function RelayerRecovery({
   }
 
   return (
-    <Alert variant="outlined" severity="info" className={classes.relayAlert}>
+    <Alert variant="outlined" severity="info" sx={(theme) => ({
+      marginTop: theme.spacing(2),
+      marginBottom: theme.spacing(2),
+      "& > .MuiAlert-message": {
+        width: "100%",
+      },
+    })}>
       <Typography>{"This transaction is eligible to be relayed"}</Typography>
       <RelaySelector
         selectedValue={selectedRelayer}
@@ -234,7 +222,6 @@ function RelayerRecovery({
 }
 
 export default function Recovery() {
-  const classes = useStyles();
   const { push } = useHistory();
   const { enqueueSnackbar } = useSnackbar();
   const dispatch = useDispatch();
@@ -447,7 +434,7 @@ export default function Recovery() {
 
   return (
     <Container maxWidth="md">
-      <Card className={classes.mainCard}>
+      <Card sx={{ padding: "32px 32px 16px" }}>
         <Alert severity="info" variant="outlined">
           If you have sent your tokens but have not redeemed them, you may paste
           in the Source Transaction ID (from Step 3) to resume your transfer.
@@ -509,7 +496,9 @@ export default function Recovery() {
         {isVAAPending && (
           <PendingVAAWarning sourceChain={recoverySourceChain} />
         )}
-        <div className={classes.advancedContainer}>
+        <Box sx={(theme) => ({
+          padding: theme.spacing(2, 0),
+        })}>
           <Accordion>
             <AccordionSummary expandIcon={<ExpandMore />}>
               Advanced
@@ -692,8 +681,8 @@ export default function Recovery() {
               </div>
             </AccordionDetails>
           </Accordion>
-        </div>
+        </Box>
       </Card>
-    </Container>
+    </Container >
   );
 }

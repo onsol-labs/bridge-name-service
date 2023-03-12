@@ -1,6 +1,6 @@
 import { CHAIN_ID_SOLANA } from "@certusone/wormhole-sdk";
-import { Alert } from "@material-ui/lab";
-import { Link, makeStyles } from "@material-ui/core";
+import { Alert } from "@mui/material";
+import { Link } from "@mui/material";
 import { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { useHandleAttest } from "../../hooks/useHandleAttest";
@@ -18,26 +18,19 @@ import TransactionProgress from "../TransactionProgress";
 import WaitingForWalletMessage from "./WaitingForWalletMessage";
 import { SOLANA_TOKEN_METADATA_PROGRAM_URL } from "../../utils/consts";
 
-const useStyles = makeStyles((theme) => ({
-  alert: {
-    marginTop: theme.spacing(1),
-  },
-}));
-
 const SolanaTokenMetadataWarning = () => {
   const sourceAsset = useSelector(selectAttestSourceAsset);
   const sourceAssetArrayed = useMemo(() => {
     return [sourceAsset];
   }, [sourceAsset]);
   const metaplexData = useMetaplexData(sourceAssetArrayed);
-  const classes = useStyles();
 
   if (metaplexData.isFetching || metaplexData.error) {
     return null;
   }
 
   return !metaplexData.data?.get(sourceAsset) ? (
-    <Alert severity="warning" variant="outlined" className={classes.alert}>
+    <Alert severity="warning" variant="outlined" sx={{ marginTop: 1 }}>
       This token is missing on-chain (Metaplex) metadata. Without it, the
       wrapped token's name and symbol will be empty. See the{" "}
       <Link

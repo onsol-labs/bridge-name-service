@@ -3,7 +3,7 @@ import {
   hexToNativeString,
   isEVMChain,
 } from "@certusone/wormhole-sdk";
-import { makeStyles, Typography } from "@material-ui/core";
+import { Typography, Box } from "@mui/material";
 import { useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import useGetTargetParsedTokenAccounts from "../../hooks/useGetTargetParsedTokenAccounts";
@@ -36,16 +36,6 @@ import SolanaCreateAssociatedAddress, {
 import StepDescription from "../StepDescription";
 import RegisterNowButton from "./RegisterNowButton";
 
-const useStyles = makeStyles((theme) => ({
-  transferField: {
-    marginTop: theme.spacing(5),
-  },
-  alert: {
-    marginTop: theme.spacing(1),
-    marginBottom: theme.spacing(1),
-  },
-}));
-
 export const useTargetInfo = () => {
   const targetChain = useSelector(selectTransferTargetChain);
   const targetAddressHex = useSelector(selectTransferTargetAddressHex);
@@ -73,7 +63,6 @@ export const useTargetInfo = () => {
 
 function Target() {
   useGetTargetParsedTokenAccounts();
-  const classes = useStyles();
   const dispatch = useDispatch();
   const sourceChain = useSelector(selectTransferSourceChain);
   const chains = useMemo(
@@ -130,7 +119,9 @@ function Target() {
       {readableTargetAddress ? (
         <>
           {targetAsset ? (
-            <div className={classes.transferField}>
+            <Box sx={{
+              marginTop: 5
+            }}>
               <Typography variant="subtitle2">Bridged tokens:</Typography>
               <Typography component="div">
                 <SmartAddress
@@ -144,9 +135,11 @@ function Target() {
                 />
                 {`(Amount: ${transferAmount})`}
               </Typography>
-            </div>
+            </Box>
           ) : null}
-          <div className={classes.transferField}>
+          <Box sx={{
+            marginTop: 5
+          }}>
             <Typography variant="subtitle2">Sent to:</Typography>
             <Typography component="div">
               <SmartAddress
@@ -156,7 +149,7 @@ function Target() {
               />
               {`(Current balance: ${uiAmountString || "0"})`}
             </Typography>
-          </div>
+          </Box>
         </>
       ) : null}
       {targetChain === CHAIN_ID_SOLANA && targetAsset ? (

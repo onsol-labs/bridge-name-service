@@ -1,18 +1,12 @@
 import {
   CircularProgress,
-  makeStyles,
   MenuItem,
   TextField,
   Typography,
-} from "@material-ui/core";
+  Box
+} from "@mui/material";
 import { useCallback } from "react";
 import useRelayersAvailable, { Relayer } from "../hooks/useRelayersAvailable";
-
-const useStyles = makeStyles((theme) => ({
-  mainContainer: {
-    textAlign: "center",
-  },
-}));
 
 export default function RelaySelector({
   selectedValue,
@@ -21,7 +15,6 @@ export default function RelaySelector({
   selectedValue: Relayer | null;
   onChange: (newValue: Relayer | null) => void;
 }) {
-  const classes = useStyles();
   const availableRelayers = useRelayersAvailable(true);
 
   const loader = (
@@ -70,12 +63,12 @@ export default function RelaySelector({
   );
 
   return (
-    <div className={classes.mainContainer}>
+    <Box sx={{ textAlign: "center" }}>
       {availableRelayers.data?.relayers?.length
         ? selector
         : availableRelayers.isFetching
           ? loader
           : error}
-    </div>
+    </Box>
   );
 }

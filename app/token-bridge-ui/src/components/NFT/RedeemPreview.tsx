@@ -1,4 +1,4 @@
-import { makeStyles, Typography } from "@material-ui/core";
+import { Typography } from "@mui/material";
 import { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { selectNFTRedeemTx, selectNFTTargetChain } from "../../store/selectors";
@@ -6,14 +6,7 @@ import { reset } from "../../store/nftSlice";
 import ButtonWithLoader from "../ButtonWithLoader";
 import ShowTx from "../ShowTx";
 
-const useStyles = makeStyles((theme) => ({
-  description: {
-    textAlign: "center",
-  },
-}));
-
 export default function RedeemPreview() {
-  const classes = useStyles();
   const dispatch = useDispatch();
   const targetChain = useSelector(selectNFTTargetChain);
   const redeemTx = useSelector(selectNFTRedeemTx);
@@ -29,7 +22,7 @@ export default function RedeemPreview() {
       <Typography
         component="div"
         variant="subtitle2"
-        className={classes.description}
+        sx={{ textAlign: "center" }}
       >
         {explainerString}
       </Typography>

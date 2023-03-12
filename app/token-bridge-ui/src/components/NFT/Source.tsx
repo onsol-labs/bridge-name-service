@@ -1,7 +1,6 @@
 import { CHAIN_ID_SOLANA, isEVMChain } from "@certusone/wormhole-sdk";
-import { Button, makeStyles } from "@material-ui/core";
-import { VerifiedUser } from "@material-ui/icons";
-import { Alert } from "@material-ui/lab";
+import { Button, Box } from "@mui/material";
+import { VerifiedUser } from "@mui/icons-material";
 import { useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
@@ -26,14 +25,7 @@ import StepDescription from "../StepDescription";
 import { TokenSelector } from "../TokenSelectors/SourceTokenSelector";
 import ChainWarningMessage from "../ChainWarningMessage";
 
-const useStyles = makeStyles((theme) => ({
-  transferField: {
-    marginTop: theme.spacing(5),
-  },
-}));
-
 function Source() {
-  const classes = useStyles();
   const dispatch = useDispatch();
   const sourceChain = useSelector(selectNFTSourceChain);
   const uiAmountString = useSelector(selectNFTSourceBalanceString);
@@ -93,9 +85,9 @@ function Source() {
       ) : null} */}
       <KeyAndBalance chainId={sourceChain} />
       {isReady || uiAmountString ? (
-        <div className={classes.transferField}>
+        <Box sx={{marginTop: 5}}>
           <TokenSelector disabled={shouldLockFields} nft={true} />
-        </div>
+        </Box>
       ) : null}
       <LowBalanceWarning chainId={sourceChain} />
       <ChainWarningMessage chainId={sourceChain} />

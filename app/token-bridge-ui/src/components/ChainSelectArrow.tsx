@@ -1,5 +1,5 @@
-import { IconButton } from "@material-ui/core";
-import { ArrowForward, SwapHoriz } from "@material-ui/icons";
+import { IconButton } from "@mui/material";
+import { ArrowForward, SwapHoriz } from "@mui/icons-material";
 import { useState } from "react";
 
 export default function ChainSelectArrow({
@@ -21,7 +21,7 @@ export default function ChainSelectArrow({
         setShowSwap(false);
       }}
       disabled={disabled}
-    >
+      size="large">
       {showSwap ? <SwapHoriz /> : <ArrowForward />}
     </IconButton>
   );

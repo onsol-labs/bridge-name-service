@@ -4,8 +4,8 @@ import {
   hexToUint8Array,
   isEVMChain,
 } from "@certusone/wormhole-sdk";
-import { makeStyles, TextField, Typography } from "@material-ui/core";
-import { Alert } from "@material-ui/lab";
+import { TextField, Typography } from "@mui/material";
+import { Alert } from "@mui/material";
 import { PublicKey } from "@solana/web3.js";
 import { BigNumber, ethers } from "ethers";
 import { useCallback, useMemo } from "react";
@@ -37,18 +37,7 @@ import LowBalanceWarning from "../LowBalanceWarning";
 import StepDescription from "../StepDescription";
 import ChainWarningMessage from "../ChainWarningMessage";
 
-const useStyles = makeStyles((theme) => ({
-  transferField: {
-    marginTop: theme.spacing(5),
-  },
-  alert: {
-    marginTop: theme.spacing(1),
-    marginBottom: theme.spacing(1),
-  },
-}));
-
 function Target() {
-  const classes = useStyles();
   const dispatch = useDispatch();
   const sourceChain = useSelector(selectNFTSourceChain);
   const chains = useMemo(
@@ -110,7 +99,7 @@ function Target() {
         label="Recipient Address"
         fullWidth
         variant="outlined"
-        className={classes.transferField}
+        sx={{ marginTop: 5 }}
         value={readableTargetAddress}
         disabled={true}
       />
@@ -120,7 +109,7 @@ function Target() {
             label="Token Address"
             fullWidth
             variant="outlined"
-            className={classes.transferField}
+            sx={{ marginTop: 5 }}
             value={targetAsset || ""}
             disabled={true}
           />
@@ -129,14 +118,17 @@ function Target() {
               variant="outlined"
               label="TokenId"
               fullWidth
-              className={classes.transferField}
+              sx={{ marginTop: 5 }}
               value={tokenId || ""}
               disabled={true}
             />
           ) : null}
         </>
       ) : null}
-      <Alert severity="info" variant="outlined" className={classes.alert}>
+      <Alert severity="info" variant="outlined" sx={{
+        marginTop: 1,
+        marginBottom: 1,
+      }}>
         <Typography>
           You will have to pay transaction fees on{" "}
           {CHAINS_BY_ID[targetChain].name} to redeem your NFT.

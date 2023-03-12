@@ -3,12 +3,11 @@ import {
   Box,
   Button,
   Container,
-  makeStyles,
   MenuItem,
   Select,
   Toolbar,
   Typography,
-} from "@material-ui/core";
+} from "@mui/material";
 import { useCallback } from "react";
 import { useLocation } from "react-router";
 import { Link, Redirect, Route, Switch } from "react-router-dom";
@@ -19,54 +18,7 @@ import NFTOriginVerifier from "./components/NFTOriginVerifier";
 import Recovery from "./components/Recovery";
 import { CLUSTER } from "./utils/consts";
 
-const useStyles = makeStyles((theme) => ({
-  appBar: {
-    background: "transparent",
-    marginTop: theme.spacing(2),
-    "& > .MuiToolbar-root": {
-      margin: "auto",
-      width: "100%",
-      maxWidth: 1440,
-    },
-  },
-  spacer: {
-    flex: 1,
-    width: "100vw",
-  },
-  link: {
-    ...theme.typography.body2,
-    fontWeight: 600,
-    marginLeft: theme.spacing(4),
-    textUnderlineOffset: "6px",
-    [theme.breakpoints.down("sm")]: {
-      marginLeft: theme.spacing(2.5),
-    },
-    [theme.breakpoints.down("xs")]: {
-      marginLeft: theme.spacing(1),
-    },
-    "&.active": {
-      textDecoration: "underline",
-    },
-  },
-  bg: {
-    // background:
-    display: "flex",
-    flexDirection: "column",
-    minHeight: "100vh",
-    position: "relative",
-    overflow: "hidden",
-  },
-  brandLink: {
-    display: "inline-flex",
-    alignItems: "center",
-    "&:hover": {
-      textDecoration: "none",
-    },
-  },
-}));
-
 function App() {
-  const classes = useStyles();
   const { pathname } = useLocation();
   const handleClusterChange = useCallback((event) => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -74,7 +26,14 @@ function App() {
     window.location.search = urlParams;
   }, []);
   return (
-    <div className={classes.bg}>
+    <Box sx={{
+      // background:
+      display: "flex",
+      flexDirection: "column",
+      minHeight: "100vh",
+      position: "relative",
+      overflow: "hidden",
+    }}>
       {
         <AppBar position="static" elevation={0} style={{ marginBottom: 40 }}>
           <Toolbar variant="dense">
@@ -97,7 +56,7 @@ function App() {
           </Toolbar>
         </AppBar>
       }
-      {[ "/nft", "/redeem"].includes(pathname) ? (
+      {["/nft", "/redeem"].includes(pathname) ? (
         <Container maxWidth="md" style={{ paddingBottom: 24 }}>
           <HeaderText
             white
@@ -128,13 +87,16 @@ function App() {
           <Redirect to="/nft" />
         </Route>
       </Switch>
-      <div className={classes.spacer} />
-      <div className={classes.gradientRight}></div>
-      <div className={classes.gradientRight2}></div>
-      <div className={classes.gradientLeft}></div>
-      <div className={classes.gradientLeft2}></div>
+      <Box sx={{
+        flex: 1,
+        width: "100vw",
+      }} />
+      <Box></Box>
+      <Box></Box>
+      <Box></Box>
+      <Box></Box>
       <Footer />
-    </div>
+    </Box>
   );
 }
 

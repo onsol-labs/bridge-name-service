@@ -1,5 +1,5 @@
 import { isEVMChain } from "@certusone/wormhole-sdk";
-import { Button, makeStyles } from "@material-ui/core";
+import { Button } from "@mui/material";
 import detectEthereumProvider from "@metamask/detect-provider";
 import { useCallback } from "react";
 import { useSelector } from "react-redux";
@@ -15,15 +15,7 @@ import {
   getEthereumToken,
 } from "../../utils/ethereum";
 
-const useStyles = makeStyles((theme) => ({
-  addButton: {
-    display: "block",
-    margin: `${theme.spacing(1)}px auto 0px`,
-  },
-}));
-
 export default function AddToMetamask() {
-  const classes = useStyles();
   const sourceParsedTokenAccount = useSelector(
     selectTransferSourceParsedTokenAccount
   );
@@ -82,7 +74,10 @@ export default function AddToMetamask() {
       onClick={handleClick}
       size="small"
       variant="outlined"
-      className={classes.addButton}
+      sx={{
+        display: "block",
+        margin: `1px auto 0px`,
+      }}
     >
       Add to Metamask
     </Button>
