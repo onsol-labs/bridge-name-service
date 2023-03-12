@@ -94,6 +94,9 @@ function Target() {
   const isTransferDisabled = useMemo(() => {
     return getIsTransferDisabled(targetChain, false);
   }, [targetChain]);
+
+  console.log(targetAsset)
+  
   return (
     <>
       <StepDescription>Select a recipient chain and address.</StepDescription>

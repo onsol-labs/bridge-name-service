@@ -1,6 +1,6 @@
 import { createTheme, responsiveFontSizes } from "@material-ui/core";
 
-import InterSemiBold from './fonts/Inter/static/Inter-SemiBold';
+//import InterSemiBold from './fonts/Inter/static/Inter-SemiBold';
 
 export const theme = responsiveFontSizes(
   createTheme({
