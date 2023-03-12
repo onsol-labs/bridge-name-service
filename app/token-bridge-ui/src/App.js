@@ -37,7 +37,7 @@ function App() {
       {
         <AppBar position="static" elevation={0} style={{ marginBottom: 40 }}>
           <Toolbar variant="dense">
-            <Button component={Link} to="/nft">
+            <Button component={Link} to="/">
               Bridge
             </Button>
             <Button component={Link} to="/redeem">
@@ -56,7 +56,7 @@ function App() {
           </Toolbar>
         </AppBar>
       }
-      {["/nft", "/redeem"].includes(pathname) ? (
+      {["/", "/redeem"].includes(pathname) ? (
         <Container maxWidth="md" style={{ paddingBottom: 24 }}>
           <HeaderText
             white
@@ -74,7 +74,7 @@ function App() {
         </Container>
       ) : null}
       <Switch>
-        <Route exact path="/nft">
+        <Route exact path="/">
           <NFT />
         </Route>
         <Route exact path="/redeem">
@@ -84,7 +84,7 @@ function App() {
           <NFTOriginVerifier />
         </Route>
         <Route>
-          <Redirect to="/nft" />
+          <Redirect to="/" />
         </Route>
       </Switch>
       <Box sx={{

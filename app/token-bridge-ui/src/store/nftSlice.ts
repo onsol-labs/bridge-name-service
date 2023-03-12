@@ -54,7 +54,8 @@ export interface NFTState {
 
 const initialState: NFTState = {
   activeStep: 0,
-  sourceChain: CHAIN_ID_SOLANA,
+  //sourceChain: CHAIN_ID_SOLANA,
+  sourceChain: CHAIN_ID_ETH,
   isSourceAssetWormholeWrapped: false,
   sourceWalletAddress: undefined,
   sourceParsedTokenAccount: undefined,

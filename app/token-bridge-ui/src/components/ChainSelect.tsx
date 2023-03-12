@@ -31,7 +31,7 @@ export default function ChainSelect({ chains, ...rest }: ChainSelectProps) {
     <TextField {...rest}
       sx={({
         ...{
-          "& .MuiSelect-root": {
+          "& .MuiSelect-select": {
             display: "flex",
             alignItems: "center",
           }
