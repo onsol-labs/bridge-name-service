@@ -11,7 +11,7 @@ import {
 } from "../store/tokenSlice";
 import { CLUSTER } from "../utils/consts";
 
-const environment = CLUSTER === "testnet" ? ENV.Testnet : ENV.MainnetBeta;
+const environment = CLUSTER === "devnet" ? ENV.Devnet : ENV.MainnetBeta;
 
 const useSolanaTokenMap = (): DataWrapper<TokenInfo[]> => {
   const tokenMap = useSelector(selectSolanaTokenMap);

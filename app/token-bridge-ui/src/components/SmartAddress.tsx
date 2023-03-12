@@ -87,14 +87,12 @@ export default function SmartAddress({
   const explorerAddress = isNative
     ? null
     : chainId === CHAIN_ID_ETH
-      ? `https://${CLUSTER === "testnet" ? "goerli." : ""}etherscan.io/${isAsset ? "token" : "address"
+      ? `https://${CLUSTER === "devnet" ? "goerli." : ""}etherscan.io/${isAsset ? "token" : "address"
       }/${useableAddress}`
       : chainId === CHAIN_ID_SOLANA
-        ? `https://solscan.io/address/${useableAddress}${CLUSTER === "testnet"
+        ? `https://solscan.io/address/${useableAddress}${CLUSTER === "devnet"
           ? "?cluster=devnet"
-          : CLUSTER === "devnet"
-            ? "?cluster=custom&customUrl=http%3A%2F%2Flocalhost%3A8899"
-            : ""
+          : ""
         }`
         : undefined;
   const explorerName = getExplorerName(chainId);

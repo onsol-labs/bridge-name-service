@@ -25,20 +25,15 @@ export default function ShowTx({
   tx: Transaction;
 }) {
   const classes = useStyles();
-  const showExplorerLink =
-    CLUSTER === "testnet" ||
-    (CLUSTER === "devnet" &&
-      (chainId === CHAIN_ID_SOLANA));
+  const showExplorerLink = CLUSTER === "devnet" && chainId === CHAIN_ID_SOLANA;
   const explorerAddress =
     chainId === CHAIN_ID_ETH
-      ? `https://${CLUSTER === "testnet" ? "goerli." : ""}etherscan.io/tx/${tx?.id
+      ? `https://${CLUSTER === "devnet" ? "goerli." : ""}etherscan.io/tx/${tx?.id
       }`
       : chainId === CHAIN_ID_SOLANA
-        ? `https://solscan.io/tx/${tx?.id}${CLUSTER === "testnet"
+        ? `https://solscan.io/tx/${tx?.id}${CLUSTER === "devnet"
           ? "?cluster=devnet"
-          : CLUSTER === "devnet"
-            ? "?cluster=custom&customUrl=http%3A%2F%2Flocalhost%3A8899"
-            : ""
+          : ""
         }`
         : undefined;
   const explorerName = getExplorerName(chainId);

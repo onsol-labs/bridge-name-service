@@ -42,7 +42,7 @@ export const SolanaWalletProvider: FC<SolanaWalletProps> = (props) => {
       new TorusWalletAdapter(),
       new ExodusWalletAdapter(),
     ];
-    if (CLUSTER === "testnet") {
+    if (CLUSTER === "devnet") {
       wallets.push(
         new BloctoWalletAdapter({ network: WalletAdapterNetwork.Devnet })
       );

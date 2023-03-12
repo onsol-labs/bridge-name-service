@@ -79,7 +79,7 @@ function App() {
         <AppBar position="static" elevation={0} style={{ marginBottom: 40 }}>
           <Toolbar variant="dense">
             <Button component={Link} to="/nft">
-              Domains
+              Bridge
             </Button>
             <Button component={Link} to="/redeem">
               Redeem
@@ -92,7 +92,6 @@ function App() {
               margin="dense"
             >
               <MenuItem value="mainnet">Mainnet</MenuItem>
-              <MenuItem value="testnet">Testnet</MenuItem>
               <MenuItem value="devnet">Devnet</MenuItem>
             </Select>
           </Toolbar>

@@ -12,10 +12,10 @@ import { CHAIN_CONFIG_MAP } from "../config";
 import ethIcon from "../icons/eth.svg";
 import solanaIcon from "../icons/solana.svg";
 
-export type Cluster = "devnet" | "testnet" | "mainnet";
+export type Cluster = "devnet" | "mainnet";
 const urlParams = new URLSearchParams(window.location.search);
 const paramCluster = urlParams.get("cluster");
-export const CLUSTER: Cluster = paramCluster === "mainnet" ? "mainnet" : paramCluster === "devnet" ? "devnet" : "testnet";
+export const CLUSTER: Cluster = paramCluster === "devnet" ? "devnet" : "mainnet";
 export interface ChainInfo {
   id: ChainId;
   name: string;
@@ -35,7 +35,7 @@ export const CHAINS: ChainInfo[] =
         logo: solanaIcon,
       },
     ] :
-    CLUSTER === "testnet"
+    CLUSTER === "devnet"
       ? [
         {
           id: CHAIN_ID_ETH,
@@ -51,7 +51,7 @@ export const CHAINS: ChainInfo[] =
       : [
         {
           id: CHAIN_ID_ETH,
-          name: "Ethereum",
+          name: "Ethereum (Goerli)",
           logo: ethIcon,
         },
         {
@@ -94,10 +94,10 @@ export const getExplorerName = (chainId: ChainId) =>
 export const WORMHOLE_RPC_HOSTS =
   CLUSTER === "mainnet"
     ? ["https://wormhole-v2-mainnet-api.certus.one"]
-    : CLUSTER === "testnet"
+    : CLUSTER === "devnet"
       ? ["https://wormhole-v2-testnet-api.certus.one"]
       : ["http://localhost:7071"];
-export const ETH_NETWORK_CHAIN_ID = CLUSTER === "mainnet" ? 1 : CLUSTER === "testnet" ? 5 : 1337;
+export const ETH_NETWORK_CHAIN_ID = CLUSTER === "mainnet" ? 1 : CLUSTER === "devnet" ? 5 : 1337;
 export const getEvmChainId = (chainId: ChainId) =>
   chainId === CHAIN_ID_ETH
     ? ETH_NETWORK_CHAIN_ID
@@ -105,7 +105,7 @@ export const getEvmChainId = (chainId: ChainId) =>
 
 export const SOLANA_HOST = process.env.REACT_APP_SOLANA_API_URL
   ? process.env.REACT_APP_SOLANA_API_URL
-  : CLUSTER === "testnet"
+  : CLUSTER === "devnet"
     ? clusterApiUrl("devnet")
     : "http://localhost:8899";
 
@@ -115,23 +115,23 @@ export const SOL_NFT_CUSTODY_ADDRESS =
   "D63bhHo634eXSj4Jq3xgu2fjB5XKc8DFHzDY9iZk7fv1";
 
 export const SOL_BRIDGE_ADDRESS =
-  CONTRACTS[CLUSTER === "mainnet" ? "MAINNET" : CLUSTER === "testnet" ? "TESTNET" : "DEVNET"].solana.core;
+  CONTRACTS[CLUSTER === "devnet" ? "DEVNET" : "MAINNET"].solana.core;
 
 export const SOL_NFT_BRIDGE_ADDRESS =
-  CONTRACTS[CLUSTER === "mainnet" ? "MAINNET" : CLUSTER === "testnet" ? "TESTNET" : "DEVNET"].solana.nft_bridge;
+  CONTRACTS[CLUSTER === "devnet" ? "DEVNET" : "MAINNET"].solana.nft_bridge;
 export const SOL_TOKEN_BRIDGE_ADDRESS =
-  CONTRACTS[CLUSTER === "mainnet" ? "MAINNET" : CLUSTER === "testnet" ? "TESTNET" : "DEVNET"].solana.token_bridge;
+  CONTRACTS[CLUSTER === "devnet" ? "DEVNET" : "MAINNET"].solana.token_bridge;
 
 export const getBridgeAddressForChain = (chainId: ChainId) =>
-  CONTRACTS[CLUSTER === "mainnet" ? "MAINNET" : CLUSTER === "testnet" ? "TESTNET" : "DEVNET"][
+  CONTRACTS[CLUSTER === "devnet" ? "DEVNET" : "MAINNET"][
     coalesceChainName(chainId)
   ].core || "";
 export const getNFTBridgeAddressForChain = (chainId: ChainId) =>
-  CONTRACTS[CLUSTER === "mainnet" ? "MAINNET" : CLUSTER === "testnet" ? "TESTNET" : "DEVNET"][
+  CONTRACTS[CLUSTER === "devnet" ? "DEVNET" : "MAINNET"][
     coalesceChainName(chainId)
   ].nft_bridge || "";
 export const getTokenBridgeAddressForChain = (chainId: ChainId) =>
-  CONTRACTS[CLUSTER === "mainnet" ? "MAINNET" : CLUSTER === "testnet" ? "TESTNET" : "DEVNET"][
+  CONTRACTS[CLUSTER === "devnet" ? "DEVNET" : "MAINNET"][
     coalesceChainName(chainId)
   ].token_bridge || "";
 
@@ -175,7 +175,7 @@ export const COVALENT_GET_TOKENS_URL = (
 };
 
 export const WETH_ADDRESS =
-  CLUSTER === "testnet"
+  CLUSTER === "devnet"
     ? "0xb4fbf271143f4fbf7b91a5ded31805e42b2208d6"
     : "0xDDb64fE46a91D46ee29420539FC25FD07c5FEa3E";
 export const WETH_DECIMALS = 18;
@@ -255,7 +255,7 @@ export const getCoinGeckoURL = (coinGeckoId: string) =>
   `https://api.coingecko.com/api/v3/simple/price?ids=${coinGeckoId}&vs_currencies=usd`;
 
 export const RELAYER_INFO_URL =
-  CLUSTER === "testnet" ? "" : "/relayerExample.json";
+  CLUSTER === "devnet" ? "" : "/relayerExample.json";
 
 export const RELAY_URL_EXTENSION = "/relayvaa/";
 
