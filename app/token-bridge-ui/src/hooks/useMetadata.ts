@@ -1,3 +1,4 @@
+import { Metadata } from '@metaplex-foundation/mpl-token-metadata';
 import {
   ChainId,
   CHAIN_ID_SOLANA,
@@ -6,7 +7,7 @@ import {
 import { TokenInfo } from "@solana/spl-token-registry";
 import { useMemo } from "react";
 import { DataWrapper, getEmptyDataWrapper } from "../store/helpers";
-import { Metadata } from "../utils/metaplex";
+// import { Metadata } from "../utils/metaplex";
 import useEvmMetadata, { EvmMetadata } from "./useEvmMetadata";
 import useMetaplexData from "./useMetaplexData";
 import useSolanaTokenMap from "./useSolanaTokenMap";
@@ -99,8 +100,8 @@ export default function useMetadata(
       chainId === CHAIN_ID_SOLANA
         ? constructSolanaMetadata(solanaAddresses, solanaTokenMap, metaplexData)
         : isEVMChain(chainId)
-        ? constructEthMetadata(ethereumAddresses, ethMetadata)
-        : getEmptyDataWrapper(),
+          ? constructEthMetadata(ethereumAddresses, ethMetadata)
+          : getEmptyDataWrapper(),
     [
       chainId,
       solanaAddresses,
