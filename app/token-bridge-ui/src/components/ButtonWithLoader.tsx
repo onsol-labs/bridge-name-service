@@ -4,7 +4,7 @@ import {
   Typography,
   Box
 } from "@mui/material";
-import { ReactChild } from "react";
+import { ReactNode } from "react";
 
 export default function ButtonWithLoader({
   disabled,
@@ -17,7 +17,7 @@ export default function ButtonWithLoader({
   onClick: () => void;
   showLoader?: boolean;
   error?: string;
-  children: ReactChild;
+  children: ReactNode;
 }) {
   return (
     <>

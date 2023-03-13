@@ -1,5 +1,5 @@
 import { Button} from "@mui/material";
-import { ReactChild } from "react";
+import { ReactNode } from "react";
 
 export default function OffsetButton({
   onClick,
@@ -8,7 +8,7 @@ export default function OffsetButton({
 }: {
   onClick: () => void;
   disabled?: boolean;
-  children: ReactChild;
+  children: ReactNode;
 }) {
   return (
     <Button

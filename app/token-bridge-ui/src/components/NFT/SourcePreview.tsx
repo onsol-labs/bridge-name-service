@@ -17,7 +17,7 @@ export default function SourcePreview() {
   const explainerContent =
     sourceChain && sourceParsedTokenAccount ? (
       <>
-        <span>You will transfer 1 </span>
+        <span>You will transfer 1</span>
         <SmartAddress
           chainId={sourceChain}
           parsedTokenAccount={sourceParsedTokenAccount}

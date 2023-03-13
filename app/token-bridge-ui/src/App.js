@@ -63,7 +63,7 @@ function App() {
             subtitle={
               <>
                 <Typography>
-                  This is a experimental ENS domain bridge that transfers
+                  This is an experimental ENS domain bridge that transfers
                   ENS domains across Solana and Ethereum through Wormhole.
                 </Typography>
               </>

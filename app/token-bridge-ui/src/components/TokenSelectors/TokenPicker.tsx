@@ -62,10 +62,11 @@ export const BasicAccountRender = (
           alignItems: "center",
           justifyContent: "center",
           width: 40,
+          margin:0,
         }}
         className="TokenImageContainer">
         {uri && <Box component="img" alt="" sx={{
-          maxHeight: "2.5rem", //Eyeballing this based off the text size
+          maxHeight: "3.5rem", //Eyeballing this based off the text size
         }} src={uri} />}
       </Box>
       <div>

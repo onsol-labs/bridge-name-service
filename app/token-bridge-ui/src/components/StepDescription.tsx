@@ -1,10 +1,10 @@
 import { Typography } from "@mui/material";
-import { ReactChild } from "react";
+import { ReactNode } from "react";
 
 export default function StepDescription({
   children,
 }: {
-  children: ReactChild;
+  children: ReactNode;
 }) {
   return (
     <Typography component="div" variant="body2" sx={{ marginBottom: 4 }}>

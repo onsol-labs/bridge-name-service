@@ -1,5 +1,5 @@
 import { Typography, Box } from "@mui/material";
-import { ReactChild } from "react";
+import { ReactNode } from "react";
 
 export default function HeaderText({
   children,
@@ -7,10 +7,10 @@ export default function HeaderText({
   small,
   subtitle,
 }: {
-  children: ReactChild;
+  children: ReactNode;
   white?: boolean;
   small?: boolean;
-  subtitle?: ReactChild;
+  subtitle?: ReactNode;
 }) {
   return (
     <Box sx={(theme) => ({

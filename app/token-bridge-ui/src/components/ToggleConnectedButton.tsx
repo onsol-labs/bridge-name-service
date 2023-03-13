@@ -22,12 +22,12 @@ const ToggleConnectedButton = ({
         variant="outlined"
         size="small"
         onClick={disconnect}
-        sx={{
+        sx={(theme) => ({
           display: "flex",
-          margin: `1px auto`,
+          margin: `${theme.spacing(1)} auto`,
           width: "100%",
           maxWidth: 400,
-        }}
+        })}
         startIcon={
           walletIcon ? (
             <Box component="img" sx={{
@@ -49,12 +49,12 @@ const ToggleConnectedButton = ({
       variant="contained"
       size="small"
       onClick={connect}
-      sx={{
+      sx={(theme) => ({
         display: "flex",
-        margin: `1px auto`,
+        margin: `${theme.spacing(1)} auto`,
         width: "100%",
         maxWidth: 400,
-      }}
+      })}
     >
       Connect
     </Button>
