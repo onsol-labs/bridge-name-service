@@ -8,7 +8,7 @@ use {
         associated_token::AssociatedToken,
         token::{Mint as AnchorMint, Token, TokenAccount},
     },
-    solana_program::{msg, pubkey::Pubkey},
+    solana_program::{msg, pubkey::Pubkey, sysvar},
     tld_house::{TldHouse, TldState, TldTreasuryManager},
 };
 
@@ -107,6 +107,10 @@ pub struct WrapDomain<'info> {
 
     /// The system program account
     pub system_program: Program<'info, System>,
+
+    /// CHECK: checked by address contraint
+    #[account(address = sysvar::instructions::id())]
+    pub instruction_sysvar_account: UncheckedAccount<'info>,
 }
 
 #[inline(never)]
@@ -156,6 +160,7 @@ pub fn handle_domain_wrapping<'info>(
         ata_program: ctx.accounts.ata_program.key(),
         spl_token_program: ctx.accounts.token_program.key(),
         name_service_program: ctx.accounts.alt_name_service_program.key(),
+        instruction_sysvar_account: ctx.accounts.instruction_sysvar_account.key(),
     };
 
     let remaining_accounts = ctx.remaining_accounts.to_vec().clone();
@@ -212,6 +217,7 @@ pub fn handle_domain_wrapping<'info>(
             ctx.accounts.ata_program.to_account_info(),
             ctx.accounts.token_program.to_account_info(),
             ctx.accounts.alt_name_service_program.to_account_info(),
+            ctx.accounts.instruction_sysvar_account.to_account_info(),
         ],
     )?;
 

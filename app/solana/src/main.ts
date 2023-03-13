@@ -222,29 +222,4 @@ async function wrapDomain(
   console.log(`https://solscan.io/tx/${tx_id2}?cluster=devnet`);
 }
 
-// createLookupTable();
-// addAddressesToTable([
-//   new PublicKey("6NydcCa9aoGomjcnVQut1nkaPFzKz6CPknMBx9zoRQB5"),
-//   new PublicKey("DkJzwGD2VWYXcUfDAzvWfP3q2jSsJSNcrAQgTQVntKJo"),
-//   new PublicKey("GqUw6MjqA9o8TNXZMEnYZdfzWgpe5FVQ8bnZqpMSCDPj"),
-//   new PublicKey("9nwUf8peEstKtAyKNeKUmLhxct2WHzfb4evLG6JnbCaP"),
-//   new PublicKey("595KxBJnKBD6JEu7FyHSJicbGkWnTCMixYCBjDxzrGp6"),
-//   new PublicKey("BXT7pGo3DP2Ad3Ygptc66HzL4vJTRPZn2nobWJtqJYiC"),
-//   new PublicKey("EzeAEs3QtU8BdbXL2AnMcP9Wbpd9YwbocqPj8hEujK6v"),
-//   new PublicKey("HVQHC4DJoNaq8WVMYvwqqXLcLJzCtvfYfvu7fcN3bFGa"),
-//   new PublicKey("EzeAEs3QtU8BdbXL2AnMcP9Wbpd9YwbocqPj8hEujK6v"),
-//   new PublicKey("B4nDum6v4RLpyETk3MmU4rZpkZKt17PsY4bpRf46BEtN"),
-//   new PublicKey("TLDhatkjchgoteyVPXkKzAvVjj25wZ6ceEtEhsDAVjK"),
-//   new PublicKey("nMtokZ8bQtN2scgy7CJDc24VQWmisEuByqar27eJXmX"),
-//   new PublicKey("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"),
-//   new PublicKey("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"),
-//   new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"),
-// ])
-wrapDomain()
-
-// let domainName = 'onsol';
-// console.log(getWormholeMintAccount(domainName)[0].toBase58())
-
-
-// in milliseconds from metadata
-
+// wrapDomain()

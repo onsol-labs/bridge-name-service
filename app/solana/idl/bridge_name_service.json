@@ -124,6 +124,11 @@
           "docs": [
             "The system program account"
           ]
+        },
+        {
+          "name": "instructionSysvarAccount",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [

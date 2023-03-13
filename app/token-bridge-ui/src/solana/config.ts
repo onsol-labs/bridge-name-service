@@ -2,6 +2,7 @@ import { Connection, Keypair, PublicKey } from "@solana/web3.js";
 
 /* .xyz - for testing */
 export const TLD = process.env.TLD || ".eth";
+export const ETH_ENVIRONMENT = process.env.ETH_ENVIRONMENT || "goerli";
 
 /* .abc */
 // export const TLD = ".abc";

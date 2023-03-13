@@ -3,7 +3,7 @@ import { createWrapDomainInstruction, WrapDomainInstructionAccounts, WrapDomainI
 import { findNameHouse, findRenewableMintAddress, findTldHouse, findTldState, findTldTreasuryManager, getAtaForMint, getHashedName, getMasterEdition, getMetadata, getNameAccountKey, getParentNameKeyWithBump, mintAnsNft } from './utils/name_house';
 import * as config from "./config";
 import { Connection, PublicKey, ComputeBudgetProgram, TransactionInstruction } from '@solana/web3.js';
-import { ANS_PROGRAM_ID, SOLANA_NATIVE_MINT, TLD_HOUSE_PROGRAM_ID } from './constants';
+import { ANS_PROGRAM_ID, ENS_ON_ETH, SOLANA_NATIVE_MINT, TLD_HOUSE_PROGRAM_ID } from './constants';
 import { findBNSVault, getWormholeMintAccountFromTokenId, NameRecordHeaderRaw } from './utils/bridgeNameService';
 
 
@@ -22,7 +22,7 @@ export async function wrapDomain(
   const [bnsVault] = findBNSVault();
 
   const [treasuryManager] = findTldTreasuryManager(config.TLD);
-  const ensMetadataUri = `https://metadata.ens.domains/goerli/0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85/${tokenId}`
+  const ensMetadataUri = `https://metadata.ens.domains/${config.ETH_ENVIRONMENT}/${ENS_ON_ETH}/${tokenId}`
   const offChainMetadata = await axios.get(ensMetadataUri);
   const parts = offChainMetadata.data['name'].split(config.TLD);
   const domainName = parts[0];

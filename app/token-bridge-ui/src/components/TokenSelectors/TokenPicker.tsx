@@ -70,7 +70,7 @@ export const BasicAccountRender = (
       </Box>
       <div>
         <Typography>{symbol}</Typography>
-        <Typography>{name}</Typography>
+        {/* <Typography>{name}</Typography> */}
         <Typography>{nftName}</Typography>
       </div>
       <div>

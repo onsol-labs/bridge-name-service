@@ -28,6 +28,7 @@ export const getMetaplexData = async (mintAddresses: string[]) => {
       if (account.data) {
         try {
           const MetadataParsed = decodeMetadata(account.data);
+          console.log(MetadataParsed)
           return MetadataParsed;
         } catch (e) {
           console.error(e);

@@ -27,6 +27,7 @@ import { arrayify, zeroPad } from "ethers/lib/utils";
 import { useSnackbar } from "notistack";
 import { useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { BNS_ON_ETH, ENS_ON_ETH } from "../solana/constants";
 import { useEthereumProvider } from "../contexts/EthereumProviderContext";
 import { useSolanaWallet } from "../contexts/SolanaWalletContext";
 import { BNS__factory } from "../ethers-contracts/abi";
@@ -70,8 +71,8 @@ export async function transferFromEth(
   nftName: string,
   overrides: Overrides & { from?: string | Promise<string> } = {}
 ): Promise<ContractReceipt> {
-  const bridneNSContractAddress = "0xEefa53A14d3D8f5dA253F0E0CbCf6B66e07F03fD";
-  const ENSContractAddress = "0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85";
+  const bridneNSContractAddress = BNS_ON_ETH;
+  const ENSContractAddress = ENS_ON_ETH;
   const recipientChainId = coalesceChainId(recipientChain);
 
   // approve transfer of ensToken to bnsContract
