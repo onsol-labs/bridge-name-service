@@ -305,7 +305,7 @@ const getEthereumAccountsCovalent = async (
         // TODO: filter?
         if (
           item.contract.address &&
-          item.contract.address === ENS_ON_ETH &&
+          item.contract.address === ENS_ON_ETH.toLowerCase() &&
           item.balance &&
           item.balance !== "0" &&
           (nft
