@@ -61,7 +61,7 @@ dependencies = [
 [[package]]
 name = "alt-name-service"
 version = "0.5.0"
-source = "git+https://github.com/onsol-labs/alternative-name-service.git?branch=v0.5.0#ce6aa5a39cde6d7ff7a647bad0e76374b7fd830d"
+source = "git+https://github.com/onsol-labs/alternative-name-service.git?branch=v0.5.0#91ad532d242414a17942a34ccd5731fb15783022"
 dependencies = [
  "anchor-lang",
  "num-derive",
@@ -2007,7 +2007,7 @@ dependencies = [
 [[package]]
 name = "tld_house"
 version = "0.5.5"
-source = "git+https://github.com/onsol-labs/tld-house.git?branch=v0.5.5#6aa311128e82b132cac764de5a014567c6d8f46d"
+source = "git+https://github.com/onsol-labs/tld-house.git?branch=v0.5.5#c60ce1688cc6db8a4c7bd9ca1e272ba08066f9c1"
 dependencies = [
  "alt-name-service",
  "anchor-lang",

@@ -13,32 +13,32 @@ export const TLD_STATE_PREFIX = "tld_pda";
 export const SOLANA_NATIVE_MINT = new PublicKey(
   "So11111111111111111111111111111111111111112",
 );
-// export const ANS_PROGRAM_ID = new PublicKey(
-//   "ALTNSZ46uaAUU7XUV6awvdorLGqAsPwa9shm7h4uP2FK",
-// );
-// export const TLD_HOUSE_PROGRAM_ID = new PublicKey(
-//   "TLDHkysf5pCnKsVA4gXpNvmy7psXLPEu4LAdDJthT9S",
-// );
-// export const NAME_HOUSE_PROGRAM_ID = new PublicKey(
-//   "NH3uX6FtVE2fNREAioP7hm5RaozotZxeL6khU1EHx51",
-// );
-// export const TLD_ORIGIN = "ANS";
 export const ANS_PROGRAM_ID = new PublicKey(
-  "B4nDum6v4RLpyETk3MmU4rZpkZKt17PsY4bpRf46BEtN",
+  "ALTNSZ46uaAUU7XUV6awvdorLGqAsPwa9shm7h4uP2FK",
 );
 export const TLD_HOUSE_PROGRAM_ID = new PublicKey(
-  "TLDhatkjchgoteyVPXkKzAvVjj25wZ6ceEtEhsDAVjK",
+  "TLDHkysf5pCnKsVA4gXpNvmy7psXLPEu4LAdDJthT9S",
 );
 export const NAME_HOUSE_PROGRAM_ID = new PublicKey(
-  "H8PAm4rHDBTcyVk9KLtfMH6rDkmyAX4YQCGBsmyR7sv3",
+  "NH3uX6FtVE2fNREAioP7hm5RaozotZxeL6khU1EHx51",
 );
-export const TLD_ORIGIN = "TEST105";
+export const TLD_ORIGIN = "ANS";
+// export const ANS_PROGRAM_ID = new PublicKey(
+//   "B4nDum6v4RLpyETk3MmU4rZpkZKt17PsY4bpRf46BEtN",
+// );
+// export const TLD_HOUSE_PROGRAM_ID = new PublicKey(
+//   "TLDhatkjchgoteyVPXkKzAvVjj25wZ6ceEtEhsDAVjK",
+// );
+// export const NAME_HOUSE_PROGRAM_ID = new PublicKey(
+//   "H8PAm4rHDBTcyVk9KLtfMH6rDkmyAX4YQCGBsmyR7sv3",
+// );
+// export const TLD_ORIGIN = "TEST105";
 export const BNS_SOL_PROGRAM_ID = new PublicKey("BQqpUU12TqvMm6NRwM9Lv7vKZLWwWzgaZh2Q2qvkmcbi")
 export const WORMHOLE_PROGRAM_ID = new PublicKey("2rHhojZ7hpu1zA91nvZmT8TqWWvMcKmmNBCr2mKTtMq4")
-export const BNS_ETH_PROGRAM_BUFFER = Buffer.from([
-  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 238, 250, 83, 161, 77, 61, 143, 93, 162, 83, 240, 224,
-  203, 207, 107, 102, 224, 127, 3, 253,
-])
+
+export const BNS_ON_ETH = "0xEefa53A14d3D8f5dA253F0E0CbCf6B66e07F03fD"
+export const BNS_ON_ETH_PADDED = "000000000000000000000000Eefa53A14d3D8f5dA253F0E0CbCf6B66e07F03fD"
+export const ENS_ON_ETH = "0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85"
 
 export const SHDW_TOKEN_MINT = new PublicKey(
   "SHDWyBxihqiCj6YekG2GUr7wqKLeLAMK1gHZck9pL6y",

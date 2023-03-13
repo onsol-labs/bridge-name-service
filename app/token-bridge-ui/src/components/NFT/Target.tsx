@@ -36,6 +36,7 @@ import KeyAndBalance from "../KeyAndBalance";
 import LowBalanceWarning from "../LowBalanceWarning";
 import StepDescription from "../StepDescription";
 import ChainWarningMessage from "../ChainWarningMessage";
+import { BNS_ON_ETH_PADDED } from "../../solana/constants";
 
 function Target() {
   const dispatch = useDispatch();
@@ -48,7 +49,7 @@ function Target() {
   const targetAddressHex = useSelector(selectNFTTargetAddressHex);
   const targetAsset = useSelector(selectNFTTargetAsset);
   const originChain = useSelector(selectNFTOriginChain);
-  const originAsset = "000000000000000000000000Eefa53A14d3D8f5dA253F0E0CbCf6B66e07F03fD" // useSelector(selectNFTOriginAsset);
+  const originAsset = BNS_ON_ETH_PADDED; // useSelector(selectNFTOriginAsset);
   const originTokenId = useSelector(selectNFTOriginTokenId);
   let tokenId;
   // console.log(originAsset)
@@ -85,7 +86,7 @@ function Target() {
   }, [targetChain]);
 
   console.log(targetAsset)
-  
+
   return (
     <>
       <StepDescription>Select a recipient chain and address.</StepDescription>

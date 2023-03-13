@@ -102,7 +102,7 @@ pub fn handle_domain_redeeming<'info>(
     tld: String,
     th_bump: u8,
 ) -> Result<()> {
-    msg!("Wrapping {}.eth", &name);
+    msg!("Redeem {}.eth", &name);
     let bns_mint_account = &ctx.accounts.bns_mint_account;
     let ts_bump = ctx.bumps.get("tld_state").unwrap();
     let name_account_bump = ctx.bumps.get("name_account").unwrap();

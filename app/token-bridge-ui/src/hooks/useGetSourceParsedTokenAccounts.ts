@@ -25,6 +25,7 @@ import {
 } from "../contexts/EthereumProviderContext";
 import { useSolanaWallet } from "../contexts/SolanaWalletContext";
 import ethIcon from "../icons/eth.svg";
+import { ENS_ON_ETH } from "../solana/constants";
 import {
   errorSourceParsedTokenAccounts as errorSourceParsedTokenAccountsNFT,
   fetchSourceParsedTokenAccounts as fetchSourceParsedTokenAccountsNFT,
@@ -304,6 +305,7 @@ const getEthereumAccountsCovalent = async (
         // TODO: filter?
         if (
           item.contract.address &&
+          item.contract.address === ENS_ON_ETH &&
           item.balance &&
           item.balance !== "0" &&
           (nft

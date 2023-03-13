@@ -26,7 +26,8 @@ module.exports = {
     },
     ethereum: {
       provider: () =>
-        new HDWalletProvider(process.env.PRIVATE_KEY, "https://rpc.ankr.com/eth"),
+        new HDWalletProvider(process.env.PRIVATE_KEY, 
+          "https://eth-mainnet.g.alchemy.com/v2/ODteMs1vRtOihFFIRAtr3WJIEg-V61W2"),
       network_id: 1,
       confirmations: 1,
       timeoutBlocks: 200,

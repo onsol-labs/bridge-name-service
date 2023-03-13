@@ -19,6 +19,7 @@ import { ethers } from "ethers";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useEthereumProvider } from "../contexts/EthereumProviderContext";
+import { BNS_ON_ETH_PADDED } from "../solana/constants";
 import {
   errorDataWrapper,
   fetchDataWrapper,
@@ -176,8 +177,8 @@ function useFetchTargetAsset(nft?: boolean) {
       if (targetChain === CHAIN_ID_SOLANA && originChain && originAsset) {
         dispatch(setTargetAsset(fetchDataWrapper()));
         try {
-          const originAsset = "000000000000000000000000Eefa53A14d3D8f5dA253F0E0CbCf6B66e07F03fD";
-          console.log('useFetchTargetAsset originAsset', originAsset)
+          const originAsset = BNS_ON_ETH_PADDED; // "000000000000000000000000Eefa53A14d3D8f5dA253F0E0CbCf6B66e07F03fD";
+          // console.log('useFetchTargetAsset originAsset', originAsset)
           const connection = new Connection(SOLANA_HOST, "confirmed");
           const asset = await (nft
             ? getForeignAssetSolNFT(

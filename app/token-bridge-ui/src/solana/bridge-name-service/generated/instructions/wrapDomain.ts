@@ -66,6 +66,7 @@ export const wrapDomainStruct = new beet.FixableBeetArgsStruct<
  * @property [_writable_] nameParentAccount
  * @property [] tldHouseProgram
  * @property [] altNameServiceProgram
+ * @property [] instructionSysvarAccount
  * @category Instructions
  * @category WrapDomain
  * @category generated
@@ -90,6 +91,7 @@ export type WrapDomainInstructionAccounts = {
   tldHouseProgram: web3.PublicKey
   altNameServiceProgram: web3.PublicKey
   systemProgram?: web3.PublicKey
+  instructionSysvarAccount?: web3.PublicKey
   anchorRemainingAccounts?: web3.AccountMeta[]
 }
 
@@ -209,6 +211,11 @@ export function createWrapDomainInstruction(
     },
     {
       pubkey: accounts.systemProgram ?? web3.SystemProgram.programId,
+      isWritable: false,
+      isSigner: false,
+    },
+    {
+      pubkey: accounts.instructionSysvarAccount ?? web3.SYSVAR_INSTRUCTIONS_PUBKEY,
       isWritable: false,
       isSigner: false,
     },
