@@ -6,6 +6,7 @@
     "@certusone/wormhole-sdk": "^0.9.11",
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",
+    "@infura/sdk": "^2.1.5",
     "@metamask/detect-provider": "^1.2.0",
     "@metaplex-foundation/beet": "^0.7.1",
     "@metaplex-foundation/mpl-token-metadata": "^2.9.0",

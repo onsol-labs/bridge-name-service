@@ -482,11 +482,11 @@ export default function Recovery() {
           fullWidth
           margin="normal"
         />
-        <RelayerRecovery
+        {/* <RelayerRecovery
           parsedPayload={parsedPayload}
           signedVaa={recoverySignedVAA}
           onClick={handleRecoverWithRelayerClick}
-        />
+        /> */}
         <ButtonWithLoader
           onClick={handleRecoverClick}
           disabled={!enableRecovery}

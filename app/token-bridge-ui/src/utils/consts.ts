@@ -142,18 +142,18 @@ export const COVALENT_API_KEY = process.env.REACT_APP_COVALENT_API_KEY
 export const COVALENT_ETHEREUM = 5; // Covalent only supports mainnet and Kovan
 
 export const GET_TOKENS_URL = (
-  cluster: Cluster, 
+  cluster: Cluster,
   chainId: ChainId,
   walletAddress: string,
   nft?: boolean,
   noNftMetadata?: boolean
 ) => {
-  if(cluster === "mainnet"){
+  if (cluster === "mainnet") {
     return `https://eth-mainnet.g.alchemy.com/v2/ODteMs1vRtOihFFIRAtr3WJIEg-V61W2/getNFTs/?owner=${walletAddress}`
-  } else if(cluster === "testnet") {
-    return `https://eth-goerli.g.alchemy.com/v2/xqzYNQBfiNgQPztNiM4mDvuc5R25ag8x/getNFTs/?owner=${walletAddress}`;
+  } else if (cluster === "testnet") {
+    return `https://eth-goerli.g.alchemy.com/v2/_vPNUynh4wlTeGt7siQNWFrWWZpdQucj/getNFTs/?owner=${walletAddress}`;
   } else {
-    return `https://eth-goerli.g.alchemy.com/v2/xqzYNQBfiNgQPztNiM4mDvuc5R25ag8x/getNFTs/?owner=${walletAddress}`;
+    return `https://eth-goerli.g.alchemy.com/v2/_vPNUynh4wlTeGt7siQNWFrWWZpdQucj/getNFTs/?owner=${walletAddress}`;
   }
 };
 
@@ -169,7 +169,7 @@ export const COVALENT_GET_TOKENS_URL = (
       : "";
   // https://www.covalenthq.com/docs/api/#get-/v1/{chain_id}/address/{address}/balances_v2/
   return chainNum
-    ? `https://eth-goerli.g.alchemy.com/v2/xqzYNQBfiNgQPztNiM4mDvuc5R25ag8x/getNFTs/?owner=${walletAddress}`
+    ? `https://eth-goerli.g.alchemy.com/v2/_vPNUynh4wlTeGt7siQNWFrWWZpdQucj/getNFTs/?owner=${walletAddress}`
     //`https://api.covalenthq.com/v1/${chainNum}/address//balances_nft/?key=${COVALENT_API_KEY}`
     : "";
 };

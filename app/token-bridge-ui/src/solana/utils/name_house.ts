@@ -168,7 +168,7 @@ export async function getNameAccountKey(
 
 export const getParentNameKeyWithBump = async (tldName: string) => {
   const [nameOriginTldKey] = await getOriginNameAccountKey();
-  console.log("nameOriginTldKey: ", nameOriginTldKey.toBase58());
+  // console.log("nameOriginTldKey: ", nameOriginTldKey.toBase58());
   const parentHashedName = await getHashedName(tldName);
   return await getNameAccountKey(
     parentHashedName,

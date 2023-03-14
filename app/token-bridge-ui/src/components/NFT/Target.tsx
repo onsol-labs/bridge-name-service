@@ -23,7 +23,9 @@ import {
   selectNFTTargetAddressHex,
   selectNFTTargetAsset,
   selectNFTTargetChain,
+  selectNFTOriginAsset,
   selectNFTTargetError,
+  selectNFTSourceParsedTokenAccount,
 } from "../../store/selectors";
 import {
   CHAINS_BY_ID,
@@ -37,6 +39,7 @@ import LowBalanceWarning from "../LowBalanceWarning";
 import StepDescription from "../StepDescription";
 import ChainWarningMessage from "../ChainWarningMessage";
 import { BNS_ON_ETH_PADDED } from "../../solana/constants";
+import { getWormholeMintAccount } from "../../solana/utils/bridgeNameService";
 
 function Target() {
   const dispatch = useDispatch();
@@ -49,12 +52,15 @@ function Target() {
   const targetAddressHex = useSelector(selectNFTTargetAddressHex);
   const targetAsset = useSelector(selectNFTTargetAsset);
   const originChain = useSelector(selectNFTOriginChain);
-  const originAsset = BNS_ON_ETH_PADDED; // useSelector(selectNFTOriginAsset);
+  const mintMetadata = useSelector(selectNFTSourceParsedTokenAccount);
   const originTokenId = useSelector(selectNFTOriginTokenId);
   let tokenId;
-  // console.log(originAsset)
-  // console.log(originTokenId)
-  // console.log(targetAddressHex)
+  let originAsset = useSelector(selectNFTOriginAsset);
+  if (originChain === CHAIN_ID_SOLANA) {
+    originAsset = getWormholeMintAccount(mintMetadata?.name!)[0].toString();
+  } else {
+    originAsset = BNS_ON_ETH_PADDED
+  }
   try {
     tokenId =
       originChain === CHAIN_ID_SOLANA && originAsset
@@ -84,8 +90,6 @@ function Target() {
   const isTransferDisabled = useMemo(() => {
     return getIsTransferDisabled(targetChain, false);
   }, [targetChain]);
-
-  console.log(targetAsset)
 
   return (
     <>

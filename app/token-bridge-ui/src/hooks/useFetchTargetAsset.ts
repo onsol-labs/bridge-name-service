@@ -20,6 +20,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useEthereumProvider } from "../contexts/EthereumProviderContext";
 import { BNS_ON_ETH_PADDED } from "../solana/constants";
+import { getWormholeMintAccount } from "../solana/utils/bridgeNameService";
 import {
   errorDataWrapper,
   fetchDataWrapper,
@@ -32,6 +33,7 @@ import {
   selectNFTOriginChain,
   selectNFTOriginTokenId,
   selectNFTTargetChain,
+  selectNFTSourceParsedTokenAccount,
   selectTransferIsSourceAssetWormholeWrapped,
   selectTransferOriginAsset,
   selectTransferOriginChain,
@@ -49,6 +51,7 @@ import {
 
 function useFetchTargetAsset(nft?: boolean) {
   const dispatch = useDispatch();
+  const mintMetadata = useSelector(selectNFTSourceParsedTokenAccount);
   const isSourceAssetWormholeWrapped = useSelector(
     nft
       ? selectNFTIsSourceAssetWormholeWrapped
@@ -57,7 +60,7 @@ function useFetchTargetAsset(nft?: boolean) {
   const originChain = useSelector(
     nft ? selectNFTOriginChain : selectTransferOriginChain
   );
-  const originAsset = useSelector(
+  let originAsset = useSelector(
     nft ? selectNFTOriginAsset : selectTransferOriginAsset
   );
   const originTokenId = useSelector(selectNFTOriginTokenId);
@@ -137,6 +140,7 @@ function useFetchTargetAsset(nft?: boolean) {
         originAsset
       ) {
         dispatch(setTargetAsset(fetchDataWrapper()));
+        originAsset = getWormholeMintAccount(mintMetadata?.name!)[0].toString();
         try {
           const asset = await (nft
             ? getForeignAssetEthNFT(
@@ -177,8 +181,7 @@ function useFetchTargetAsset(nft?: boolean) {
       if (targetChain === CHAIN_ID_SOLANA && originChain && originAsset) {
         dispatch(setTargetAsset(fetchDataWrapper()));
         try {
-          const originAsset = BNS_ON_ETH_PADDED; // "000000000000000000000000Eefa53A14d3D8f5dA253F0E0CbCf6B66e07F03fD";
-          // console.log('useFetchTargetAsset originAsset', originAsset)
+          const originAsset = BNS_ON_ETH_PADDED;
           const connection = new Connection(SOLANA_HOST, "confirmed");
           const asset = await (nft
             ? getForeignAssetSolNFT(

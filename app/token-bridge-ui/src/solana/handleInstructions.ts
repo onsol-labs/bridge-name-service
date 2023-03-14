@@ -13,6 +13,7 @@ export interface PreparedInstructionWrapDomain {
 }
 
 export async function wrapDomain(
+  connection: Connection,
   tokenId: string,
   payerAddress: PublicKey,
 ): Promise<PreparedInstructionWrapDomain> {
@@ -36,6 +37,9 @@ export async function wrapDomain(
     undefined,
     parentNameKey,
   );
+
+  const nameAccountCreated = await NameRecordHeaderRaw.fromAccountAddress(connection, nameAccount)
+  if (nameAccountCreated) return { instructions: [], domainName: domainName }
   const attribuesLen = offChainMetadata.data['attributes'].length
   // console.log(offChainMetadata)
   // the value below needs to be taken from the nft metadata.

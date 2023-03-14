@@ -236,7 +236,7 @@ const createNFTParsedTokenAccountFromCovalent = (
     animation_url: nft_data.external_data.animation_url,
     external_url: nft_data.external_data.external_url,
     image: nft_data.external_data.image,
-    image_256: nft_data.external_data.image_256,
+    image_256: covalent.logo_url,
     nftName: nft_data.external_data.name,
     description: nft_data.external_data.description,
   };
@@ -321,20 +321,20 @@ const getEthereumAccountsCovalent = async (
               token_id: item.id.tokenId,
               token_balance: item.balance,
               external_data: {
-                image: item.metadata.image_url,
-                image_256: item.metadata.image_url,
+                image: item.media[0].thumbnail,
+                image_256: item.media[0].thumbnail,
                 name: item.metadata.name,
                 description: item.metadata.description,
 
               },
-              token_url: item.metadata.url,
+              token_url: item.tokenUri.raw,
             }]
 
           } as AlchemyData);
         }
       }
     }
-    console.log("output: ", output)
+    // console.log("output: ", output)
     return output;
   } catch (error) {
     return Promise.reject("Unable to retrieve your Ethereum Tokens.");

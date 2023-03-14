@@ -77,12 +77,14 @@ export async function transferFromEth(
 
   // approve transfer of ensToken to bnsContract
   const ensToken = NFTImplementation__factory.connect(tokenAddress, signer);
-  await (await ensToken.approve(bridneNSContractAddress, tokenID)).wait();
+  const ownerOfToken = await ensToken.ownerOf(tokenID);
+  if (ownerOfToken === await signer.getAddress()) {
+    await (await ensToken.approve(bridneNSContractAddress, tokenID)).wait();
 
-  // wraps ens token to bnsContract and creates bnsNFT
-  const bnsContract = BNS__factory.connect(bridneNSContractAddress, signer);
-  await (await bnsContract.wrapNFT(ENSContractAddress, tokenID, overrides)).wait();
-
+    // wraps ens token to bnsContract and creates bnsNFT
+    const bnsContract = BNS__factory.connect(bridneNSContractAddress, signer);
+    await (await bnsContract.wrapNFT(ENSContractAddress, tokenID, overrides)).wait();
+  }
   // bridge the bnsToken to wormhole
   const bnsToken = NFTImplementation__factory.connect(bridneNSContractAddress, signer);
   await (await bnsToken.approve(nftBridgeAddress, tokenID)).wait();
