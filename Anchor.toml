@@ -2,7 +2,7 @@
 seeds = false
 skip-lint = false
 [programs.devnet]
-bridge_name_service = "BQqpUU12TqvMm6NRwM9Lv7vKZLWwWzgaZh2Q2qvkmcbi"
+bridge_name_service = "BNSwwSqW7HkAviEjNYhkMKws9jRerzMwb6yvKyYHPeqT"
 
 [registry]
 url = "https://api.apr.dev"
