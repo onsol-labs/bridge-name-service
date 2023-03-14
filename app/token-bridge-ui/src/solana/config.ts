@@ -21,5 +21,5 @@ export const SOLANA_ENVIRONMENT =
 
 export const TLD_HOUSE_AUTHORITY = new PublicKey(
   process.env.TLD_HOUSE_AUTHORITY ||
-  "TLDnouMsypo9L4TTzPrpr7MEghoiu3o16RDt5VJRpni",
+  "DaJVVD52pfVRZe7ArD7Y8GSQaUssSxgdtuTKgimtWzCx",
 );

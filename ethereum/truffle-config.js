@@ -29,11 +29,13 @@ module.exports = {
     ethereum: {
       provider: () =>
         new HDWalletProvider(process.env.PRIVATE_KEY, 
-          "https://eth-mainnet.g.alchemy.com/v2/ODteMs1vRtOihFFIRAtr3WJIEg-V61W2"),
+          "https://mainnet.infura.io/v3/576a4181b38c475aa545b5a0f7458acf"),
       network_id: 1,
       confirmations: 1,
       timeoutBlocks: 200,
       skipDryRun: false,
+      gas: "1500582",
+      gasPrice: "40000000000",
     },
     base_testnet: {
       provider: () => {

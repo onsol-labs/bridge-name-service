@@ -1,8 +1,8 @@
 import { Connection, Keypair, PublicKey } from "@solana/web3.js";
-import { bs58 } from "@project-serum/anchor/dist/cjs/utils/bytes"
 
 /* .xyz - for testing */
 export const TLD = process.env.TLD || ".eth";
+export const ETH_ENVIRONMENT = process.env.ETH_ENVIRONMENT || "goerli";
 
 export const SHDW_ACCOUNT = new PublicKey(
   process.env.SHDW_ACCOUNT_PK ||
@@ -38,7 +38,7 @@ export const DEVNET =
   "https://rpc-devnet.helius.xyz/?api-key=a357afba-2171-4387-8073-e0402df45e33";
 
 /* connection */
-export const CONNECTION = new Connection(DEVNET);
+export const CONNECTION = new Connection(MAINNET);
 // export const CONNECTION = new Connection(
 //   SOLANA_ENVIRONMENT == "mainnet-beta" ? MAINNET : DEVNET,
 // );
@@ -52,5 +52,5 @@ export const AWS_REGION = "eu-west-1";
 
 export const TLD_HOUSE_AUTHORITY = new PublicKey(
   process.env.TLD_HOUSE_AUTHORITY ||
-  "TLDnouMsypo9L4TTzPrpr7MEghoiu3o16RDt5VJRpni",
+  "DaJVVD52pfVRZe7ArD7Y8GSQaUssSxgdtuTKgimtWzCx",
 );

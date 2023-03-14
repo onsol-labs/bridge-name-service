@@ -121,7 +121,8 @@ async function wrapDomain(
     parentNameKey,
   );
   const [bnsMint, hexedTokenId] = getWormholeMintAccount(domainName)
-  const ensMetadataUri = `https://metadata.ens.domains/goerli/0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85/0x${hexedTokenId}`
+  //const ensMetadataUri = `https://metadata.ens.domains/goerli/0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85/0x${hexedTokenId}`
+  const ensMetadataUri = `https://metadata.ens.domains/${config.ETH_ENVIRONMENT}/0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85/0x${hexedTokenId}`
   const offChainMetadata = await axios.get(ensMetadataUri);
   const attribuesLen = offChainMetadata.data['attributes'].length
   // console.log(offChainMetadata)

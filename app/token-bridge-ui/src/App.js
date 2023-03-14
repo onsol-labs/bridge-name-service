@@ -72,7 +72,7 @@ function App() {
               </>
             }
           >
-            ENS Domain Bridge
+            .bridge
           </HeaderText>
         </Container>
       ) : null}
@@ -98,7 +98,7 @@ function App() {
       <Box></Box>
       <Box></Box>
       <Box></Box>
-      <Footer />
+      {/* <Footer /> */}
     </Box>
   );
 }
