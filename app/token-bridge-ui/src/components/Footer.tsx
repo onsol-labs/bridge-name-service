@@ -15,11 +15,10 @@ export default function Footer() {
       },
     })}>
       <Typography variant="body2" gutterBottom>
-        This Interface is only intended as a developmental tool. For more
-        information, visit the sites below:
+        hello there
       </Typography>
 
-      <Button
+      {/* <Button
         variant="outlined"
         href="https://wormhole.com/"
         target="_blank"
@@ -47,7 +46,8 @@ export default function Footer() {
       >
         {" "}
         Github
-      </Button>
+      </Button> */}
+      &nbps;
     </Box>
   );
 }
