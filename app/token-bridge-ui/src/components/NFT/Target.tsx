@@ -135,7 +135,7 @@ function Target() {
       }}>
         <Typography>
           You will have to pay transaction fees on{" "}
-          {CHAINS_BY_ID[targetChain].name} to redeem your NFT.
+          {CHAINS_BY_ID[targetChain].name} to redeem your Domain.
         </Typography>
         {isEVMChain(targetChain) && (
           <GasEstimateSummary methodType="nft" chainId={targetChain} />

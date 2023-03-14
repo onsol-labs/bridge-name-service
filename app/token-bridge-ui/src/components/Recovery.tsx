@@ -1,5 +1,6 @@
 import {
   ChainId,
+  CHAIN_ID_ETH,
   CHAIN_ID_SOLANA,
   getEmitterAddressEth,
   getEmitterAddressSolana,
@@ -226,10 +227,10 @@ export default function Recovery() {
   const { enqueueSnackbar } = useSnackbar();
   const dispatch = useDispatch();
   const { provider } = useEthereumProvider();
-  const [type, setType] = useState("Token");
+  const [type, setType] = useState("NFT");
   const isNFT = type === "NFT";
   const [recoverySourceChain, setRecoverySourceChain] =
-    useState<ChainId>(CHAIN_ID_SOLANA);
+    useState<ChainId>(CHAIN_ID_ETH);
   const [recoverySourceTx, setRecoverySourceTx] = useState("");
   const [recoverySourceTxIsLoading, setRecoverySourceTxIsLoading] =
     useState(false);
@@ -436,7 +437,7 @@ export default function Recovery() {
     <Container maxWidth="md">
       <Card sx={{ padding: "32px 32px 16px" }}>
         <Alert severity="info" variant="outlined">
-          If you have sent your tokens but have not redeemed them, you may paste
+          If you have sent your domain but have not redeemed it, you may paste
           in the Source Transaction ID (from Step 3) to resume your transfer.
         </Alert>
         <TextField
@@ -449,8 +450,8 @@ export default function Recovery() {
           fullWidth
           margin="normal"
         >
-          <MenuItem value="Token">Token</MenuItem>
-          <MenuItem value="NFT">NFT</MenuItem>
+          {/* <MenuItem value="Token">Token</MenuItem> */}
+          <MenuItem value="NFT">Domain</MenuItem>
         </TextField>
         <ChainSelect
           select

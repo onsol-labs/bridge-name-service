@@ -64,7 +64,10 @@ function App() {
               <>
                 <Typography>
                   This is an experimental ENS domain bridge that transfers
-                  ENS domains across Solana and Ethereum through Wormhole.
+                  ENS domains across Solana and Ethereum.
+                </Typography>
+                <Typography>
+                  - powered by ANS Protocol and Wormhole -
                 </Typography>
               </>
             }

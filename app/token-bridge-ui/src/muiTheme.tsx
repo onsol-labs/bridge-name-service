@@ -13,6 +13,7 @@ export const theme = responsiveFontSizes(
         lineHeight: 0.9,
         letterSpacing: -2,
         fontWeight: "bold",
+        fontSize: "3rem",
       },
       h2: {
         fontWeight: "200",

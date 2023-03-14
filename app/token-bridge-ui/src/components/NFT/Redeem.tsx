@@ -13,7 +13,7 @@ function Redeem() {
   const { isReady, statusMessage } = useIsWalletReady(targetChain);
   return (
     <>
-      <StepDescription>Receive the NFT on the target chain</StepDescription>
+      <StepDescription>Receive the Domain on the target chain</StepDescription>
       <KeyAndBalance chainId={targetChain} />
       <ButtonWithLoader
         disabled={!isReady || disabled}

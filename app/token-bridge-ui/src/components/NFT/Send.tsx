@@ -38,7 +38,7 @@ function Send() {
   return (
     <>
       <StepDescription>
-        Transfer the NFT to the Wormhole Token Bridge.
+        Transfer the Domain to the Wormhole Token Bridge.
       </StepDescription>
       <KeyAndBalance chainId={sourceChain} />
       <Alert severity="info" variant="outlined">
