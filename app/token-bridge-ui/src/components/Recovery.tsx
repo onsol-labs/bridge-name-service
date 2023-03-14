@@ -1,5 +1,6 @@
 import {
   ChainId,
+  CHAIN_ID_ETH,
   CHAIN_ID_SOLANA,
   getEmitterAddressEth,
   getEmitterAddressSolana,
@@ -226,10 +227,10 @@ export default function Recovery() {
   const { enqueueSnackbar } = useSnackbar();
   const dispatch = useDispatch();
   const { provider } = useEthereumProvider();
-  const [type, setType] = useState("Token");
+  const [type, setType] = useState("NFT");
   const isNFT = type === "NFT";
   const [recoverySourceChain, setRecoverySourceChain] =
-    useState<ChainId>(CHAIN_ID_SOLANA);
+    useState<ChainId>(CHAIN_ID_ETH);
   const [recoverySourceTx, setRecoverySourceTx] = useState("");
   const [recoverySourceTxIsLoading, setRecoverySourceTxIsLoading] =
     useState(false);
@@ -449,7 +450,7 @@ export default function Recovery() {
           fullWidth
           margin="normal"
         >
-          <MenuItem value="Token">Token</MenuItem>
+          {/* <MenuItem value="Token">Token</MenuItem> */}
           <MenuItem value="NFT">NFT</MenuItem>
         </TextField>
         <ChainSelect
@@ -481,11 +482,11 @@ export default function Recovery() {
           fullWidth
           margin="normal"
         />
-        <RelayerRecovery
+        {/* <RelayerRecovery
           parsedPayload={parsedPayload}
           signedVaa={recoverySignedVAA}
           onClick={handleRecoverWithRelayerClick}
-        />
+        /> */}
         <ButtonWithLoader
           onClick={handleRecoverClick}
           disabled={!enableRecovery}

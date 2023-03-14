@@ -37,6 +37,7 @@ export const BasicAccountRender = (
   const tokenId = account.tokenId ? shortenAddress(account.tokenId) : account.tokenId;
   const shouldDisplayBalance = !displayBalance || displayBalance(account);
 
+  // console.log(account)
   const nftContent = (
     <Box
       sx={(theme) => ({
@@ -62,7 +63,7 @@ export const BasicAccountRender = (
           alignItems: "center",
           justifyContent: "center",
           width: 40,
-          margin:0,
+          margin: 0,
         }}
         className="TokenImageContainer">
         {uri && <Box component="img" alt="" sx={{
@@ -80,7 +81,6 @@ export const BasicAccountRender = (
       </div>
     </Box>
   );
-
   const tokenContent = (
     <Box
       sx={(theme) => ({
@@ -113,7 +113,7 @@ export const BasicAccountRender = (
         }} src={uri} />}
       </Box>
       <div>
-        <Typography variant="subtitle1">{symbol}</Typography>
+        <Typography variant="subtitle1">{nftName}</Typography>
       </div>
       <div>
         {

@@ -26,7 +26,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useEthereumProvider } from "../contexts/EthereumProviderContext";
 import { useSolanaWallet } from "../contexts/SolanaWalletContext";
 import { setIsRedeeming, setRedeemTx } from "../store/nftSlice";
-import { selectNFTIsRedeeming, selectNFTTargetChain } from "../store/selectors";
+import { selectNFTIsRedeeming, selectNFTTargetChain, selectNFTOriginTokenId } from "../store/selectors";
 import {
   getNFTBridgeAddressForChain,
   MAX_VAA_UPLOAD_RETRIES_SOLANA,
@@ -39,23 +39,34 @@ import parseError from "../utils/parseError";
 import { signSendAndConfirm } from "../utils/solana";
 import useNFTSignedVAA from "./useNFTSignedVAA";
 import { createNftAns, wrapDomain } from "../solana/handleInstructions";
+import { BNS_ON_ETH, ENS_ON_ETH } from "../solana/constants";
+import { BNS__factory } from "../ethers-contracts/abi";
 
 async function evm(
   dispatch: any,
   enqueueSnackbar: any,
   signer: Signer,
   signedVAA: Uint8Array,
-  chainId: ChainId
+  chainId: ChainId,
+  tokenID: string
 ) {
   dispatch(setIsRedeeming(true));
   try {
     const overrides = {};
-    const receipt = await redeemOnEth(
-      getNFTBridgeAddressForChain(chainId),
-      signer,
-      signedVAA,
-      overrides
-    );
+    const bridneNSContractAddress = BNS_ON_ETH;
+    const ENSContractAddress = ENS_ON_ETH;
+    const bnsContract = BNS__factory.connect(bridneNSContractAddress, signer);
+    const ownerOfToken = await bnsContract.ownerOf(tokenID);
+    if (ownerOfToken === getNFTBridgeAddressForChain(chainId)) {
+      await redeemOnEth(
+        getNFTBridgeAddressForChain(chainId),
+        signer,
+        signedVAA,
+        overrides
+      );
+    }
+    const receipt = await (await bnsContract.unwrapNFT(ENSContractAddress, tokenID, overrides)).wait();
+
     dispatch(
       setRedeemTx({ id: receipt.transactionHash, block: receipt.blockNumber })
     );
@@ -134,13 +145,15 @@ async function solana(
         );
         txid = await signSendAndConfirm(wallet, connection, transaction);
       }
-      const { instructions, domainName } = await wrapDomain(tokenId.toHexString(), new PublicKey(payerAddress))
-      const transaction = new Transaction().add(...instructions);
+      const { instructions, domainName } = await wrapDomain(connection, tokenId.toHexString(), new PublicKey(payerAddress))
+      if (instructions.length > 1) {
+        const transaction = new Transaction().add(...instructions);
 
-      const { blockhash } = await connection.getLatestBlockhash('finalized');
-      transaction.recentBlockhash = blockhash;
-      transaction.feePayer = new PublicKey(payerAddress);
-      txid = await signSendAndConfirm(wallet, connection, transaction);
+        const { blockhash } = await connection.getLatestBlockhash('finalized');
+        transaction.recentBlockhash = blockhash;
+        transaction.feePayer = new PublicKey(payerAddress);
+        txid = await signSendAndConfirm(wallet, connection, transaction);
+      }
       const createAnsNftIx = await createNftAns(connection, domainName, new PublicKey(payerAddress));
       const txn = new Transaction().add(...createAnsNftIx);
 
@@ -169,12 +182,13 @@ export function useHandleNFTRedeem() {
   const solPK = solanaWallet?.publicKey;
   const { signer } = useEthereumProvider();
   const signedVAA = useNFTSignedVAA();
-  // console.log(signedVAA?.toString())
+  const originTokenId = useSelector(selectNFTOriginTokenId);
+  // console.log(originTokenId?.toString())
 
   const isRedeeming = useSelector(selectNFTIsRedeeming);
   const handleRedeemClick = useCallback(() => {
     if (isEVMChain(targetChain) && !!signer && signedVAA) {
-      evm(dispatch, enqueueSnackbar, signer, signedVAA, targetChain);
+      evm(dispatch, enqueueSnackbar, signer, signedVAA, targetChain, originTokenId!);
     } else if (
       targetChain === CHAIN_ID_SOLANA &&
       !!solanaWallet &&

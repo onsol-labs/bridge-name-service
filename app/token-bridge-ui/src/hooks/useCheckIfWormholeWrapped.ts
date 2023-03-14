@@ -15,6 +15,7 @@ import { Connection } from "@solana/web3.js";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useEthereumProvider } from "../contexts/EthereumProviderContext";
+import { getWormholeMintAccount } from "../solana/utils/bridgeNameService";
 import { setSourceWormholeWrappedInfo as setNFTSourceWormholeWrappedInfo } from "../store/nftSlice";
 import {
   selectNFTIsRecovery,
@@ -56,7 +57,7 @@ function useCheckIfWormholeWrapped(nft?: boolean) {
   const sourceChain = useSelector(
     nft ? selectNFTSourceChain : selectTransferSourceChain
   );
-  const sourceAsset = useSelector(
+  let sourceAsset = useSelector(
     nft ? selectNFTSourceAsset : selectTransferSourceAsset
   );
   const nftSourceParsedTokenAccount = useSelector(
@@ -81,18 +82,18 @@ function useCheckIfWormholeWrapped(nft?: boolean) {
         const wrappedInfo = makeStateSafe(
           await (nft
             ? getOriginalAssetEthNFT(
-                getNFTBridgeAddressForChain(sourceChain),
-                provider,
-                sourceAsset,
-                tokenId,
-                sourceChain
-              )
+              getNFTBridgeAddressForChain(sourceChain),
+              provider,
+              sourceAsset,
+              tokenId,
+              sourceChain
+            )
             : getOriginalAssetEth(
-                getTokenBridgeAddressForChain(sourceChain),
-                provider,
-                sourceAsset,
-                sourceChain
-              ))
+              getTokenBridgeAddressForChain(sourceChain),
+              provider,
+              sourceAsset,
+              sourceChain
+            ))
         );
         if (!cancelled) {
           dispatch(setSourceWormholeWrappedInfo(wrappedInfo));
@@ -101,23 +102,24 @@ function useCheckIfWormholeWrapped(nft?: boolean) {
       if (sourceChain === CHAIN_ID_SOLANA && sourceAsset) {
         try {
           const connection = new Connection(SOLANA_HOST, "confirmed");
+          sourceAsset = getWormholeMintAccount(nftSourceParsedTokenAccount?.name!)[0].toString();
           const wrappedInfo = makeStateSafe(
             await (nft
               ? getOriginalAssetSolNFT(
-                  connection,
-                  SOL_NFT_BRIDGE_ADDRESS,
-                  sourceAsset
-                )
+                connection,
+                SOL_NFT_BRIDGE_ADDRESS,
+                sourceAsset
+              )
               : getOriginalAssetSol(
-                  connection,
-                  SOL_TOKEN_BRIDGE_ADDRESS,
-                  sourceAsset
-                ))
+                connection,
+                SOL_TOKEN_BRIDGE_ADDRESS,
+                sourceAsset
+              ))
           );
           if (!cancelled) {
             dispatch(setSourceWormholeWrappedInfo(wrappedInfo));
           }
-        } catch (e) {}
+        } catch (e) { }
       }
     })();
     return () => {

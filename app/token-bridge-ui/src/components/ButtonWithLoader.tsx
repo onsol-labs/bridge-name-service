@@ -45,7 +45,7 @@ export default function ButtonWithLoader({
               bottom: 0,
               left: "50%",
               marginLeft: -12,
-              marginBottom: 6,
+              marginBottom: '6px',
             }}
           />
         ) : null}

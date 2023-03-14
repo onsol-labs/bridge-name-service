@@ -107,7 +107,7 @@ export default function NFTViewer({
                 data.big_image ||
                 data.small_image,
               animation_url: data.animation_url,
-              nftName: data.nftName,
+              nftName: data.name,
               description: data.description,
               isLoading: false,
             });
@@ -191,7 +191,6 @@ export default function NFTViewer({
       ) : null}
     </>
   );
-
   return (
     <>
       <Box sx={!isLoading ? { display: "none" } : {}}>
