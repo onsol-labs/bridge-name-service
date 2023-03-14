@@ -38,13 +38,13 @@ fn main() {
 
     // let nft_bridge = Pubkey::from_str("2rHhojZ7hpu1zA91nvZmT8TqWWvMcKmmNBCr2mKTtMq4").unwrap();
     // let chain_id = 2_u16;
-    // // let token_address =
-    // //     hex::decode("000000000000000000000000Eefa53A14d3D8f5dA253F0E0CbCf6B66e07F03fD").unwrap();
+    let token_address =
+        hex::decode("0000000000000000000000002b2E2629C8Ae7C991E0c3cEcB48b8ab4dc7299f3").unwrap();
     // let token_address = vec![
     //     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 238, 250, 83, 161, 77, 61, 143, 93, 162, 83, 240, 224,
     //     203, 207, 107, 102, 224, 127, 3, 253,
     // ];
-    // // println!("token_address: {:?}", token_address);
+    println!("token_address: {:?}", token_address);
 
     // // println!("decoded = {:x}", decoded.unwrap().as_slice().as_ref());
     // let mut token_id = vec![0u8; 32];

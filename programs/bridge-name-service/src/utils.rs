@@ -17,10 +17,10 @@ pub fn check_wormhole_mint_account(domain: &str, bns_mint_key: &Pubkey) -> Resul
 
     // BNS in ETH
     // let token_address =
-    //     hex::decode("000000000000000000000000Eefa53A14d3D8f5dA253F0E0CbCf6B66e07F03fD").unwrap();
+    //     hex::decode("0000000000000000000000002b2E2629C8Ae7C991E0c3cEcB48b8ab4dc7299f3").unwrap();
     let token_address = vec![
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 238, 250, 83, 161, 77, 61, 143, 93, 162, 83, 240, 224,
-        203, 207, 107, 102, 224, 127, 3, 253,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 43, 46, 38, 41, 200, 174, 124, 153, 30, 12, 60, 236,
+        180, 139, 138, 180, 220, 114, 153, 243,
     ];
     let mut token_id = vec![0u8; 32];
     u256_result.to_big_endian(&mut token_id);

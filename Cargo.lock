@@ -61,7 +61,7 @@ dependencies = [
 [[package]]
 name = "alt-name-service"
 version = "0.5.0"
-source = "git+https://github.com/onsol-labs/alternative-name-service.git?branch=v0.5.0#91ad532d242414a17942a34ccd5731fb15783022"
+source = "git+https://github.com/onsol-labs/alternative-name-service.git?branch=deployed#79e747b8e47d57c4754f304610c577858902fbd5"
 dependencies = [
  "anchor-lang",
  "num-derive",
@@ -478,6 +478,7 @@ dependencies = [
  "anchor-spl",
  "arrayref",
  "mpl-token-metadata",
+ "name-house",
  "solana-program",
  "spl-associated-token-account",
  "spl-name-service",
@@ -1180,6 +1181,24 @@ dependencies = [
  "solana-program",
  "spl-token",
  "thiserror",
+]
+
+[[package]]
+name = "name-house"
+version = "0.5.5"
+source = "git+https://github.com/onsol-labs/name_house.git?branch=deployed#3269f0e2d35221bf49d1abebc7510668e31aaf82"
+dependencies = [
+ "alt-name-service",
+ "anchor-lang",
+ "anchor-spl",
+ "arrayref",
+ "mpl-token-metadata",
+ "solana-program",
+ "spl-associated-token-account",
+ "spl-token",
+ "thiserror",
+ "tld_house",
+ "uint",
 ]
 
 [[package]]
@@ -2007,7 +2026,7 @@ dependencies = [
 [[package]]
 name = "tld_house"
 version = "0.5.5"
-source = "git+https://github.com/onsol-labs/tld-house.git?branch=v0.5.5#c60ce1688cc6db8a4c7bd9ca1e272ba08066f9c1"
+source = "git+https://github.com/onsol-labs/tld-house.git?branch=main#f191bc4b198245a7c0ae6378ee84457cb6d0e671"
 dependencies = [
  "alt-name-service",
  "anchor-lang",
