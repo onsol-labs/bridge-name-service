@@ -13,26 +13,26 @@ export const TLD_STATE_PREFIX = "tld_pda";
 export const SOLANA_NATIVE_MINT = new PublicKey(
   "So11111111111111111111111111111111111111112",
 );
-// export const ANS_PROGRAM_ID = new PublicKey(
-//   "ALTNSZ46uaAUU7XUV6awvdorLGqAsPwa9shm7h4uP2FK",
-// );
-// export const TLD_HOUSE_PROGRAM_ID = new PublicKey(
-//   "TLDHkysf5pCnKsVA4gXpNvmy7psXLPEu4LAdDJthT9S",
-// );
-// export const NAME_HOUSE_PROGRAM_ID = new PublicKey(
-//   "NH3uX6FtVE2fNREAioP7hm5RaozotZxeL6khU1EHx51",
-// );
-// export const TLD_ORIGIN = "ANS";
 export const ANS_PROGRAM_ID = new PublicKey(
-  "B4nDum6v4RLpyETk3MmU4rZpkZKt17PsY4bpRf46BEtN",
+  "ALTNSZ46uaAUU7XUV6awvdorLGqAsPwa9shm7h4uP2FK",
 );
 export const TLD_HOUSE_PROGRAM_ID = new PublicKey(
-  "TLDhatkjchgoteyVPXkKzAvVjj25wZ6ceEtEhsDAVjK",
+  "TLDHkysf5pCnKsVA4gXpNvmy7psXLPEu4LAdDJthT9S",
 );
 export const NAME_HOUSE_PROGRAM_ID = new PublicKey(
-  "H8PAm4rHDBTcyVk9KLtfMH6rDkmyAX4YQCGBsmyR7sv3",
+  "NH3uX6FtVE2fNREAioP7hm5RaozotZxeL6khU1EHx51",
 );
-export const TLD_ORIGIN = "TEST105";
+export const TLD_ORIGIN = "ANS";
+// export const ANS_PROGRAM_ID = new PublicKey(
+//   "B4nDum6v4RLpyETk3MmU4rZpkZKt17PsY4bpRf46BEtN",
+// );
+// export const TLD_HOUSE_PROGRAM_ID = new PublicKey(
+//   "TLDhatkjchgoteyVPXkKzAvVjj25wZ6ceEtEhsDAVjK",
+// );
+// export const NAME_HOUSE_PROGRAM_ID = new PublicKey(
+//   "H8PAm4rHDBTcyVk9KLtfMH6rDkmyAX4YQCGBsmyR7sv3",
+// );
+// export const TLD_ORIGIN = "TEST105";
 export const BNS_SOL_PROGRAM_ID = new PublicKey("BQqpUU12TqvMm6NRwM9Lv7vKZLWwWzgaZh2Q2qvkmcbi")
 export const WORMHOLE_PROGRAM_ID = new PublicKey("2rHhojZ7hpu1zA91nvZmT8TqWWvMcKmmNBCr2mKTtMq4")
 
