@@ -10,7 +10,7 @@ export default function SendPreview() {
   const sourceChain = useSelector(selectNFTSourceChain);
   const transferTx = useSelector(selectNFTTransferTx);
 
-  const explainerString = "The NFT has been sent!";
+  const explainerString = "The Domain has been sent!";
 
   return (
     <>

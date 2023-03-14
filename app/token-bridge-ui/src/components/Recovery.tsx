@@ -437,7 +437,7 @@ export default function Recovery() {
     <Container maxWidth="md">
       <Card sx={{ padding: "32px 32px 16px" }}>
         <Alert severity="info" variant="outlined">
-          If you have sent your tokens but have not redeemed them, you may paste
+          If you have sent your domain but have not redeemed it, you may paste
           in the Source Transaction ID (from Step 3) to resume your transfer.
         </Alert>
         <TextField
@@ -451,7 +451,7 @@ export default function Recovery() {
           margin="normal"
         >
           {/* <MenuItem value="Token">Token</MenuItem> */}
-          <MenuItem value="NFT">NFT</MenuItem>
+          <MenuItem value="NFT">Domain</MenuItem>
         </TextField>
         <ChainSelect
           select
