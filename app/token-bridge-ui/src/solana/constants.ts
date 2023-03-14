@@ -33,7 +33,8 @@ export const TLD_ORIGIN = "ANS";
 //   "H8PAm4rHDBTcyVk9KLtfMH6rDkmyAX4YQCGBsmyR7sv3",
 // );
 // export const TLD_ORIGIN = "TEST105";
-export const BNS_SOL_PROGRAM_ID = new PublicKey("BQqpUU12TqvMm6NRwM9Lv7vKZLWwWzgaZh2Q2qvkmcbi")
+//export const BNS_SOL_PROGRAM_ID = new PublicKey("BQqpUU12TqvMm6NRwM9Lv7vKZLWwWzgaZh2Q2qvkmcbi")
+export const BNS_SOL_PROGRAM_ID = new PublicKey("BNSwwSqW7HkAviEjNYhkMKws9jRerzMwb6yvKyYHPeqT")
 export const WORMHOLE_PROGRAM_ID = new PublicKey("2rHhojZ7hpu1zA91nvZmT8TqWWvMcKmmNBCr2mKTtMq4")
 
 export const BNS_ON_ETH = "0xEefa53A14d3D8f5dA253F0E0CbCf6B66e07F03fD"

@@ -2,8 +2,8 @@ use solana_program::{pubkey, pubkey::Pubkey};
 
 pub const BNS_PREFIX: &str = "bridge_name_service";
 
-// pub const ORIGIN_TLD_KEY: Pubkey = pubkey!("3mX9b4AZaQehNoQGfckVcmgmA6bkBoFcbLj9RMmMyNcU");
-pub const ORIGIN_TLD_KEY: Pubkey = pubkey!("EzeAEs3QtU8BdbXL2AnMcP9Wbpd9YwbocqPj8hEujK6v");
+pub const ORIGIN_TLD_KEY: Pubkey = pubkey!("3mX9b4AZaQehNoQGfckVcmgmA6bkBoFcbLj9RMmMyNcU");
+// pub const ORIGIN_TLD_KEY: Pubkey = pubkey!("EzeAEs3QtU8BdbXL2AnMcP9Wbpd9YwbocqPj8hEujK6v");
 
 pub const TLD_HOUSE_PREFIX: &str = "tld_house";
 

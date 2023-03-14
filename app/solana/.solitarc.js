@@ -7,7 +7,7 @@ const binaryInstallDir = path.join(__dirname, '.crates');
 module.exports = {
   idlGenerator: 'anchor',
   programName: 'bridge_name_service',
-  programId: 'BQqpUU12TqvMm6NRwM9Lv7vKZLWwWzgaZh2Q2qvkmcbi',
+  programId: 'BNSwwSqW7HkAviEjNYhkMKws9jRerzMwb6yvKyYHPeqT',
   idlDir,
   sdkDir,
   binaryInstallDir,

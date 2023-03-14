@@ -9,7 +9,7 @@ pub mod utils;
 pub use errors::*;
 pub use processor::*;
 
-declare_id!("BQqpUU12TqvMm6NRwM9Lv7vKZLWwWzgaZh2Q2qvkmcbi");
+declare_id!("BNSwwSqW7HkAviEjNYhkMKws9jRerzMwb6yvKyYHPeqT");
 
 #[program]
 pub mod bridge_name_service {

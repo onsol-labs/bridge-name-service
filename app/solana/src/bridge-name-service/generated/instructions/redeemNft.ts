@@ -97,7 +97,7 @@ export const redeemNftInstructionDiscriminator = [
 export function createRedeemNftInstruction(
   accounts: RedeemNftInstructionAccounts,
   args: RedeemNftInstructionArgs,
-  programId = new web3.PublicKey('BQqpUU12TqvMm6NRwM9Lv7vKZLWwWzgaZh2Q2qvkmcbi')
+  programId = new web3.PublicKey('BNSwwSqW7HkAviEjNYhkMKws9jRerzMwb6yvKyYHPeqT')
 ) {
   const [data] = redeemNftStruct.serialize({
     instructionDiscriminator: redeemNftInstructionDiscriminator,

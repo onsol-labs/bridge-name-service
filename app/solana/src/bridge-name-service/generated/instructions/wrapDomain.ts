@@ -112,7 +112,7 @@ export const wrapDomainInstructionDiscriminator = [
 export function createWrapDomainInstruction(
   accounts: WrapDomainInstructionAccounts,
   args: WrapDomainInstructionArgs,
-  programId = new web3.PublicKey('BQqpUU12TqvMm6NRwM9Lv7vKZLWwWzgaZh2Q2qvkmcbi')
+  programId = new web3.PublicKey('BNSwwSqW7HkAviEjNYhkMKws9jRerzMwb6yvKyYHPeqT')
 ) {
   const [data] = wrapDomainStruct.serialize({
     instructionDiscriminator: wrapDomainInstructionDiscriminator,
