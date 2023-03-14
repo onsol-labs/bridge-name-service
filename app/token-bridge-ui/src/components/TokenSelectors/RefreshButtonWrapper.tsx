@@ -1,26 +1,9 @@
 import {
-  createStyles,
   IconButton,
-  makeStyles,
   Tooltip,
-} from "@material-ui/core";
-import RefreshIcon from "@material-ui/icons/Refresh";
-
-const useStyles = makeStyles(() =>
-  createStyles({
-    inlineContentWrapper: {
-      display: "inline-block",
-      flexGrow: 1,
-    },
-    flexWrapper: {
-      "& > *": {
-        margin: ".5rem",
-      },
-      display: "flex",
-      alignItems: "center",
-    },
-  })
-);
+  Box,
+} from "@mui/material";
+import RefreshIcon from "@mui/icons-material/Refresh";
 
 export default function RefreshButtonWrapper({
   children,
@@ -29,17 +12,25 @@ export default function RefreshButtonWrapper({
   children: JSX.Element;
   callback: () => any;
 }) {
-  const classes = useStyles();
 
   const refreshWrapper = (
-    <div className={classes.flexWrapper}>
-      <div className={classes.inlineContentWrapper}>{children}</div>
+    <Box sx={{
+      "& > *": {
+        margin: ".5rem",
+      },
+      display: "flex",
+      alignItems: "center",
+    }}>
+      <Box sx={{
+        display: "inline-block",
+        flexGrow: 1,
+      }}>{children}</Box>
       <Tooltip title="Reload Tokens">
-        <IconButton onClick={callback}>
+        <IconButton onClick={callback} size="large">
           <RefreshIcon />
         </IconButton>
       </Tooltip>
-    </div>
+    </Box>
   );
 
   return refreshWrapper;

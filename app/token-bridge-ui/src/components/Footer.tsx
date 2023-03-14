@@ -1,40 +1,33 @@
-import { Button, makeStyles, Typography } from "@material-ui/core";
-
-const useStyles = makeStyles((theme) => ({
-  footer: {
-    textAlign: "center",
-    borderTop: "1px solid #585587",
-    position: "relative",
-    maxWidth: 1100,
-    margin: "80px auto 0px",
-    paddingTop: theme.spacing(2),
-    paddingBottom: theme.spacing(6.5),
-    [theme.breakpoints.up("md")]: {
-      paddingBottom: theme.spacing(12),
-    },
-  },
-  button: {
-    textTransform: "none",
-    margin: theme.spacing(1),
-  },
-}));
+import { Button, Typography, Box } from "@mui/material";
 
 export default function Footer() {
-  const classes = useStyles();
   return (
-    <footer className={classes.footer}>
+    <Box component="footer" sx={(theme) => ({
+      textAlign: "center",
+      borderTop: "1px solid #585587",
+      position: "relative",
+      maxWidth: 1100,
+      margin: "80px auto 0px",
+      paddingTop: theme.spacing(2),
+      paddingBottom: theme.spacing(6.5),
+      [theme.breakpoints.up("md")]: {
+        paddingBottom: theme.spacing(12),
+      },
+    })}>
       <Typography variant="body2" gutterBottom>
-        This Interface is only intended as a developmental tool. For more
-        information, visit the sites below:
+        hello there
       </Typography>
 
-      <Button
+      {/* <Button
         variant="outlined"
         href="https://wormhole.com/"
         target="_blank"
         rel="noopener noreferrer"
         color="inherit"
-        className={classes.button}
+        sx={(theme) => ({
+          textTransform: "none",
+          margin: theme.spacing(1),
+        })}
       >
         {" "}
         Wormhole
@@ -46,11 +39,15 @@ export default function Footer() {
         target="_blank"
         rel="noopener noreferrer"
         color="inherit"
-        className={classes.button}
+        sx={(theme) => ({
+          textTransform: "none",
+          margin: theme.spacing(1),
+        })}
       >
         {" "}
         Github
-      </Button>
-    </footer>
+      </Button> */}
+      &nbps;
+    </Box>
   );
 }

@@ -8,29 +8,11 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
-  makeStyles,
-} from "@material-ui/core";
-import CloseIcon from "@material-ui/icons/Close";
+  Box
+} from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 import { WalletName, WalletReadyState } from "@solana/wallet-adapter-base";
 import { useWallet, Wallet } from "@solana/wallet-adapter-react";
-
-const useStyles = makeStyles((theme) => ({
-  flexTitle: {
-    display: "flex",
-    alignItems: "center",
-    "& > div": {
-      flexGrow: 1,
-      marginRight: theme.spacing(4),
-    },
-    "& > button": {
-      marginRight: theme.spacing(-1),
-    },
-  },
-  icon: {
-    height: 24,
-    width: 24,
-  },
-}));
 
 const DetectedWalletListItem = ({
   wallet,
@@ -54,14 +36,17 @@ const DetectedWalletListItem = ({
 };
 
 const WalletListItem = ({ wallet, text }: { wallet: Wallet; text: string }) => {
-  const classes = useStyles();
   return (
     <>
       <ListItemIcon>
-        <img
+        <Box
+          component="img"
           src={wallet.adapter.icon}
           alt={wallet.adapter.name}
-          className={classes.icon}
+          sx={{
+            height: 24,
+            width: 24,
+          }}
         />
       </ListItemIcon>
       <ListItemText>{text}</ListItemText>
@@ -76,7 +61,6 @@ const SolanaConnectWalletDialog = ({
   isOpen: boolean;
   onClose: () => void;
 }) => {
-  const classes = useStyles();
   const { wallets, select } = useWallet();
 
   const [detected, undetected] = useMemo(() => {
@@ -98,12 +82,22 @@ const SolanaConnectWalletDialog = ({
   return (
     <Dialog open={isOpen} onClose={onClose}>
       <DialogTitle>
-        <div className={classes.flexTitle}>
+        <Box sx={{
+          display: "flex",
+          alignItems: "center",
+          "& > div": {
+            flexGrow: 1,
+            marginRight: 4,
+          },
+          "& > button": {
+            marginRight: -1,
+          }
+        }}>
           <div>Select your wallet</div>
-          <IconButton onClick={onClose}>
+          <IconButton onClick={onClose} size="large">
             <CloseIcon />
           </IconButton>
-        </div>
+        </Box>
       </DialogTitle>
       <List>
         {detected.map((wallet) => (
@@ -132,7 +126,7 @@ const SolanaConnectWalletDialog = ({
           </ListItem>
         ))}
       </List>
-    </Dialog>
+    </Dialog >
   );
 };
 

@@ -1,4 +1,4 @@
-import { makeStyles, Typography } from "@material-ui/core";
+import { Typography } from "@mui/material";
 import numeral from "numeral";
 import { useSelector } from "react-redux";
 import {
@@ -11,14 +11,7 @@ import {
 import { CHAINS_BY_ID } from "../../utils/consts";
 import SmartAddress from "../SmartAddress";
 
-const useStyles = makeStyles((theme) => ({
-  description: {
-    textAlign: "center",
-  },
-}));
-
 export default function SourcePreview() {
-  const classes = useStyles();
   const sourceChain = useSelector(selectTransferSourceChain);
   const sourceParsedTokenAccount = useSelector(
     selectTransferSourceParsedTokenAccount
@@ -58,7 +51,7 @@ export default function SourcePreview() {
       <Typography
         component="div"
         variant="subtitle2"
-        className={classes.description}
+        sx={{ textAlign: "center" }}
       >
         {explainerContent}
       </Typography>

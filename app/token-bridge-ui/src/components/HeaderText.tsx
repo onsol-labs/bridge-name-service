@@ -1,24 +1,5 @@
-import { makeStyles, Typography } from "@material-ui/core";
-import clsx from "clsx";
-import { ReactChild } from "react";
-
-const useStyles = makeStyles((theme) => ({
-  centeredContainer: {
-    marginBottom: theme.spacing(4),
-    textAlign: "center",
-    width: "100%",
-  },
-  linearGradient: {
-    WebkitBackgroundClip: "text",
-    backgroundClip: "text",
-    WebkitTextFillColor: "transparent",
-    MozBackgroundClip: "text",
-    MozTextFillColor: "transparent",
-  },
-  subtitle: {
-    marginTop: theme.spacing(2),
-  },
-}));
+import { Typography, Box } from "@mui/material";
+import { ReactNode } from "react";
 
 export default function HeaderText({
   children,
@@ -26,26 +7,37 @@ export default function HeaderText({
   small,
   subtitle,
 }: {
-  children: ReactChild;
+  children: ReactNode;
   white?: boolean;
   small?: boolean;
-  subtitle?: ReactChild;
+  subtitle?: ReactNode;
 }) {
-  const classes = useStyles();
   return (
-    <div className={classes.centeredContainer}>
+    <Box sx={(theme) => ({
+      marginBottom: theme.spacing(4),
+      textAlign: "center",
+      width: "100%",
+    })}>
       <Typography
         variant={small ? "h2" : "h1"}
         component="h1"
-        className={clsx({ [classes.linearGradient]: !white })}
+        sx={(!white) ? {
+          WebkitBackgroundClip: "text",
+          backgroundClip: "text",
+          WebkitTextFillColor: "transparent",
+          MozBackgroundClip: "text",
+          MozTextFillColor: "transparent",
+        } : {}}
       >
         {children}
       </Typography>
       {subtitle ? (
-        <Typography component="div" className={classes.subtitle}>
+        <Typography component="div" sx={(theme) => ({
+          marginTop: theme.spacing(2),
+        })}>
           {subtitle}
         </Typography>
       ) : null}
-    </div>
+    </Box>
   );
 }

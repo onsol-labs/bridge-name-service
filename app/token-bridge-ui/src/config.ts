@@ -20,3 +20,4 @@ export type ChainConfigMap = {
 };
 
 export const CHAIN_CONFIG_MAP: ChainConfigMap = {};
+

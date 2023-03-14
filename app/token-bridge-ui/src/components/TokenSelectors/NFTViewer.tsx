@@ -3,14 +3,13 @@ import {
   Card,
   CardContent,
   CardMedia,
-  makeStyles,
   Tooltip,
   Typography,
-} from "@material-ui/core";
+  Box,
+} from "@mui/material";
 import axios from "axios";
 import { useCallback, useEffect, useLayoutEffect, useState } from "react";
 import { NFTParsedTokenAccount } from "../../store/nftSlice";
-import clsx from "clsx";
 import {
   ChainId,
   CHAIN_ID_ETH,
@@ -55,91 +54,6 @@ const LogoIcon = ({ chainId }: { chainId: ChainId }) =>
       alt="Ethereum"
     />
   ) : null;
-
-const useStyles = makeStyles((theme) => ({
-  card: {
-    maxWidth: "100%",
-    width: 400,
-    margin: `${theme.spacing(1)}px auto`,
-    padding: 8,
-    position: "relative",
-    zIndex: 1,
-    transition: "background-position 1s, transform 0.25s",
-    "&:hover": {
-      backgroundPosition: "right center",
-      transform: "scale(1.25)",
-    },
-    backgroundSize: "200% auto",
-    backgroundColor: "#ffb347",
-    background:
-      "linear-gradient(to right, #ffb347 0%, #ffcc33  51%, #ffb347  100%)",
-  },
-  silverBorder: {
-    backgroundColor: "#D9D8D6",
-    backgroundSize: "200% auto",
-    background:
-      "linear-gradient(to bottom right, #757F9A 0%, #D7DDE8  51%, #757F9A  100%)",
-    "&:hover": {
-      backgroundPosition: "right center",
-    },
-  },
-  cardInset: {},
-  textContent: {
-    background: "transparent",
-    paddingTop: 4,
-    paddingBottom: 2,
-    display: "flex",
-  },
-  detailsContent: {
-    background: "transparent",
-    paddingTop: 4,
-    paddingBottom: 2,
-    "&:last-child": {
-      //override rule
-      paddingBottom: 2,
-    },
-  },
-  title: {
-    flex: 1,
-  },
-  description: {
-    padding: theme.spacing(0.5, 0, 1),
-  },
-  tokenId: {
-    fontSize: "8px",
-  },
-  mediaContent: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    background: "transparent",
-    margin: theme.spacing(0, 2),
-    "& > img, & > video": {
-      border: "1px solid #ffb347",
-    },
-  },
-  silverMediaBorder: {
-    "& > img, & > video": {
-      borderColor: "#D7DDE8",
-    },
-  },
-  eth: {
-    // colors from https://en.wikipedia.org/wiki/Ethereum#/media/File:Ethereum-icon-purple.svg
-    backgroundColor: "rgb(69,74,117)",
-    background:
-      "linear-gradient(160deg, rgba(69,74,117,1) 0%, rgba(138,146,178,1) 33%, rgba(69,74,117,1) 66%, rgba(98,104,143,1) 100%)",
-  },
-  solana: {
-    // colors from https://solana.com/branding/new/exchange/exchange-sq-black.svg
-    backgroundColor: "rgb(153,69,255)",
-    background:
-      "linear-gradient(45deg, rgba(153,69,255,1) 0%, rgba(121,98,231,1) 20%, rgba(0,209,140,1) 100%)",
-  },
-  hidden: {
-    display: "none",
-  },
-}));
 
 export default function NFTViewer({
   value,
@@ -193,7 +107,7 @@ export default function NFTViewer({
                 data.big_image ||
                 data.small_image,
               animation_url: data.animation_url,
-              nftName: data.nftName,
+              nftName: data.name,
               description: data.description,
               isLoading: false,
             });
@@ -212,7 +126,6 @@ export default function NFTViewer({
     }
   }, [uri]);
 
-  const classes = useStyles();
   const animLower = metadata.animation_url?.toLowerCase();
   const hasVideo =
     !animLower?.startsWith("ipfs://") && // cloudflare ipfs doesn't support streaming video
@@ -278,32 +191,73 @@ export default function NFTViewer({
       ) : null}
     </>
   );
-
   return (
     <>
-      <div className={!isLoading ? classes.hidden : ""}>
+      <Box sx={!isLoading ? { display: "none" } : {}}>
         {/* <ViewerLoader /> */}
-      </div>
+      </Box>
       <Card
-        className={clsx(classes.card, {
-          [classes.silverBorder]: chainId === CHAIN_ID_SOLANA,
-          [classes.hidden]: isLoading,
+        sx={(theme) => ({
+          ...{
+            maxWidth: "100%",
+            width: 400,
+            margin: `${theme.spacing(1)} auto`,
+            padding: "8px",
+            position: "relative",
+            zIndex: 1,
+            transition: "background-position 1s, transform 0.25s",
+            "&:hover": {
+              backgroundPosition: "right center",
+              transform: "scale(1.25)",
+            },
+            backgroundSize: "200% auto",
+            backgroundColor: "#ffb347",
+            background:
+              "linear-gradient(to right, #ffb347 0%, #ffcc33  51%, #ffb347  100%)",
+          },
+          ...(chainId === CHAIN_ID_SOLANA && {
+            backgroundColor: "#D9D8D6",
+            backgroundSize: "200% auto",
+            background:
+              "linear-gradient(to bottom right, #757F9A 0%, #D7DDE8  51%, #757F9A  100%)",
+            "&:hover": {
+              backgroundPosition: "right center",
+            }
+          }),
+          ...(isLoading && {
+            display: "none"
+          })
         })}
         elevation={10}
       >
-        <div
-          className={clsx(classes.cardInset, {
-            [classes.eth]: chainId === CHAIN_ID_ETH,
-            [classes.solana]: chainId === CHAIN_ID_SOLANA,
+        <Box
+          sx={(theme) => ({
+            ...(chainId === CHAIN_ID_ETH && {
+              // colors from https://en.wikipedia.org/wiki/Ethereum#/media/File:Ethereum-icon-purple.svg
+              backgroundColor: "rgb(69,74,117)",
+              background:
+                "linear-gradient(160deg, rgba(69,74,117,1) 0%, rgba(138,146,178,1) 33%, rgba(69,74,117,1) 66%, rgba(98,104,143,1) 100%)",
+            }),
+            ...(chainId === CHAIN_ID_SOLANA && {
+              // colors from https://solana.com/branding/new/exchange/exchange-sq-black.svg
+              backgroundColor: "rgb(153,69,255)",
+              background:
+                "linear-gradient(45deg, rgba(153,69,255,1) 0%, rgba(121,98,231,1) 20%, rgba(0,209,140,1) 100%)",
+            })
           })}
         >
-          <CardContent className={classes.textContent}>
+          <CardContent sx={{
+            background: "transparent",
+            paddingTop: 2,
+            paddingBottom: 1,
+            display: "flex",
+          }}>
             {metadata.nftName ? (
-              <Typography className={classes.title}>
+              <Typography sx={{ flex: 1 }}>
                 {metadata.nftName}
               </Typography>
             ) : (
-              <div className={classes.title} />
+              <Box sx={{ flex: 1 }} />
             )}
             <SmartAddress
               chainId={chainId}
@@ -314,20 +268,47 @@ export default function NFTViewer({
             <LogoIcon chainId={chainId} />
           </CardContent>
           <CardMedia
-            className={clsx(classes.mediaContent, {
-              [classes.silverMediaBorder]: chainId === CHAIN_ID_SOLANA
+            sx={(theme) => ({
+              ...{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                background: "transparent",
+                margin: theme.spacing(0, 2),
+                "& > img, & > video": {
+                  border: "1px solid #ffb347",
+                }
+              },
+              ...(chainId === CHAIN_ID_SOLANA && {
+                "& > img, & > video": {
+                  borderColor: "#D7DDE8",
+                },
+              })
             })}
           >
             {media}
           </CardMedia>
-          <CardContent className={classes.detailsContent}>
+          <CardContent sx={{
+            background: "transparent",
+            paddingTop: 2,
+            paddingBottom: 1,
+            "&:last-child": {
+              //override rule
+              paddingBottom: 2,
+            },
+          }}>
             {metadata.description ? (
-              <Typography variant="body2" className={classes.description}>
+              <Typography variant="body2" sx={{
+                pt: 0.5,
+                px: 0,
+                pb: 1
+              }}>
                 {metadata.description}
               </Typography>
             ) : null}
             {value.tokenId ? (
-              <Typography className={classes.tokenId} align="right">
+              <Typography sx={{ fontSize: "8px" }} align="right">
                 <Tooltip title="Copy" arrow>
                   <span onClick={copyTokenId}>
                     {value.tokenId.length > 18
@@ -338,7 +319,7 @@ export default function NFTViewer({
               </Typography>
             ) : null}
           </CardContent>
-        </div>
+        </Box>
       </Card>
     </>
   );

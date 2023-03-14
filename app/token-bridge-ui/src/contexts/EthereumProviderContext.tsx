@@ -2,7 +2,6 @@ import detectEthereumProvider from "@metamask/detect-provider";
 import WalletConnectProvider from "@walletconnect/web3-provider";
 import { BigNumber, ethers } from "ethers";
 import React, {
-  ReactChildren,
   useCallback,
   useContext,
   useEffect,
@@ -41,8 +40,8 @@ interface IEthereumProviderContext {
 }
 
 const EthereumProviderContext = React.createContext<IEthereumProviderContext>({
-  connect: (connectType: ConnectType) => {},
-  disconnect: () => {},
+  connect: (connectType: ConnectType) => { },
+  disconnect: () => { },
   provider: undefined,
   chainId: undefined,
   signer: undefined,
@@ -55,7 +54,7 @@ const EthereumProviderContext = React.createContext<IEthereumProviderContext>({
 export const EthereumProviderProvider = ({
   children,
 }: {
-  children: ReactChildren;
+  children: React.ReactNode;
 }) => {
   const [providerError, setProviderError] = useState<string | null>(null);
   const [provider, setProvider] = useState<Provider>(undefined);
@@ -171,7 +170,7 @@ export const EthereumProviderProvider = ({
                     detectedProvider.on("chainChanged", (chainId) => {
                       try {
                         setChainId(BigNumber.from(chainId).toNumber());
-                      } catch (e) {}
+                      } catch (e) { }
                     });
                     // @ts-ignore
                     detectedProvider.on("accountsChanged", (accounts) => {
@@ -188,7 +187,7 @@ export const EthereumProviderProvider = ({
                               "An error occurred while getting the signer address"
                             );
                           });
-                      } catch (e) {}
+                      } catch (e) { }
                     });
                   }
                 })

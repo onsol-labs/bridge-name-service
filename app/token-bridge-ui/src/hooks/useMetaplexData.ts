@@ -3,11 +3,12 @@ import { useLayoutEffect, useMemo, useState } from "react";
 import { DataWrapper } from "../store/helpers";
 import { SOLANA_HOST } from "../utils/consts";
 import {
-  decodeMetadata,
   getMetadataAddress,
-  Metadata,
+  METADATA_REPLACE
 } from "../utils/metaplex";
+import { Metadata } from '@metaplex-foundation/mpl-token-metadata';
 import { getMultipleAccountsRPC } from "../utils/solana";
+import { BNS_COLLECTION_ON_SOL } from "../solana/constants";
 
 export const getMetaplexData = async (mintAddresses: string[]) => {
   const promises = [];
@@ -27,7 +28,8 @@ export const getMetaplexData = async (mintAddresses: string[]) => {
     } else {
       if (account.data) {
         try {
-          const MetadataParsed = decodeMetadata(account.data);
+          const [MetadataParsed] = Metadata.deserialize(account.data);
+          // console.log(MetadataParsed)
           return MetadataParsed;
         } catch (e) {
           console.error(e);
@@ -49,8 +51,11 @@ const createResultMap = (
   const output = new Map<string, Metadata | undefined>();
 
   addresses.forEach((address) => {
-    const metadata = metadatas.find((x) => x?.mint === address);
+    const metadata = metadatas.find((x) => x?.mint.toBase58() === address && x?.collection?.verified && x?.collection?.key.toBase58() === BNS_COLLECTION_ON_SOL);
     if (metadata) {
+      metadata.data.name = metadata.data.name.replace(METADATA_REPLACE, "");
+      metadata.data.uri = metadata.data.uri.replace(METADATA_REPLACE, "");
+      metadata.data.symbol = metadata.data.symbol.replace(METADATA_REPLACE, "");
       output.set(address, metadata);
     } else {
       output.set(address, undefined);

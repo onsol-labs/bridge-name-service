@@ -1,7 +1,6 @@
 import { CHAIN_ID_SOLANA, isEVMChain } from "@certusone/wormhole-sdk";
-import { Button, makeStyles } from "@material-ui/core";
-import { VerifiedUser } from "@material-ui/icons";
-import { Alert } from "@material-ui/lab";
+import { Button, Box } from "@mui/material";
+import { VerifiedUser } from "@mui/icons-material";
 import { useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
@@ -26,14 +25,7 @@ import StepDescription from "../StepDescription";
 import { TokenSelector } from "../TokenSelectors/SourceTokenSelector";
 import ChainWarningMessage from "../ChainWarningMessage";
 
-const useStyles = makeStyles((theme) => ({
-  transferField: {
-    marginTop: theme.spacing(5),
-  },
-}));
-
 function Source() {
-  const classes = useStyles();
   const dispatch = useDispatch();
   const sourceChain = useSelector(selectNFTSourceChain);
   const uiAmountString = useSelector(selectNFTSourceBalanceString);
@@ -42,7 +34,7 @@ function Source() {
   const shouldLockFields = useSelector(selectNFTShouldLockFields);
   const { isReady, statusMessage } = useIsWalletReady(sourceChain);
   const handleSourceChange = useCallback(
-    (event) => {
+    (event:any) => {
       dispatch(setSourceChain(event.target.value));
     },
     [dispatch]
@@ -57,7 +49,7 @@ function Source() {
     <>
       <StepDescription>
         <div style={{ display: "flex", alignItems: "center" }}>
-          Select an NFT to send through the Wormhole NFT Bridge.
+          Select a Domain to send through the Wormhole Bridge.
           <div style={{ flexGrow: 1 }} />
           <div>
             <Button
@@ -81,7 +73,7 @@ function Source() {
         disabled={shouldLockFields}
         chains={CHAINS_WITH_NFT_SUPPORT}
       />
-      {isEVMChain(sourceChain) ? (
+      {/* {isEVMChain(sourceChain) ? (
         <Alert severity="info" variant="outlined">
           Only NFTs which implement ERC-721 are supported.
         </Alert>
@@ -90,12 +82,12 @@ function Source() {
         <Alert severity="info" variant="outlined">
           Only NFTs with a supply of 1 are supported.
         </Alert>
-      ) : null}
+      ) : null} */}
       <KeyAndBalance chainId={sourceChain} />
       {isReady || uiAmountString ? (
-        <div className={classes.transferField}>
+        <Box sx={{marginTop: 5}}>
           <TokenSelector disabled={shouldLockFields} nft={true} />
-        </div>
+        </Box>
       ) : null}
       <LowBalanceWarning chainId={sourceChain} />
       <ChainWarningMessage chainId={sourceChain} />

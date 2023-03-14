@@ -22,9 +22,9 @@
   "scripts": {
     "build": "truffle compile",
     "test": "mkdir -p build/contracts && cp node_modules/@openzeppelin/contracts/build/contracts/* build/contracts/ && truffle test --network test",
-    "deploy": "truffle deploy --reset --network goerli",
-    "migrate": "mkdir -p build/contracts && cp node_modules/@openzeppelin/contracts/build/contracts/* build/contracts/ && truffle migrate --reset --network goerli",
-    "verify": "truffle run verify BNS@0xEefa53A14d3D8f5dA253F0E0CbCf6B66e07F03fD --network goerli",
+    "deploy": "truffle deploy --reset --network ethereum",
+    "migrate": "mkdir -p build/contracts && cp node_modules/@openzeppelin/contracts/build/contracts/* build/contracts/ && truffle migrate --network ethereum",
+    "verify": "truffle run verify BNS@0x01b0cc6460f553e91c7ec3b75c0088e2ee42d332  --network ethereum",
     "abigen": "truffle run abigen"
   },
   "author": "",

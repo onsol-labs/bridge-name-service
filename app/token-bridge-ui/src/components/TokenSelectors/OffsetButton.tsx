@@ -1,9 +1,5 @@
-import { Button, makeStyles } from "@material-ui/core";
-import { ReactChild } from "react";
-
-const useStyles = makeStyles((theme) => ({
-  offsetButton: { display: "block", marginLeft: "auto", marginTop: 8 },
-}));
+import { Button} from "@mui/material";
+import { ReactNode } from "react";
 
 export default function OffsetButton({
   onClick,
@@ -12,15 +8,18 @@ export default function OffsetButton({
 }: {
   onClick: () => void;
   disabled?: boolean;
-  children: ReactChild;
+  children: ReactNode;
 }) {
-  const classes = useStyles();
   return (
     <Button
       onClick={onClick}
       disabled={disabled}
       variant="outlined"
-      className={classes.offsetButton}
+      sx={{
+        display: "block",
+        marginLeft: "auto",
+        marginTop: 8
+      }}
     >
       {children}
     </Button>

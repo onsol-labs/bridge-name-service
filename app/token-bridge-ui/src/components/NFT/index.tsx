@@ -5,7 +5,7 @@ import {
   StepButton,
   StepContent,
   Stepper,
-} from "@material-ui/core";
+} from "@mui/material";
 import { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router";
@@ -108,7 +108,7 @@ function NFT() {
         </Step>
         <Step expanded={activeStep >= 2} disabled={isSendComplete}>
           <StepButton disabled icon={null}>
-            3. Send NFT
+            3. Send Domain
           </StepButton>
           <StepContent>
             {activeStep === 2 ? <Send /> : <SendPreview />}
@@ -120,7 +120,7 @@ function NFT() {
             disabled={!isSendComplete || isRedeemComplete}
             icon={null}
           >
-            4. Redeem NFT
+            4. Redeem Domain
           </StepButton>
           <StepContent>
             {isRedeemComplete ? <RedeemPreview /> : <Redeem />}

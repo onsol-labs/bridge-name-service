@@ -1,5 +1,6 @@
 import {
   ChainId,
+  CHAIN_ID_ETH,
   CHAIN_ID_SOLANA,
   getEmitterAddressEth,
   getEmitterAddressSolana,
@@ -12,7 +13,6 @@ import {
   parseSequenceFromLogSolana,
   parseTransferPayload,
   parseVaa,
-  queryExternalId,
   uint8ArrayToHex,
 } from "@certusone/wormhole-sdk";
 import {
@@ -24,13 +24,12 @@ import {
   CircularProgress,
   Container,
   Divider,
-  makeStyles,
   MenuItem,
   TextField,
   Typography,
-} from "@material-ui/core";
-import { ExpandMore } from "@material-ui/icons";
-import { Alert } from "@material-ui/lab";
+} from "@mui/material";
+import { ExpandMore } from "@mui/icons-material";
+import { Alert } from "@mui/material";
 import { Connection } from "@solana/web3.js";
 import axios from "axios";
 import { ethers } from "ethers";
@@ -42,7 +41,6 @@ import { useEthereumProvider } from "../contexts/EthereumProviderContext";
 import useIsWalletReady from "../hooks/useIsWalletReady";
 import useRelayersAvailable, { Relayer } from "../hooks/useRelayersAvailable";
 import { setRecoveryVaa as setRecoveryNFTVaa } from "../store/nftSlice";
-import { setRecoveryVaa } from "../store/transferSlice";
 import {
   CHAINS,
   CHAINS_BY_ID,
@@ -63,22 +61,6 @@ import ChainSelect from "./ChainSelect";
 import KeyAndBalance from "./KeyAndBalance";
 import RelaySelector from "./RelaySelector";
 import PendingVAAWarning from "./Transfer/PendingVAAWarning";
-
-const useStyles = makeStyles((theme) => ({
-  mainCard: {
-    padding: "32px 32px 16px",
-  },
-  advancedContainer: {
-    padding: theme.spacing(2, 0),
-  },
-  relayAlert: {
-    marginTop: theme.spacing(2),
-    marginBottom: theme.spacing(2),
-    "& > .MuiAlert-message": {
-      width: "100%",
-    },
-  },
-}));
 
 async function fetchSignedVAA(
   chainId: ChainId,
@@ -156,7 +138,6 @@ function RelayerRecovery({
   signedVaa: string;
   onClick: () => void;
 }) {
-  const classes = useStyles();
   const relayerInfo = useRelayersAvailable(true);
   const [selectedRelayer, setSelectedRelayer] = useState<Relayer | null>(null);
   const [isAttemptingToSchedule, setIsAttemptingToSchedule] = useState(false);
@@ -218,7 +199,13 @@ function RelayerRecovery({
   }
 
   return (
-    <Alert variant="outlined" severity="info" className={classes.relayAlert}>
+    <Alert variant="outlined" severity="info" sx={(theme) => ({
+      marginTop: theme.spacing(2),
+      marginBottom: theme.spacing(2),
+      "& > .MuiAlert-message": {
+        width: "100%",
+      },
+    })}>
       <Typography>{"This transaction is eligible to be relayed"}</Typography>
       <RelaySelector
         selectedValue={selectedRelayer}
@@ -236,15 +223,14 @@ function RelayerRecovery({
 }
 
 export default function Recovery() {
-  const classes = useStyles();
   const { push } = useHistory();
   const { enqueueSnackbar } = useSnackbar();
   const dispatch = useDispatch();
   const { provider } = useEthereumProvider();
-  const [type, setType] = useState("Token");
+  const [type, setType] = useState("NFT");
   const isNFT = type === "NFT";
   const [recoverySourceChain, setRecoverySourceChain] =
-    useState<ChainId>(CHAIN_ID_SOLANA);
+    useState<ChainId>(CHAIN_ID_ETH);
   const [recoverySourceTx, setRecoverySourceTx] = useState("");
   const [recoverySourceTxIsLoading, setRecoverySourceTxIsLoading] =
     useState(false);
@@ -365,7 +351,7 @@ export default function Recovery() {
     isNFT,
     isReady,
   ]);
-  const handleTypeChange = useCallback((event) => {
+  const handleTypeChange = useCallback((event: any) => {
     setRecoverySourceChain((prevChain) =>
       event.target.value === "NFT" &&
         !CHAINS_WITH_NFT_SUPPORT.find((chain) => chain.id === prevChain)
@@ -374,14 +360,14 @@ export default function Recovery() {
     );
     setType(event.target.value);
   }, []);
-  const handleSourceChainChange = useCallback((event) => {
+  const handleSourceChainChange = useCallback((event: any) => {
     setRecoverySourceTx("");
     setRecoverySourceChain(event.target.value);
   }, []);
-  const handleSourceTxChange = useCallback((event) => {
+  const handleSourceTxChange = useCallback((event: any) => {
     setRecoverySourceTx(event.target.value.trim());
   }, []);
-  const handleSignedVAAChange = useCallback((event) => {
+  const handleSignedVAAChange = useCallback((event: any) => {
     setRecoverySignedVAA(event.target.value.trim());
   }, []);
   useEffect(() => {
@@ -449,9 +435,9 @@ export default function Recovery() {
 
   return (
     <Container maxWidth="md">
-      <Card className={classes.mainCard}>
+      <Card sx={{ padding: "32px 32px 16px" }}>
         <Alert severity="info" variant="outlined">
-          If you have sent your tokens but have not redeemed them, you may paste
+          If you have sent your domain but have not redeemed it, you may paste
           in the Source Transaction ID (from Step 3) to resume your transfer.
         </Alert>
         <TextField
@@ -464,8 +450,8 @@ export default function Recovery() {
           fullWidth
           margin="normal"
         >
-          <MenuItem value="Token">Token</MenuItem>
-          <MenuItem value="NFT">NFT</MenuItem>
+          {/* <MenuItem value="Token">Token</MenuItem> */}
+          <MenuItem value="NFT">Domain</MenuItem>
         </TextField>
         <ChainSelect
           select
@@ -496,11 +482,11 @@ export default function Recovery() {
           fullWidth
           margin="normal"
         />
-        <RelayerRecovery
+        {/* <RelayerRecovery
           parsedPayload={parsedPayload}
           signedVaa={recoverySignedVAA}
           onClick={handleRecoverWithRelayerClick}
-        />
+        /> */}
         <ButtonWithLoader
           onClick={handleRecoverClick}
           disabled={!enableRecovery}
@@ -511,7 +497,9 @@ export default function Recovery() {
         {isVAAPending && (
           <PendingVAAWarning sourceChain={recoverySourceChain} />
         )}
-        <div className={classes.advancedContainer}>
+        <Box sx={(theme) => ({
+          padding: theme.spacing(2, 0),
+        })}>
           <Accordion>
             <AccordionSummary expandIcon={<ExpandMore />}>
               Advanced
@@ -694,8 +682,8 @@ export default function Recovery() {
               </div>
             </AccordionDetails>
           </Accordion>
-        </div>
+        </Box>
       </Card>
-    </Container>
+    </Container >
   );
 }

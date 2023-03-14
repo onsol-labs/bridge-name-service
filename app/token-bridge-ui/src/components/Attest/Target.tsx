@@ -1,6 +1,6 @@
 import { isEVMChain } from "@certusone/wormhole-sdk";
-import { makeStyles, Typography } from "@material-ui/core";
-import { Alert } from "@material-ui/lab";
+import { Typography } from "@mui/material";
+import { Alert } from "@mui/material";
 import { useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { GasEstimateSummary } from "../../hooks/useTransactionFees";
@@ -17,15 +17,7 @@ import ChainSelect from "../ChainSelect";
 import KeyAndBalance from "../KeyAndBalance";
 import LowBalanceWarning from "../LowBalanceWarning";
 
-const useStyles = makeStyles((theme) => ({
-  alert: {
-    marginTop: theme.spacing(1),
-    marginBottom: theme.spacing(1),
-  },
-}));
-
 function Target() {
-  const classes = useStyles();
   const dispatch = useDispatch();
   const sourceChain = useSelector(selectAttestSourceChain);
   const chains = useMemo(
@@ -36,7 +28,7 @@ function Target() {
   const isTargetComplete = useSelector(selectAttestIsTargetComplete);
   const shouldLockFields = useSelector(selectAttestShouldLockFields);
   const handleTargetChange = useCallback(
-    (event) => {
+    (event: any) => {
       dispatch(setTargetChain(event.target.value));
     },
     [dispatch]
@@ -56,7 +48,10 @@ function Target() {
         chains={chains}
       />
       <KeyAndBalance chainId={targetChain} />
-      <Alert severity="info" variant="outlined" className={classes.alert}>
+      <Alert severity="info" variant="outlined" sx={{
+        marginTop: 1,
+        marginBottom: 1,
+      }}>
         <Typography>
           You will have to pay transaction fees on{" "}
           {CHAINS_BY_ID[targetChain].name} to attest this token.{" "}

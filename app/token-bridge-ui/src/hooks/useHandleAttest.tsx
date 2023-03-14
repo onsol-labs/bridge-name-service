@@ -11,7 +11,7 @@ import {
   parseSequenceFromLogSolana,
   uint8ArrayToHex,
 } from "@certusone/wormhole-sdk";
-import { Alert } from "@material-ui/lab";
+import { Alert } from "@mui/material";
 import { WalletContextState } from "@solana/wallet-adapter-react";
 import { Connection, PublicKey } from "@solana/web3.js";
 import { Signer } from "ethers";
@@ -53,8 +53,6 @@ async function evm(
   dispatch(setIsSending(true));
   try {
     const overrides = {};
-    console.log("ATTESSTINGGG")
-    console.log(sourceAsset)
     const receipt = await attestFromEth(
       getTokenBridgeAddressForChain(chainId),
       signer,
@@ -106,8 +104,6 @@ async function solana(
   dispatch(setIsSending(true));
   try {
     const connection = new Connection(SOLANA_HOST, "confirmed");
-    console.log("ATTESTING")
-    console.log(sourceAsset)
     const transaction = await attestFromSolana(
       connection,
       SOL_BRIDGE_ADDRESS,

@@ -2,20 +2,19 @@ import { ChainId } from "@certusone/wormhole-sdk";
 import {
   Button,
   CircularProgress,
-  createStyles,
   Dialog,
   DialogContent,
   DialogTitle,
   IconButton,
   List,
   ListItem,
-  makeStyles,
   TextField,
   Tooltip,
   Typography,
-} from "@material-ui/core";
-import KeyboardArrowDownIcon from "@material-ui/icons/KeyboardArrowDown";
-import RefreshIcon from "@material-ui/icons/Refresh";
+  Box
+} from "@mui/material";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import RefreshIcon from "@mui/icons-material/Refresh";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { NFTParsedTokenAccount } from "../../store/nftSlice";
@@ -25,97 +24,11 @@ import { getIsTokenTransferDisabled } from "../../utils/consts";
 import { shortenAddress } from "../../utils/solana";
 import NFTViewer from "./NFTViewer";
 
-const useStyles = makeStyles((theme) =>
-  createStyles({
-    alignCenter: {
-      textAlign: "center",
-    },
-    optionContainer: {
-      padding: 0,
-    },
-    optionContent: {
-      padding: theme.spacing(1),
-    },
-    tokenList: {
-      maxHeight: theme.spacing(80), //TODO smarter
-      height: theme.spacing(80),
-      overflow: "auto",
-    },
-    dialogContent: {
-      overflowX: "hidden",
-    },
-    selectionButtonContainer: {
-      textAlign: "center",
-      marginTop: theme.spacing(2),
-      marginBottom: theme.spacing(2),
-    },
-    selectionButton: {
-      maxWidth: "100%",
-      width: theme.breakpoints.values.sm,
-    },
-    tokenOverviewContainer: {
-      display: "flex",
-      width: "100%",
-      alignItems: "center",
-      "& div": {
-        margin: theme.spacing(1),
-        flexBasis: "25%",
-        "&$tokenImageContainer": {
-          maxWidth: 40,
-        },
-        "&$tokenMarketsList": {
-          marginTop: theme.spacing(-0.5),
-          marginLeft: 0,
-          flexBasis: "100%",
-        },
-        "&:last-child": {
-          textAlign: "right",
-        },
-        flexShrink: 1,
-      },
-      flexWrap: "wrap",
-    },
-    tokenImageContainer: {
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      width: 40,
-    },
-    tokenImage: {
-      maxHeight: "2.5rem", //Eyeballing this based off the text size
-    },
-    tokenMarketsList: {
-      order: 1,
-      textAlign: "left",
-      width: "100%",
-      "& > .MuiButton-root": {
-        marginTop: theme.spacing(1),
-        marginRight: theme.spacing(1),
-      },
-    },
-    migrationAlert: {
-      width: "100%",
-      "& .MuiAlert-message": {
-        width: "100%",
-      },
-    },
-    flexTitle: {
-      display: "flex",
-      flexDirection: "row",
-      alignItems: "center",
-    },
-    grower: {
-      flexGrow: 1,
-    },
-  })
-);
-
 export const BasicAccountRender = (
   account: MarketParsedTokenAccount,
   nft: boolean,
   displayBalance?: (account: NFTParsedTokenAccount) => boolean
 ) => {
-  const classes = useStyles();
   const mintPrettyString = shortenAddress(account.mintKey);
   const uri = nft ? account.image_256 : account.logo || account.uri;
   const symbol = account.symbol || "Unknown";
@@ -124,11 +37,39 @@ export const BasicAccountRender = (
   const tokenId = account.tokenId ? shortenAddress(account.tokenId) : account.tokenId;
   const shouldDisplayBalance = !displayBalance || displayBalance(account);
 
+  // console.log(account)
   const nftContent = (
-    <div className={classes.tokenOverviewContainer}>
-      <div className={classes.tokenImageContainer}>
-        {uri && <img alt="" className={classes.tokenImage} src={uri} />}
-      </div>
+    <Box
+      sx={(theme) => ({
+        display: "flex",
+        width: "100%",
+        alignItems: "center",
+        "& div": {
+          margin: theme.spacing(1),
+          flexBasis: "25%",
+          "& .TokenImageContainer": {
+            maxWidth: 40,
+          },
+          "&:last-child": {
+            textAlign: "right",
+          },
+          flexShrink: 1,
+        },
+        flexWrap: "wrap",
+      })}>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          width: 40,
+          margin: 0,
+        }}
+        className="TokenImageContainer">
+        {uri && <Box component="img" alt="" sx={{
+          maxHeight: "3.5rem", //Eyeballing this based off the text size
+        }} src={uri} />}
+      </Box>
       <div>
         <Typography>{symbol}</Typography>
         {/* <Typography>{name}</Typography> */}
@@ -138,16 +79,41 @@ export const BasicAccountRender = (
         <Typography>{mintPrettyString}</Typography>
         <Typography style={{ wordBreak: "break-all" }}>{tokenId}</Typography>
       </div>
-    </div>
+    </Box>
   );
-
   const tokenContent = (
-    <div className={classes.tokenOverviewContainer}>
-      <div className={classes.tokenImageContainer}>
-        {uri && <img alt="" className={classes.tokenImage} src={uri} />}
-      </div>
+    <Box
+      sx={(theme) => ({
+        display: "flex",
+        width: "100%",
+        alignItems: "center",
+        "& div": {
+          margin: theme.spacing(1),
+          flexBasis: "25%",
+          "& .TokenImageContainer": {
+            maxWidth: 40,
+          },
+          "&:last-child": {
+            textAlign: "right",
+          },
+          flexShrink: 1,
+        },
+        flexWrap: "wrap",
+      })}>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          width: 40,
+        }}
+        className="TokenImageContainer">
+        {uri && <Box component="img" alt="" sx={{
+          maxHeight: "2.5rem", //Eyeballing this based off the text size
+        }} src={uri} />}
+      </Box>
       <div>
-        <Typography variant="subtitle1">{symbol}</Typography>
+        <Typography variant="subtitle1">{nftName}</Typography>
       </div>
       <div>
         {
@@ -168,7 +134,7 @@ export const BasicAccountRender = (
           <div />
         )}
       </div>
-    </div>
+    </Box>
   );
 
   return nft ? nftContent : tokenContent;
@@ -217,7 +183,6 @@ export default function TokenPicker({
   showLoader?: boolean;
   useTokenId?: boolean;
 }) {
-  const classes = useStyles();
   const [holderString, setHolderString] = useState("");
   const [tokenIdHolderString, setTokenIdHolderString] = useState("");
   const [loadingError, setLoadingError] = useState("");
@@ -245,7 +210,7 @@ export default function TokenPicker({
       try {
         //Covalent balances tend to be stale, so we make an attempt to correct it at selection time.
         if (getAddress && !option.isNativeAsset) {
-          console.log('getting addy')
+          // console.log('getting addy')
           newOption = await getAddress(option.mintKey, option.nftName ?? "null", option.symbol ?? "null", option.uri ?? "null", option.tokenId,);
           newOption = {
             ...option,
@@ -254,7 +219,7 @@ export default function TokenPicker({
             logo: option.logo || newOption.logo,
             uri: option.uri || newOption.uri,
           } as NFTParsedTokenAccount;
-          console.log('newOption: ', newOption)
+          // console.log('newOption: ', newOption)
         } else {
           newOption = option;
         }
@@ -376,20 +341,24 @@ export default function TokenPicker({
   //TODO sigfigs function on the balance strings
 
   const localLoader = (
-    <div className={classes.alignCenter}>
+    <Box sx={{
+      textAlign: "center",
+    }}>
       <CircularProgress />
       <Typography variant="body2">
         {showLoader ? "Loading available tokens" : "Searching for results"}
       </Typography>
-    </div>
+    </Box>
   );
 
   const displayLocalError = (
-    <div className={classes.alignCenter}>
+    <Box sx={{
+      textAlign: "center",
+    }}>
       <Typography variant="body2" color="error">
         {loadingError || selectionError}
       </Typography>
-    </div>
+    </Box>
   );
 
   const dialog = (
@@ -401,17 +370,23 @@ export default function TokenPicker({
       fullWidth
     >
       <DialogTitle>
-        <div id="simple-dialog-title" className={classes.flexTitle}>
-          <Typography variant="h5">Select a token</Typography>
-          <div className={classes.grower} />
+        <Box id="simple-dialog-title" sx={{
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+        }}>
+          <Typography variant="h5">Select a domain</Typography>
+          <Box flexGrow={1} />
           <Tooltip title="Reload tokens">
-            <IconButton onClick={resetAccountsWrapper}>
+            <IconButton onClick={resetAccountsWrapper} size="large">
               <RefreshIcon />
             </IconButton>
           </Tooltip>
-        </div>
+        </Box>
       </DialogTitle>
-      <DialogContent className={classes.dialogContent}>
+      <DialogContent sx={{
+        overflowX: "hidden",
+      }}>
         <TextField
           variant="outlined"
           label="Search name or paste address"
@@ -435,7 +410,11 @@ export default function TokenPicker({
         ) : loadingError || selectionError ? (
           displayLocalError
         ) : (
-          <List component="div" className={classes.tokenList}>
+          <List component="div" sx={(theme) => ({
+            maxHeight: theme.spacing(80), //TODO smarter
+            height: theme.spacing(80),
+            overflow: "auto",
+          })}>
             {nonFeaturedOptions.map((option) => {
               return (
                 <ListItem
@@ -456,9 +435,11 @@ export default function TokenPicker({
               );
             })}
             {nonFeaturedOptions.length ? null : (
-              <div className={classes.alignCenter}>
+              <Box sx={{
+                textAlign: "center",
+              }}>
                 <Typography>No results found</Typography>
-              </div>
+              </Box>
             )}
           </List>
         )}
@@ -467,21 +448,30 @@ export default function TokenPicker({
   );
 
   const selectionChip = (
-    <div className={classes.selectionButtonContainer}>
+    <Box sx={(theme) => ({
+      textAlign: "center",
+      marginTop: theme.spacing(2),
+      marginBottom: theme.spacing(2),
+    })}>
       <Button
         onClick={openDialog}
         disabled={disabled}
         variant="outlined"
         startIcon={<KeyboardArrowDownIcon />}
-        className={classes.selectionButton}
+        sx={(theme) => ({
+          maxWidth: "100%",
+          width: theme.breakpoints.values.sm,
+        })}
       >
-        {value ? (
-          <RenderOption account={value} />
-        ) : (
-          <Typography color="textSecondary">Select a token</Typography>
-        )}
-      </Button>
-    </div>
+        {
+          value ? (
+            <RenderOption account={value} />
+          ) : (
+            <Typography color="textSecondary">Select a domain</Typography>
+          )
+        }
+      </Button >
+    </Box >
   );
 
   return (

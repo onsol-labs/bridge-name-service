@@ -1,4 +1,4 @@
-import { makeStyles, Typography } from "@material-ui/core";
+import { makeStyles, Typography } from "@mui/material";
 import { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -10,19 +10,11 @@ import ButtonWithLoader from "../ButtonWithLoader";
 import ShowTx from "../ShowTx";
 import AddToMetamask from "./AddToMetamask";
 
-const useStyles = makeStyles((theme) => ({
-  description: {
-    textAlign: "center",
-    marginBottom: theme.spacing(2),
-  },
-}));
-
 export default function RedeemPreview({
   overrideExplainerString,
 }: {
   overrideExplainerString?: string;
 }) {
-  const classes = useStyles();
   const dispatch = useDispatch();
   const targetChain = useSelector(selectTransferTargetChain);
   const redeemTx = useSelector(selectTransferRedeemTx);
@@ -39,7 +31,10 @@ export default function RedeemPreview({
       <Typography
         component="div"
         variant="subtitle1"
-        className={classes.description}
+        sx={{
+          textAlign: "center",
+          marginBottom: 2,
+        }}
       >
         {explainerString}
       </Typography>

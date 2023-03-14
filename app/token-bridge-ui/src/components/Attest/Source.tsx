@@ -1,4 +1,4 @@
-import { makeStyles, TextField } from "@material-ui/core";
+import {  TextField } from "@mui/material";
 import { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -18,14 +18,7 @@ import ChainSelect from "../ChainSelect";
 import KeyAndBalance from "../KeyAndBalance";
 import LowBalanceWarning from "../LowBalanceWarning";
 
-const useStyles = makeStyles((theme) => ({
-  transferField: {
-    marginTop: theme.spacing(5),
-  },
-}));
-
 function Source() {
-  const classes = useStyles();
   const dispatch = useDispatch();
   const sourceChain = useSelector(selectAttestSourceChain);
   const sourceAsset = useSelector(selectAttestSourceAsset);
@@ -33,13 +26,13 @@ function Source() {
   const shouldLockFields = useSelector(selectAttestShouldLockFields);
   console.log('attest source: ', sourceAsset)
   const handleSourceChange = useCallback(
-    (event) => {
+    (event: any) => {
       dispatch(setSourceChain(event.target.value));
     },
     [dispatch]
   );
   const handleAssetChange = useCallback(
-    (event) => {
+    (event: any) => {
       dispatch(setSourceAsset(event.target.value));
     },
     [dispatch]
@@ -63,7 +56,7 @@ function Source() {
         label="Asset"
         variant="outlined"
         fullWidth
-        className={classes.transferField}
+        sx={{ marginTop: 5 }}
         value={sourceAsset}
         onChange={handleAssetChange}
         disabled={shouldLockFields}

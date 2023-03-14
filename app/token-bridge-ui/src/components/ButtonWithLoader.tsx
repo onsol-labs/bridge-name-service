@@ -1,31 +1,10 @@
 import {
   Button,
   CircularProgress,
-  makeStyles,
   Typography,
-} from "@material-ui/core";
-import { ReactChild } from "react";
-
-const useStyles = makeStyles((theme) => ({
-  root: {
-    position: "relative",
-  },
-  button: {
-    marginTop: theme.spacing(2),
-    width: "100%",
-  },
-  loader: {
-    position: "absolute",
-    bottom: 0,
-    left: "50%",
-    marginLeft: -12,
-    marginBottom: 6,
-  },
-  error: {
-    marginTop: theme.spacing(1),
-    textAlign: "center",
-  },
-}));
+  Box
+} from "@mui/material";
+import { ReactNode } from "react";
 
 export default function ButtonWithLoader({
   disabled,
@@ -38,16 +17,20 @@ export default function ButtonWithLoader({
   onClick: () => void;
   showLoader?: boolean;
   error?: string;
-  children: ReactChild;
+  children: ReactNode;
 }) {
-  const classes = useStyles();
   return (
     <>
-      <div className={classes.root}>
+      <Box sx={{
+        position: "relative",
+      }}>
         <Button
           color="primary"
           variant="contained"
-          className={classes.button}
+          sx={{
+            marginTop: 1,
+            width: "100%",
+          }}
           disabled={disabled}
           onClick={onClick}
         >
@@ -57,12 +40,21 @@ export default function ButtonWithLoader({
           <CircularProgress
             size={24}
             color="inherit"
-            className={classes.loader}
+            sx={{
+              position: "absolute",
+              bottom: 0,
+              left: "50%",
+              marginLeft: -12,
+              marginBottom: '6px',
+            }}
           />
         ) : null}
-      </div>
+      </Box>
       {error ? (
-        <Typography variant="body2" color="error" className={classes.error}>
+        <Typography variant="body2" color="error" sx={{
+          marginTop: 1,
+          textAlign: "center"
+        }}>
           {error}
         </Typography>
       ) : null}

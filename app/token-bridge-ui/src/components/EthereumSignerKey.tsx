@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { Typography } from "@material-ui/core";
+import { Typography } from "@mui/material";
 import { useEthereumProvider } from "../contexts/EthereumProviderContext";
 import ToggleConnectedButton from "./ToggleConnectedButton";
 import EvmConnectWalletDialog from "./EvmConnectWalletDialog";

@@ -1,4 +1,4 @@
-import { Alert } from "@material-ui/lab";
+import { Alert } from "@mui/material";
 import { useSelector } from "react-redux";
 import { useHandleNFTTransfer } from "../../hooks/useHandleNFTTransfer";
 import useIsWalletReady from "../../hooks/useIsWalletReady";
@@ -38,7 +38,7 @@ function Send() {
   return (
     <>
       <StepDescription>
-        Transfer the NFT to the Wormhole Token Bridge.
+        Transfer the Domain to the Wormhole Token Bridge.
       </StepDescription>
       <KeyAndBalance chainId={sourceChain} />
       <Alert severity="info" variant="outlined">

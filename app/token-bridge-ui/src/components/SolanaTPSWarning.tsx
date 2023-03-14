@@ -1,19 +1,10 @@
-import { makeStyles } from "@material-ui/core";
-import { Alert } from "@material-ui/lab";
+import { Alert } from "@mui/material";
 import { Connection } from "@solana/web3.js";
 import numeral from "numeral";
 import { useEffect, useState } from "react";
 import { SOLANA_HOST } from "../utils/consts";
 
-const useStyles = makeStyles((theme) => ({
-  alert: {
-    marginTop: theme.spacing(1),
-    marginBottom: theme.spacing(1),
-  },
-}));
-
 export default function SolanaTPSWarning() {
-  const classes = useStyles();
   const [tps, setTps] = useState<number | null>(null);
   useEffect(() => {
     let cancelled = false;
@@ -33,7 +24,7 @@ export default function SolanaTPSWarning() {
               setTps(avgTps);
             }
           }
-        } catch (e) {}
+        } catch (e) { }
       })();
     }, 5000);
     return () => {
@@ -45,7 +36,10 @@ export default function SolanaTPSWarning() {
     <Alert
       variant="outlined"
       severity="warning"
-      className={classes.alert}
+      sx={{
+        marginTop: 1,
+        marginBottom: 1,
+      }}
     >{`WARNING! The Solana Transactions Per Second (TPS) is below 1500. This is a sign of network congestion. Proceed with caution as you may have difficulty submitting transactions and the guardians may have difficulty witnessing them (this could lead to processing delays). Current TPS: ${numeral(
       tps
     ).format("0,0")}`}</Alert>

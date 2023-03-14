@@ -1,16 +1,9 @@
-import { makeStyles, Typography } from "@material-ui/core";
+import { Typography } from "@mui/material";
 import { CHAINS_BY_ID } from "../../utils/consts";
 import SmartAddress from "../SmartAddress";
 import { useTargetInfo } from "./Target";
 
-const useStyles = makeStyles((theme) => ({
-  description: {
-    textAlign: "center",
-  },
-}));
-
 export default function TargetPreview() {
-  const classes = useStyles();
   const {
     targetChain,
     readableTargetAddress,
@@ -48,7 +41,9 @@ export default function TargetPreview() {
     <Typography
       component="div"
       variant="subtitle2"
-      className={classes.description}
+      sx={{
+        textAlign: "center",
+      }}
     >
       {explainerContent}
     </Typography>

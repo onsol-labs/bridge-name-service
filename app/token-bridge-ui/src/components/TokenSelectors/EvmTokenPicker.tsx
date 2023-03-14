@@ -78,9 +78,9 @@ export default function EvmTokenPicker(
       address: string,
       name: string,
       symbol: string,
-      uri: string, 
+      uri: string,
       tokenId?: string
-      ) => {
+    ) => {
       if (provider && signerAddress && isReady) {
         try {
           const tokenAccount = await (nft
@@ -92,12 +92,7 @@ export default function EvmTokenPicker(
           if (nft && !tokenId) {
             return Promise.reject("Token ID is required.");
           } else if (nft && tokenId) {
-            console.log('getAddress')
-            // console.log(tokenId)
-            // console.log(nft)
-            // console.log(tokenAccount)
-            // console.log(signerAddress)
-            return ethNFTToNFTParsedTokenAccount(
+            let nftParsed = ethNFTToNFTParsedTokenAccount(
               tokenAccount as ethers_contracts.NFTImplementation,
               tokenId,
               signerAddress,
@@ -105,6 +100,7 @@ export default function EvmTokenPicker(
               uri,
               symbol,
             );
+            return nftParsed;
           } else {
             return ethTokenToParsedTokenAccount(
               tokenAccount as ethers_contracts.TokenImplementation,

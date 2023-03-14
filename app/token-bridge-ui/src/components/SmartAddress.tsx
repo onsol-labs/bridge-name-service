@@ -3,36 +3,14 @@ import {
   CHAIN_ID_ETH,
   CHAIN_ID_SOLANA,
 } from "@certusone/wormhole-sdk";
-import { Button, makeStyles, Tooltip, Typography } from "@material-ui/core";
-import { FileCopy, OpenInNew } from "@material-ui/icons";
-import { withStyles } from "@material-ui/styles";
-import clsx from "clsx";
-import { ReactChild } from "react";
+import { Button, Tooltip, Typography } from "@mui/material";
+import { FileCopy, OpenInNew } from "@mui/icons-material";
+import { withStyles } from 'tss-react/mui';
+import { ReactNode } from "react";
 import useCopyToClipboard from "../hooks/useCopyToClipboard";
 import { ParsedTokenAccount } from "../store/transferSlice";
 import { CLUSTER, getExplorerName } from "../utils/consts";
 import { shortenAddress } from "../utils/solana";
-
-const useStyles = makeStyles((theme) => ({
-  mainTypog: {
-    display: "inline-block",
-    marginLeft: theme.spacing(1),
-    marginRight: theme.spacing(1),
-    textDecoration: "underline",
-    textUnderlineOffset: "2px",
-  },
-  noGutter: {
-    marginLeft: 0,
-    marginRight: 0,
-  },
-  noUnderline: {
-    textDecoration: "none",
-  },
-  buttons: {
-    marginLeft: ".5rem",
-    marginRight: ".5rem",
-  },
-}));
 
 const tooltipStyles = {
   tooltip: {
@@ -45,7 +23,7 @@ const tooltipStyles = {
 };
 
 // @ts-ignore
-const StyledTooltip = withStyles(tooltipStyles)(Tooltip);
+const StyledTooltip = withStyles(Tooltip, tooltipStyles);
 
 export default function SmartAddress({
   chainId,
@@ -68,10 +46,9 @@ export default function SmartAddress({
   variant?: any;
   noGutter?: boolean;
   noUnderline?: boolean;
-  extraContent?: ReactChild;
+  extraContent?: ReactNode;
   isAsset?: boolean;
 }) {
-  const classes = useStyles();
   const useableAddress = parsedTokenAccount?.mintKey || address || "";
   const useableSymbol = parsedTokenAccount?.symbol || symbol || "";
   const isNative = parsedTokenAccount?.isNativeAsset || false;
@@ -92,9 +69,7 @@ export default function SmartAddress({
       : chainId === CHAIN_ID_SOLANA
         ? `https://solscan.io/address/${useableAddress}${CLUSTER === "testnet"
           ? "?cluster=devnet"
-          : CLUSTER === "devnet"
-            ? "?cluster=custom&customUrl=http%3A%2F%2Flocalhost%3A8899"
-            : ""
+          : ""
         }`
         : undefined;
   const explorerName = getExplorerName(chainId);
@@ -106,7 +81,10 @@ export default function SmartAddress({
       size="small"
       variant="outlined"
       startIcon={<OpenInNew />}
-      className={classes.buttons}
+      sx={{
+        marginLeft: ".5rem",
+        marginRight: ".5rem",
+      }}
       href={explorerAddress}
       target="_blank"
       rel="noopener noreferrer"
@@ -121,7 +99,10 @@ export default function SmartAddress({
       variant="outlined"
       startIcon={<FileCopy />}
       onClick={copyToClipboard}
-      className={classes.buttons}
+      sx={{
+        marginLeft: ".5rem",
+        marginRight: ".5rem",
+      }}
     >
       Copy
     </Button>
@@ -146,14 +127,33 @@ export default function SmartAddress({
   return (
     <StyledTooltip
       title={tooltipContent}
-      interactive={true}
-      className={classes.mainTypog}
+      //interactive={true}
+      sx={(theme: any) => ({
+        display: "inline-block",
+        marginLeft: theme.spacing(1),
+        marginRight: theme.spacing(1),
+        textDecoration: "underline",
+        textUnderlineOffset: "2px",
+      })}
     >
       <Typography
         variant={variant || "body1"}
-        className={clsx(classes.mainTypog, {
-          [classes.noGutter]: noGutter,
-          [classes.noUnderline]: noUnderline,
+
+        sx={(theme) => ({
+          ...{
+            display: "inline-block",
+            marginLeft: theme.spacing(1),
+            marginRight: theme.spacing(1),
+            textDecoration: "underline",
+            textUnderlineOffset: "2px",
+          },
+          ...(noGutter && {
+            marginLeft: 0,
+            marginRight: 0,
+          }),
+          ...(noUnderline && {
+            textDecoration: "none",
+          })
         })}
         component="div"
       >

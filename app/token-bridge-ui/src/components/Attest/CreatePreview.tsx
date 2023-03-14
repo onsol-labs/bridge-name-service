@@ -1,4 +1,4 @@
-import { Link, makeStyles, Typography } from "@material-ui/core";
+import { Link, Typography } from "@mui/material";
 import { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -10,20 +10,10 @@ import ButtonWithLoader from "../ButtonWithLoader";
 import ShowTx from "../ShowTx";
 import { useHistory } from "react-router";
 import { getHowToAddToTokenListUrl } from "../../utils/consts";
-import { Alert } from "@material-ui/lab";
-
-const useStyles = makeStyles((theme) => ({
-  description: {
-    textAlign: "center",
-  },
-  alert: {
-    marginTop: theme.spacing(1),
-  },
-}));
+import { Alert } from "@mui/material";
 
 export default function CreatePreview() {
   const { push } = useHistory();
-  const classes = useStyles();
   const dispatch = useDispatch();
   const targetChain = useSelector(selectAttestTargetChain);
   const createTx = useSelector(selectAttestCreateTx);
@@ -44,13 +34,15 @@ export default function CreatePreview() {
       <Typography
         component="div"
         variant="subtitle2"
-        className={classes.description}
+        sx={{
+          textAlign: "center"
+        }}
       >
         {explainerString}
       </Typography>
       {createTx ? <ShowTx chainId={targetChain} tx={createTx} /> : null}
       {howToAddToTokenListUrl ? (
-        <Alert severity="info" variant="outlined" className={classes.alert}>
+        <Alert severity="info" variant="outlined" sx={{ marginTop: 1 }}>
           Remember to add the token to the{" "}
           <Link
             href={howToAddToTokenListUrl}

@@ -3,22 +3,12 @@ import {
   CHAIN_ID_SOLANA,
   isEVMChain,
 } from "@certusone/wormhole-sdk";
-import { LinearProgress, makeStyles, Typography } from "@material-ui/core";
+import { LinearProgress, Typography, Box } from "@mui/material";
 import { Connection } from "@solana/web3.js";
 import { useEffect, useState } from "react";
 import { useEthereumProvider } from "../contexts/EthereumProviderContext";
 import { Transaction } from "../store/transferSlice";
 import { CHAINS_BY_ID, SOLANA_HOST } from "../utils/consts";
-
-const useStyles = makeStyles((theme) => ({
-  root: {
-    marginTop: theme.spacing(2),
-    textAlign: "center",
-  },
-  message: {
-    marginTop: theme.spacing(1),
-  },
-}));
 
 export default function TransactionProgress({
   chainId,
@@ -29,7 +19,6 @@ export default function TransactionProgress({
   tx: Transaction | undefined;
   isSendComplete: boolean;
 }) {
-  const classes = useStyles();
   const { provider } = useEthereumProvider();
   const [currentBlock, setCurrentBlock] = useState(0);
   useEffect(() => {
@@ -71,29 +60,33 @@ export default function TransactionProgress({
     tx && tx.block && currentBlock ? currentBlock - tx.block : undefined;
   const expectedBlocks = // minimum confirmations enforced by guardians or specified by the contract
     chainId === CHAIN_ID_SOLANA
-        ? 32
-        : isEVMChain(chainId)
-          ? 15
-          : 1;
+      ? 32
+      : isEVMChain(chainId)
+        ? 15
+        : 1;
   if (
     !isSendComplete &&
     (chainId === CHAIN_ID_SOLANA || isEVMChain(chainId)) &&
     blockDiff !== undefined
   ) {
     return (
-      <div className={classes.root}>
+      <Box sx={(theme) => ({
+        marginTop: theme.spacing(2),
+        textAlign: "center",
+      })}
+      >
         <LinearProgress
           value={
             blockDiff < expectedBlocks ? (blockDiff / expectedBlocks) * 75 : 75
           }
           variant="determinate"
         />
-        <Typography variant="body2" className={classes.message}>
+        <Typography variant="body2" sx={(theme) => ({ marginTop: theme.spacing(1) })}>
           {blockDiff < expectedBlocks
             ? `Waiting for ${blockDiff} / ${expectedBlocks} confirmations on ${CHAINS_BY_ID[chainId].name}...`
             : `Waiting for Wormhole Network consensus...`}
         </Typography>
-      </div>
+      </Box>
     );
   }
   return null;

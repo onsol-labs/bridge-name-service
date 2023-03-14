@@ -11,7 +11,6 @@ import {
   isEVMChain,
   parseSequenceFromLogEth,
   parseSequenceFromLogSolana,
-  textToHexString,
   uint8ArrayToHex,
 } from "@certusone/wormhole-sdk";
 import { NFTImplementation__factory } from "@certusone/wormhole-sdk/lib/cjs/ethers-contracts";
@@ -20,7 +19,7 @@ import {
   // transferFromEth,
   transferFromSolana,
 } from "@certusone/wormhole-sdk/lib/esm/nft_bridge";
-import { Alert } from "@material-ui/lab";
+import { Alert } from "@mui/material";
 import { WalletContextState } from "@solana/wallet-adapter-react";
 import { Connection } from "@solana/web3.js";
 import { BigNumber, BigNumberish, ContractReceipt, Overrides, Signer } from "ethers";
@@ -28,6 +27,7 @@ import { arrayify, zeroPad } from "ethers/lib/utils";
 import { useSnackbar } from "notistack";
 import { useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { BNS_ON_ETH, ENS_ON_ETH } from "../solana/constants";
 import { useEthereumProvider } from "../contexts/EthereumProviderContext";
 import { useSolanaWallet } from "../contexts/SolanaWalletContext";
 import { BNS__factory } from "../ethers-contracts/abi";
@@ -71,17 +71,21 @@ export async function transferFromEth(
   nftName: string,
   overrides: Overrides & { from?: string | Promise<string> } = {}
 ): Promise<ContractReceipt> {
-  const bridneNSContractAddress = "0xEefa53A14d3D8f5dA253F0E0CbCf6B66e07F03fD";
-  const ENSContractAddress = "0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85";
+  const bridneNSContractAddress = BNS_ON_ETH;
+  const ENSContractAddress = ENS_ON_ETH;
   const recipientChainId = coalesceChainId(recipientChain);
-  //TODO: should we check if token attestation exists on the target chain
+
+  // approve transfer of ensToken to bnsContract
   const ensToken = NFTImplementation__factory.connect(tokenAddress, signer);
-  await (await ensToken.approve(bridneNSContractAddress, tokenID)).wait();
-  const bnsContract = BNS__factory.connect(bridneNSContractAddress, signer);
-  console.log('ok2')
+  const ownerOfToken = await ensToken.ownerOf(tokenID);
+  if (ownerOfToken === await signer.getAddress()) {
+    await (await ensToken.approve(bridneNSContractAddress, tokenID)).wait();
 
-  await (await bnsContract.wrapNFT(ENSContractAddress, tokenID, overrides)).wait();
-
+    // wraps ens token to bnsContract and creates bnsNFT
+    const bnsContract = BNS__factory.connect(bridneNSContractAddress, signer);
+    await (await bnsContract.wrapNFT(ENSContractAddress, tokenID, overrides)).wait();
+  }
+  // bridge the bnsToken to wormhole
   const bnsToken = NFTImplementation__factory.connect(bridneNSContractAddress, signer);
   await (await bnsToken.approve(nftBridgeAddress, tokenID)).wait();
   const bridge = NFTBridge__factory.connect(nftBridgeAddress, signer);
@@ -91,7 +95,6 @@ export async function transferFromEth(
     recipientChainId,
     recipientAddress,
     createNonce(),
-    // overrides
   );
   const receipt = await v.wait();
   return receipt;
@@ -111,12 +114,8 @@ async function evm(
   dispatch(setIsSending(true));
   try {
     // Klaytn requires specifying gasPrice
-    const overrides = { gasPrice: (await signer.getGasPrice()).toString() };
-    console.log("tokenAddress: ", tokenAddress)
-    // tokenId = BigNumber.from(tokenId).toString()
-    console.log("tokenId: ", tokenId)
-    // console.log("getGasPrice: ", (await signer.getGasPrice()).toString())
-    // console.log("getNFTBridgeAddressForChain: ", getNFTBridgeAddressForChain(chainId))
+    // Klaytn has been removed from the so no need to override.
+    const overrides = {}
 
     const receipt = await transferFromEth(
       getNFTBridgeAddressForChain(chainId),
@@ -144,7 +143,7 @@ async function evm(
     enqueueSnackbar(null, {
       content: <Alert severity="info">Fetching VAA</Alert>,
     });
-    console.log('sequence useHandleNFTTransfer', sequence.toString())
+    // console.log('sequence useHandleNFTTransfer', sequence.toString())
     const { vaaBytes } = await getSignedVAAWithRetry(
       WORMHOLE_RPC_HOSTS,
       chainId,

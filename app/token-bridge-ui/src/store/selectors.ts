@@ -77,7 +77,7 @@ export const selectNFTSourceError = (state: RootState): string | undefined => {
     return "Select a source chain";
   }
   if (!state.nft.sourceParsedTokenAccount) {
-    return "Select an NFT";
+    return "Select a Domain";
   }
   if (
     state.nft.sourceChain === CHAIN_ID_SOLANA &&

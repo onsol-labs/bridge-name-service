@@ -8,13 +8,12 @@ import StepDescription from "../StepDescription";
 import WaitingForWalletMessage from "./WaitingForWalletMessage";
 
 function Redeem() {
-  console.log('redeeming')
   const { handleClick, disabled, showLoader } = useHandleNFTRedeem();
   const targetChain = useSelector(selectNFTTargetChain);
   const { isReady, statusMessage } = useIsWalletReady(targetChain);
   return (
     <>
-      <StepDescription>Receive the NFT on the target chain</StepDescription>
+      <StepDescription>Receive the Domain on the target chain</StepDescription>
       <KeyAndBalance chainId={targetChain} />
       <ButtonWithLoader
         disabled={!isReady || disabled}

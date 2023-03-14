@@ -13,7 +13,7 @@ import {
   transferNativeSol,
   uint8ArrayToHex,
 } from "@certusone/wormhole-sdk";
-import { Alert } from "@material-ui/lab";
+import { Alert } from "@mui/material";
 import { WalletContextState } from "@solana/wallet-adapter-react";
 import { Connection } from "@solana/web3.js";
 import { Signer } from "ethers";

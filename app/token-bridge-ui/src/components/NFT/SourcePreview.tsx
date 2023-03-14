@@ -1,4 +1,4 @@
-import { makeStyles, Typography } from "@material-ui/core";
+import { Typography } from "@mui/material";
 import { useSelector } from "react-redux";
 import {
   selectNFTSourceChain,
@@ -8,14 +8,7 @@ import { CHAINS_BY_ID } from "../../utils/consts";
 import SmartAddress from "../SmartAddress";
 import NFTViewer from "../TokenSelectors/NFTViewer";
 
-const useStyles = makeStyles((theme) => ({
-  description: {
-    textAlign: "center",
-  },
-}));
-
 export default function SourcePreview() {
-  const classes = useStyles();
   const sourceChain = useSelector(selectNFTSourceChain);
   const sourceParsedTokenAccount = useSelector(
     selectNFTSourceParsedTokenAccount
@@ -24,12 +17,12 @@ export default function SourcePreview() {
   const explainerContent =
     sourceChain && sourceParsedTokenAccount ? (
       <>
-        <span>You will transfer 1 NFT of</span>
+        <span>You will transfer 1</span>
         <SmartAddress
           chainId={sourceChain}
           parsedTokenAccount={sourceParsedTokenAccount}
         />
-        <span>from</span>
+        <span>Domain from</span>
         <SmartAddress
           chainId={sourceChain}
           address={sourceParsedTokenAccount?.publicKey}
@@ -45,7 +38,9 @@ export default function SourcePreview() {
       <Typography
         component="div"
         variant="subtitle2"
-        className={classes.description}
+        sx={{
+          textAlign: "center",
+        }}
       >
         {explainerContent}
       </Typography>

@@ -1,34 +1,42 @@
-import { CssBaseline } from "@material-ui/core";
-import { ThemeProvider } from "@material-ui/core/styles";
+import CssBaseline from "@mui/material/CssBaseline";
+import { ThemeProvider, StyledEngineProvider } from "@mui/material/styles";
 import { SnackbarProvider } from "notistack";
 import ReactDOM from "react-dom";
 import { Provider } from "react-redux";
-import { HashRouter } from "react-router-dom";
+import { BrowserRouter } from "react-router-dom";
 import App from "./App";
 import { EthereumProviderProvider } from "./contexts/EthereumProviderContext";
 import { SolanaWalletProvider } from "./contexts/SolanaWalletContext.tsx";
 import ErrorBoundary from "./ErrorBoundary";
 import { theme } from "./muiTheme";
 import { store } from "./store";
+if (!window.localStorage) {
+  window.localStorage = require('localstorage-polyfill');
+}
+if (module.hot) {
+  module.hot.accept();
+}
 
 ReactDOM.render(
-  <ErrorBoundary>
-    <Provider store={store}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <ErrorBoundary>
-          <SnackbarProvider maxSnack={3}>
-            <SolanaWalletProvider>
-              <EthereumProviderProvider>
-                <HashRouter>
-                  <App />
-                </HashRouter>
-              </EthereumProviderProvider>
-            </SolanaWalletProvider>
-          </SnackbarProvider>
-        </ErrorBoundary>
-      </ThemeProvider>
-    </Provider>
-  </ErrorBoundary>,
+  <StyledEngineProvider injectFirst>
+    <ThemeProvider theme={theme}>
+      <ErrorBoundary>
+        <Provider store={store}>
+          <CssBaseline />
+          <ErrorBoundary>
+            <SnackbarProvider maxSnack={3}>
+              <SolanaWalletProvider>
+                <EthereumProviderProvider>
+                  <BrowserRouter>
+                    <App />
+                  </BrowserRouter>
+                </EthereumProviderProvider>
+              </SolanaWalletProvider>
+            </SnackbarProvider>
+          </ErrorBoundary>
+        </Provider>
+      </ErrorBoundary>
+    </ThemeProvider >
+  </StyledEngineProvider>,
   document.getElementById("root")
 );

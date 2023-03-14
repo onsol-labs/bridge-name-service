@@ -4,8 +4,8 @@ import {
   hexToUint8Array,
   isEVMChain,
 } from "@certusone/wormhole-sdk";
-import { makeStyles, TextField, Typography } from "@material-ui/core";
-import { Alert } from "@material-ui/lab";
+import { TextField, Typography } from "@mui/material";
+import { Alert } from "@mui/material";
 import { PublicKey } from "@solana/web3.js";
 import { BigNumber, ethers } from "ethers";
 import { useCallback, useMemo } from "react";
@@ -23,7 +23,9 @@ import {
   selectNFTTargetAddressHex,
   selectNFTTargetAsset,
   selectNFTTargetChain,
+  selectNFTOriginAsset,
   selectNFTTargetError,
+  selectNFTSourceParsedTokenAccount,
 } from "../../store/selectors";
 import {
   CHAINS_BY_ID,
@@ -36,19 +38,10 @@ import KeyAndBalance from "../KeyAndBalance";
 import LowBalanceWarning from "../LowBalanceWarning";
 import StepDescription from "../StepDescription";
 import ChainWarningMessage from "../ChainWarningMessage";
-
-const useStyles = makeStyles((theme) => ({
-  transferField: {
-    marginTop: theme.spacing(5),
-  },
-  alert: {
-    marginTop: theme.spacing(1),
-    marginBottom: theme.spacing(1),
-  },
-}));
+import { BNS_ON_ETH_PADDED } from "../../solana/constants";
+import { getWormholeMintAccount } from "../../solana/utils/bridgeNameService";
 
 function Target() {
-  const classes = useStyles();
   const dispatch = useDispatch();
   const sourceChain = useSelector(selectNFTSourceChain);
   const chains = useMemo(
@@ -59,18 +52,21 @@ function Target() {
   const targetAddressHex = useSelector(selectNFTTargetAddressHex);
   const targetAsset = useSelector(selectNFTTargetAsset);
   const originChain = useSelector(selectNFTOriginChain);
-  const originAsset = "000000000000000000000000Eefa53A14d3D8f5dA253F0E0CbCf6B66e07F03fD" // useSelector(selectNFTOriginAsset);
+  const mintMetadata = useSelector(selectNFTSourceParsedTokenAccount);
   const originTokenId = useSelector(selectNFTOriginTokenId);
   let tokenId;
-  console.log(originAsset)
-  console.log(originTokenId)
-  console.log(targetAddressHex)
+  let originAsset = useSelector(selectNFTOriginAsset);
+  if (originChain === CHAIN_ID_SOLANA) {
+    originAsset = getWormholeMintAccount(mintMetadata?.name!)[0].toString();
+  } else {
+    originAsset = BNS_ON_ETH_PADDED
+  }
   try {
     tokenId =
       originChain === CHAIN_ID_SOLANA && originAsset
         ? BigNumber.from(
-            new PublicKey(hexToUint8Array(originAsset)).toBytes()
-          ).toString()
+          new PublicKey(hexToUint8Array(originAsset)).toBytes()
+        ).toString()
         : originTokenId;
   } catch (e) {
     tokenId = originTokenId;
@@ -83,7 +79,7 @@ function Target() {
   const { statusMessage } = useIsWalletReady(targetChain);
   useSyncTargetAddress(!shouldLockFields, true);
   const handleTargetChange = useCallback(
-    (event) => {
+    (event: any) => {
       dispatch(setTargetChain(event.target.value));
     },
     [dispatch]
@@ -94,6 +90,7 @@ function Target() {
   const isTransferDisabled = useMemo(() => {
     return getIsTransferDisabled(targetChain, false);
   }, [targetChain]);
+
   return (
     <>
       <StepDescription>Select a recipient chain and address.</StepDescription>
@@ -110,7 +107,7 @@ function Target() {
         label="Recipient Address"
         fullWidth
         variant="outlined"
-        className={classes.transferField}
+        sx={{ marginTop: 5 }}
         value={readableTargetAddress}
         disabled={true}
       />
@@ -120,7 +117,7 @@ function Target() {
             label="Token Address"
             fullWidth
             variant="outlined"
-            className={classes.transferField}
+            sx={{ marginTop: 5 }}
             value={targetAsset || ""}
             disabled={true}
           />
@@ -129,17 +126,20 @@ function Target() {
               variant="outlined"
               label="TokenId"
               fullWidth
-              className={classes.transferField}
+              sx={{ marginTop: 5 }}
               value={tokenId || ""}
               disabled={true}
             />
           ) : null}
         </>
       ) : null}
-      <Alert severity="info" variant="outlined" className={classes.alert}>
+      <Alert severity="info" variant="outlined" sx={{
+        marginTop: 1,
+        marginBottom: 1,
+      }}>
         <Typography>
           You will have to pay transaction fees on{" "}
-          {CHAINS_BY_ID[targetChain].name} to redeem your NFT.
+          {CHAINS_BY_ID[targetChain].name} to redeem your Domain.
         </Typography>
         {isEVMChain(targetChain) && (
           <GasEstimateSummary methodType="nft" chainId={targetChain} />

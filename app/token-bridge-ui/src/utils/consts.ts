@@ -12,31 +12,18 @@ import { CHAIN_CONFIG_MAP } from "../config";
 import ethIcon from "../icons/eth.svg";
 import solanaIcon from "../icons/solana.svg";
 
-export type Cluster = "devnet" | "testnet";
+export type Cluster = "testnet" | "mainnet";
 const urlParams = new URLSearchParams(window.location.search);
 const paramCluster = urlParams.get("cluster");
-export const CLUSTER: Cluster =
-  paramCluster === "devnet" ? "devnet" : "testnet";
+export const CLUSTER: Cluster = paramCluster === "testnet" ? "testnet" : "mainnet";
 export interface ChainInfo {
   id: ChainId;
   name: string;
   logo: string;
 }
 export const CHAINS: ChainInfo[] =
-  CLUSTER === "testnet"
+  CLUSTER === "mainnet"
     ? [
-      {
-        id: CHAIN_ID_ETH,
-        name: "Ethereum (Goerli)",
-        logo: ethIcon,
-      },
-      {
-        id: CHAIN_ID_SOLANA,
-        name: "Solana",
-        logo: solanaIcon,
-      },
-    ]
-    : [
       {
         id: CHAIN_ID_ETH,
         name: "Ethereum",
@@ -46,8 +33,33 @@ export const CHAINS: ChainInfo[] =
         id: CHAIN_ID_SOLANA,
         name: "Solana",
         logo: solanaIcon,
-      }
-    ];
+      },
+    ] :
+    CLUSTER === "testnet"
+      ? [
+        {
+          id: CHAIN_ID_ETH,
+          name: "Ethereum (Goerli)",
+          logo: ethIcon,
+        },
+        {
+          id: CHAIN_ID_SOLANA,
+          name: "Solana",
+          logo: solanaIcon,
+        },
+      ]
+      : [
+        {
+          id: CHAIN_ID_ETH,
+          name: "Ethereum (Goerli)",
+          logo: ethIcon,
+        },
+        {
+          id: CHAIN_ID_SOLANA,
+          name: "Solana",
+          logo: solanaIcon,
+        }
+      ];
 export const CHAINS_WITH_NFT_SUPPORT = CHAINS.filter(
   ({ id }) =>
     id === CHAIN_ID_ETH ||
@@ -76,18 +88,21 @@ export const getDefaultNativeCurrencyAddressEvm = (chainId: ChainId) => {
 export const getExplorerName = (chainId: ChainId) =>
   chainId === CHAIN_ID_ETH
     ? "Etherscan"
-      : chainId === CHAIN_ID_SOLANA
-        ? "Solscan"
-        : "Explorer";
+    : chainId === CHAIN_ID_SOLANA
+      ? "Solscan"
+      : "Explorer";
 export const WORMHOLE_RPC_HOSTS =
-  CLUSTER === "testnet"
-    ? ["https://wormhole-v2-testnet-api.certus.one"]
-    : ["http://localhost:7071"];
-export const ETH_NETWORK_CHAIN_ID = CLUSTER === "testnet" ? 5 : 1337;
+  CLUSTER === "mainnet"
+    ? ["https://wormhole-v2-mainnet-api.certus.one"]
+    : CLUSTER === "testnet"
+      ? ["https://wormhole-v2-testnet-api.certus.one"]
+      : ["http://localhost:7071"];
+export const ETH_NETWORK_CHAIN_ID = CLUSTER === "mainnet" ? 1 : CLUSTER === "testnet" ? 5 : 1337;
 export const getEvmChainId = (chainId: ChainId) =>
   chainId === CHAIN_ID_ETH
     ? ETH_NETWORK_CHAIN_ID
-      : undefined;
+    : undefined;
+
 export const SOLANA_HOST = process.env.REACT_APP_SOLANA_API_URL
   ? process.env.REACT_APP_SOLANA_API_URL
   : CLUSTER === "testnet"
@@ -100,23 +115,23 @@ export const SOL_NFT_CUSTODY_ADDRESS =
   "D63bhHo634eXSj4Jq3xgu2fjB5XKc8DFHzDY9iZk7fv1";
 
 export const SOL_BRIDGE_ADDRESS =
-  CONTRACTS[CLUSTER === "testnet" ? "TESTNET" : "DEVNET"].solana.core;
+  CONTRACTS[CLUSTER === "testnet" ? "TESTNET" : "MAINNET"].solana.core;
 
 export const SOL_NFT_BRIDGE_ADDRESS =
-  CONTRACTS[CLUSTER === "testnet" ? "TESTNET" : "DEVNET"].solana.nft_bridge;
+  CONTRACTS[CLUSTER === "testnet" ? "TESTNET" : "MAINNET"].solana.nft_bridge;
 export const SOL_TOKEN_BRIDGE_ADDRESS =
-  CONTRACTS[CLUSTER === "testnet" ? "TESTNET" : "DEVNET"].solana.token_bridge;
+  CONTRACTS[CLUSTER === "testnet" ? "TESTNET" : "MAINNET"].solana.token_bridge;
 
 export const getBridgeAddressForChain = (chainId: ChainId) =>
-  CONTRACTS[CLUSTER === "testnet" ? "TESTNET" : "DEVNET"][
+  CONTRACTS[CLUSTER === "testnet" ? "TESTNET" : "MAINNET"][
     coalesceChainName(chainId)
   ].core || "";
 export const getNFTBridgeAddressForChain = (chainId: ChainId) =>
-  CONTRACTS[CLUSTER === "testnet" ? "TESTNET" : "DEVNET"][
+  CONTRACTS[CLUSTER === "testnet" ? "TESTNET" : "MAINNET"][
     coalesceChainName(chainId)
   ].nft_bridge || "";
 export const getTokenBridgeAddressForChain = (chainId: ChainId) =>
-  CONTRACTS[CLUSTER === "testnet" ? "TESTNET" : "DEVNET"][
+  CONTRACTS[CLUSTER === "testnet" ? "TESTNET" : "MAINNET"][
     coalesceChainName(chainId)
   ].token_bridge || "";
 
@@ -125,6 +140,22 @@ export const COVALENT_API_KEY = process.env.REACT_APP_COVALENT_API_KEY
   : "";
 
 export const COVALENT_ETHEREUM = 5; // Covalent only supports mainnet and Kovan
+
+export const GET_TOKENS_URL = (
+  cluster: Cluster,
+  chainId: ChainId,
+  walletAddress: string,
+  nft?: boolean,
+  noNftMetadata?: boolean
+) => {
+  if (cluster === "mainnet") {
+    return `https://eth-mainnet.g.alchemy.com/v2/p3abkrkSOlaL_jtCvKMjDNcyuA02l5L2/getNFTs/?owner=${walletAddress}`
+  } else if (cluster === "testnet") {
+    return `https://eth-goerli.g.alchemy.com/v2/_vPNUynh4wlTeGt7siQNWFrWWZpdQucj/getNFTs/?owner=${walletAddress}`;
+  } else {
+    return `https://eth-goerli.g.alchemy.com/v2/_vPNUynh4wlTeGt7siQNWFrWWZpdQucj/getNFTs/?owner=${walletAddress}`;
+  }
+};
 
 export const COVALENT_GET_TOKENS_URL = (
   chainId: ChainId,
@@ -138,7 +169,7 @@ export const COVALENT_GET_TOKENS_URL = (
       : "";
   // https://www.covalenthq.com/docs/api/#get-/v1/{chain_id}/address/{address}/balances_v2/
   return chainNum
-    ? `https://eth-goerli.g.alchemy.com/v2/xqzYNQBfiNgQPztNiM4mDvuc5R25ag8x/getNFTs/?owner=${walletAddress}`
+    ? `https://eth-goerli.g.alchemy.com/v2/_vPNUynh4wlTeGt7siQNWFrWWZpdQucj/getNFTs/?owner=${walletAddress}`
     //`https://api.covalenthq.com/v1/${chainNum}/address//balances_nft/?key=${COVALENT_API_KEY}`
     : "";
 };
@@ -178,9 +209,6 @@ export const ETH_TOKENS_THAT_CAN_BE_SWAPPED_ON_SOLANA = [
   getAddress("0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"), // USDC
   getAddress("0xdac17f958d2ee523a2206206994597c13d831ec7"), // USDT
 ];
-
-export const MIGRATION_PROGRAM_ADDRESS =
-  CLUSTER === "testnet" ? "" : "Ex9bCdVMSfx7EzB3pgSi2R4UHwJAXvTw18rBQm5YQ8gK";
 
 export const WORMHOLE_EXPLORER_BASE = "https://wormhole.com/explorer";
 

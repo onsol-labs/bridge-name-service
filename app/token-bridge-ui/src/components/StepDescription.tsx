@@ -1,20 +1,13 @@
-import { makeStyles, Typography } from "@material-ui/core";
-import { ReactChild } from "react";
-
-const useStyles = makeStyles((theme) => ({
-  description: {
-    marginBottom: theme.spacing(4),
-  },
-}));
+import { Typography } from "@mui/material";
+import { ReactNode } from "react";
 
 export default function StepDescription({
   children,
 }: {
-  children: ReactChild;
+  children: ReactNode;
 }) {
-  const classes = useStyles();
   return (
-    <Typography component="div" variant="body2" className={classes.description}>
+    <Typography component="div" variant="body2" sx={{ marginBottom: 4 }}>
       {children}
     </Typography>
   );

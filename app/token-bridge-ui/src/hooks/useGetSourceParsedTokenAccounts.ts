@@ -25,6 +25,7 @@ import {
 } from "../contexts/EthereumProviderContext";
 import { useSolanaWallet } from "../contexts/SolanaWalletContext";
 import ethIcon from "../icons/eth.svg";
+import { ENS_ON_ETH } from "../solana/constants";
 import {
   errorSourceParsedTokenAccounts as errorSourceParsedTokenAccountsNFT,
   fetchSourceParsedTokenAccounts as fetchSourceParsedTokenAccountsNFT,
@@ -53,7 +54,8 @@ import {
   setSourceWalletAddress,
 } from "../store/transferSlice";
 import {
-  COVALENT_GET_TOKENS_URL,
+  GET_TOKENS_URL,
+  CLUSTER,
   SOLANA_HOST,
   WETH_ADDRESS,
   WETH_DECIMALS,
@@ -234,7 +236,7 @@ const createNFTParsedTokenAccountFromCovalent = (
     animation_url: nft_data.external_data.animation_url,
     external_url: nft_data.external_data.external_url,
     image: nft_data.external_data.image,
-    image_256: nft_data.external_data.image_256,
+    image_256: covalent.logo_url,
     nftName: nft_data.external_data.name,
     description: nft_data.external_data.description,
   };
@@ -303,6 +305,7 @@ const getEthereumAccountsCovalent = async (
         // TODO: filter?
         if (
           item.contract.address &&
+          item.contract.address === ENS_ON_ETH.toLowerCase() &&
           item.balance &&
           item.balance !== "0" &&
           (nft
@@ -318,20 +321,20 @@ const getEthereumAccountsCovalent = async (
               token_id: item.id.tokenId,
               token_balance: item.balance,
               external_data: {
-                image: item.metadata.image_url,
-                image_256: item.metadata.image_url,
+                image: item.media[0].thumbnail,
+                image_256: item.media[0].thumbnail,
                 name: item.metadata.name,
                 description: item.metadata.description,
 
               },
-              token_url: item.metadata.url,
+              token_url: item.tokenUri.raw,
             }]
 
           } as AlchemyData);
         }
       }
     }
-    console.log("output: ", output)
+    // console.log("output: ", output)
     return output;
   } catch (error) {
     return Promise.reject("Unable to retrieve your Ethereum Tokens.");
@@ -630,7 +633,7 @@ function useGetAvailableTokens(nft: boolean = false) {
 
   //Ethereum covalent or blockscout accounts load
   useEffect(() => {
-    //const testWallet = "0xf60c2ea62edbfe808163751dd0d8693dcb30019c";
+    // const testWallet = "0xf60c2ea62edbfe808163751dd0d8693dcb30019c";
     // const nftTestWallet1 = "0x3f304c6721f35ff9af00fd32650c8e0a982180ab";
     // const nftTestWallet2 = "0x98ed231428088eb440e8edb5cc8d66dcf913b86e";
     // const nftTestWallet3 = "0xb1fadf677a7e9b90e9d4f31c8ffb3dc18c138c6f";
@@ -638,7 +641,7 @@ function useGetAvailableTokens(nft: boolean = false) {
     let cancelled = false;
     const walletAddress = signerAddress;
     if (walletAddress && isEVMChain(lookupChain) && !covalent) {
-      let url = COVALENT_GET_TOKENS_URL(lookupChain, walletAddress, nft);
+      let url = GET_TOKENS_URL(CLUSTER, lookupChain, walletAddress, nft);
       let getAccounts;
       if (url) {
         getAccounts = getEthereumAccountsCovalent;

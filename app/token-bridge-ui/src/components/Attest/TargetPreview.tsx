@@ -1,16 +1,9 @@
-import { makeStyles, Typography } from "@material-ui/core";
+import { Typography } from "@mui/material";
 import { useSelector } from "react-redux";
 import { selectAttestTargetChain } from "../../store/selectors";
 import { CHAINS_BY_ID } from "../../utils/consts";
 
-const useStyles = makeStyles((theme) => ({
-  description: {
-    textAlign: "center",
-  },
-}));
-
 export default function TargetPreview() {
-  const classes = useStyles();
   const targetChain = useSelector(selectAttestTargetChain);
 
   const explainerString = `to ${CHAINS_BY_ID[targetChain].name}`;
@@ -19,7 +12,9 @@ export default function TargetPreview() {
     <Typography
       component="div"
       variant="subtitle2"
-      className={classes.description}
+      sx={{
+        textAlign: "center",
+      }}
     >
       {explainerString}
     </Typography>

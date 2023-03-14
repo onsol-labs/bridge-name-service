@@ -8,10 +8,12 @@ module.exports = {
       provider: () => {
         return new HDWalletProvider(
           process.env.PRIVATE_KEY,
-          "https://eth-goerli.g.alchemy.com/v2/xqzYNQBfiNgQPztNiM4mDvuc5R25ag8x"
+          "https://goerli.infura.io/v3/576a4181b38c475aa545b5a0f7458acf"
         );
       },
       network_id: "5",
+      // gasPrice: "56000000000",
+      // skipDryRun: true,
     },
     development: {
       host: "127.0.0.1",
@@ -26,11 +28,14 @@ module.exports = {
     },
     ethereum: {
       provider: () =>
-        new HDWalletProvider(process.env.PRIVATE_KEY, "https://rpc.ankr.com/eth"),
+        new HDWalletProvider(process.env.PRIVATE_KEY, 
+          "https://mainnet.infura.io/v3/576a4181b38c475aa545b5a0f7458acf"),
       network_id: 1,
       confirmations: 1,
       timeoutBlocks: 200,
       skipDryRun: false,
+      gas: "1500582",
+      gasPrice: "40000000000",
     },
     base_testnet: {
       provider: () => {
