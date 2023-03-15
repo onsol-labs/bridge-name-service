@@ -66,16 +66,17 @@ function App() {
                   This is an experimental ENS domain bridge that transfers
                   ENS domains across Solana and Ethereum.
                 </Typography>
-                <Typography>
-                  - powered by ANS Protocol and Wormhole -
-                </Typography>
+                <Typography sx={{ marginTop: 0.5}}>
+                - powered by ANS Protocol and Wormhole -
+              </Typography>
               </>
             }
           >
-            .bridge
-          </HeaderText>
-        </Container>
-      ) : null}
+      .bridge
+    </HeaderText>
+        </Container >
+      ) : null
+}
       <Switch>
         <Route exact path="/">
           <NFT />
@@ -98,8 +99,8 @@ function App() {
       <Box></Box>
       <Box></Box>
       <Box></Box>
-      {/* <Footer /> */}
-    </Box>
+      <Footer />
+    </Box >
   );
 }
 
