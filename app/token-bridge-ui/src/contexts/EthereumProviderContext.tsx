@@ -10,7 +10,11 @@ import React, {
 } from "react";
 import metamaskIcon from "../icons/metamask-fox.svg";
 import walletconnectIcon from "../icons/walletconnect.svg";
+import backpackIcon from "../icons/backpack.svg";
 import { EVM_RPC_MAP } from "../utils/metaMaskChainParameters";
+import { InjectedConnector } from "wagmi/connectors/injected";
+import { getDefaultProvider } from "ethers";
+
 const CacheSubprovider = require("web3-provider-engine/subproviders/cache");
 
 export type Provider = ethers.providers.Web3Provider | undefined;
@@ -18,6 +22,7 @@ export type Signer = ethers.Signer | undefined;
 
 export enum ConnectType {
   METAMASK,
+  BACKPACK,
   WALLETCONNECT,
 }
 
@@ -79,6 +84,7 @@ export const EthereumProviderProvider = ({
     (async () => {
       const connections: Connection[] = [];
       try {
+        // const detectedProvider = await detectEthereumProvider();
         const detectedProvider = await detectEthereumProvider({ mustBeMetaMask: true });
         if (detectedProvider) {
           connections.push({
@@ -90,6 +96,12 @@ export const EthereumProviderProvider = ({
       } catch (error) {
         console.error(error);
       }
+      // connections.push({
+      //   connectType: ConnectType.BACKPACK,
+      //   name: "Backpack",
+      //   icon: backpackIcon,
+      // });
+
       connections.push({
         connectType: ConnectType.WALLETCONNECT,
         name: "Wallet Connect",
@@ -291,6 +303,65 @@ export const EthereumProviderProvider = ({
               console.error(error);
             }
           });
+        // } else if (connectType === ConnectType.BACKPACK) {
+        //   const backpackProvider = new InjectedConnector({
+        //     options: {
+        //       name: "Backpack",
+        //     }
+        //   });
+
+        //   backpackProvider.connect().then((detectedProvider) => {
+        //     if (detectedProvider) {
+        //       const provider = detectedProvider.provider;
+        //       setEthereumProvider(provider)
+        //           setProviderError(null);
+        //           // @ts-ignore
+        //           setProvider(provider);
+        //           setChainId(detectedProvider.chain.id);
+        //           backpackProvider.getSigner().then((signer)=>{
+        //             setSigner(signer);
+        //             signer
+        //               .getAddress()
+        //               .then((address) => {
+        //                 setSignerAddress(address);
+        //               })
+        //               .catch(() => {
+        //                 setProviderError(
+        //                   "An error occurred while getting the signer address"
+        //                 );
+        //               });
+        //           })
+        //           // TODO: try using ethers directly
+        //           // @ts-ignore
+        //           if (backpackProvider) {
+        //             // @ts-ignore
+        //             foundProvider.onChainChanged((chainId) => {
+        //               try {
+        //                 setChainId(BigNumber.from(chainId).toNumber());
+        //               } catch (e) { }
+        //             });
+        //             // @ts-ignore
+        //             foundProvider.onAccountsChanged((accounts) => {
+        //               try {
+        //                 backpackProvider.getSigner().then((signer)=>{
+        //                   setSigner(signer);
+        //                   signer
+        //                     .getAddress()
+        //                     .then((address) => {
+        //                       setSignerAddress(address);
+        //                     })
+        //                     .catch(() => {
+        //                       setProviderError(
+        //                         "An error occurred while getting the signer address"
+        //                       );
+        //                     });
+        //                 })
+        //               } catch (e) { }
+        //             });
+        //           }
+        //     }
+        //   })
+
       }
     },
     [disconnect]

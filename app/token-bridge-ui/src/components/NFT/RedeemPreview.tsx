@@ -28,7 +28,7 @@ export default function RedeemPreview() {
       </Typography>
       {redeemTx ? <ShowTx chainId={targetChain} tx={redeemTx} /> : null}
       <ButtonWithLoader onClick={handleResetClick}>
-        Transfer Another NFT!
+        Transfer Another DOMAIN!
       </ButtonWithLoader>
     </>
   );

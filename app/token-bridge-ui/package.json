@@ -39,7 +39,8 @@
     "react-scripts": "5.0.0",
     "redux": "^3.7.2",
     "rxjs": "^7.5.6",
-    "tss-react": "^4.7.5"
+    "tss-react": "^4.7.5",
+    "wagmi": "^0.12.1"
   },
   "scripts": {
     "build-contracts:copy": "node scripts/copyContracts.js",
