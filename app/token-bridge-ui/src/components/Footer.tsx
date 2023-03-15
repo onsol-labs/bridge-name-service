@@ -47,7 +47,6 @@ export default function Footer() {
         {" "}
         Github
       </Button> */}
-      &nbps;
     </Box>
   );
 }

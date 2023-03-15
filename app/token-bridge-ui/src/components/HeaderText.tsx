@@ -27,7 +27,10 @@ export default function HeaderText({
           WebkitTextFillColor: "transparent",
           MozBackgroundClip: "text",
           MozTextFillColor: "transparent",
-        } : {}}
+        } : {
+          fontFamily: "Montserrat",
+          fontWeight: "600"
+      }}
       >
         {children}
       </Typography>
