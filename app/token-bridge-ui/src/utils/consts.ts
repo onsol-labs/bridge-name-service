@@ -135,12 +135,6 @@ export const getTokenBridgeAddressForChain = (chainId: ChainId) =>
     coalesceChainName(chainId)
   ].token_bridge || "";
 
-export const COVALENT_API_KEY = process.env.REACT_APP_COVALENT_API_KEY
-  ? process.env.REACT_APP_COVALENT_API_KEY
-  : "";
-
-export const COVALENT_ETHEREUM = 5; // Covalent only supports mainnet and Kovan
-
 export const GET_TOKENS_URL = (
   cluster: Cluster,
   chainId: ChainId,
@@ -155,23 +149,6 @@ export const GET_TOKENS_URL = (
   } else {
     return `https://eth-goerli.g.alchemy.com/v2/_vPNUynh4wlTeGt7siQNWFrWWZpdQucj/getNFTs/?owner=${walletAddress}`;
   }
-};
-
-export const COVALENT_GET_TOKENS_URL = (
-  chainId: ChainId,
-  walletAddress: string,
-  nft?: boolean,
-  noNftMetadata?: boolean
-) => {
-  const chainNum =
-    chainId === CHAIN_ID_ETH
-      ? COVALENT_ETHEREUM
-      : "";
-  // https://www.covalenthq.com/docs/api/#get-/v1/{chain_id}/address/{address}/balances_v2/
-  return chainNum
-    ? `https://eth-goerli.g.alchemy.com/v2/_vPNUynh4wlTeGt7siQNWFrWWZpdQucj/getNFTs/?owner=${walletAddress}`
-    //`https://api.covalenthq.com/v1/${chainNum}/address//balances_nft/?key=${COVALENT_API_KEY}`
-    : "";
 };
 
 export const WETH_ADDRESS =
