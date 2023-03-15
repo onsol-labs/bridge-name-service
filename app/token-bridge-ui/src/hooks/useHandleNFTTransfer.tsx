@@ -190,7 +190,8 @@ async function solana(
     console.log(fromAddress)
     const [bnsMint] = getWormholeMintAccount(nftName!);
     const bnsNftOwner = await getNftOwner(connection, bnsMint);
-    if (bnsNftOwner.toBase58() !== payerAddress) {
+    //console.log(typeof bnsNftOwner);
+    if (bnsNftOwner !== payerAddress) {
       const payerPubkey = new PublicKey(payerAddress)
       const computeUnitsIx = ComputeBudgetProgram.setComputeUnitLimit({
         units: 600000
