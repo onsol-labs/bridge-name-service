@@ -67,6 +67,12 @@ const EvmConnectWalletDialog = ({
     .filter((connection) => {
       if (connection.connectType === ConnectType.METAMASK) {
         return true;
+      } else if (connection.connectType === ConnectType.BACKPACK) {
+        const evmChainId = getEvmChainId(chainId);
+        // WalletConnect requires a rpc provider
+        return (
+          evmChainId !== undefined && EVM_RPC_MAP[evmChainId] !== undefined
+        );
       } else if (connection.connectType === ConnectType.WALLETCONNECT) {
         const evmChainId = getEvmChainId(chainId);
         // WalletConnect requires a rpc provider
