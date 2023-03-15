@@ -224,25 +224,34 @@ pub fn handle_domain_wrapping<'info>(
         ],
     )?;
 
-    assert_is_ata_enhanced(
-        &ctx.accounts.vault_ata_account.to_account_info(),
-        &ctx.accounts.bns_vault.key(),
-        &ctx.accounts.bns_mint_account.key(),
-        false,
-        false,
-    )?;
+    if ctx.accounts.vault_ata_account.data_is_empty() {
+        assert_is_ata_enhanced(
+            &ctx.accounts.vault_ata_account.to_account_info(),
+            &ctx.accounts.bns_vault.key(),
+            &ctx.accounts.bns_mint_account.key(),
+            false,
+            false,
+        )?;
 
-    make_ata(
-        ctx.accounts.vault_ata_account.to_account_info(),
-        ctx.accounts.bns_vault.to_account_info(),
-        ctx.accounts.bns_mint_account.to_account_info(),
-        ctx.accounts.owner.to_account_info(),
-        ctx.accounts.ata_program.to_account_info(),
-        ctx.accounts.token_program.to_account_info(),
-        ctx.accounts.system_program.to_account_info(),
-        &[],
-    )?;
-
+        make_ata(
+            ctx.accounts.vault_ata_account.to_account_info(),
+            ctx.accounts.bns_vault.to_account_info(),
+            ctx.accounts.bns_mint_account.to_account_info(),
+            ctx.accounts.owner.to_account_info(),
+            ctx.accounts.ata_program.to_account_info(),
+            ctx.accounts.token_program.to_account_info(),
+            ctx.accounts.system_program.to_account_info(),
+            &[],
+        )?;
+    } else {
+        assert_is_ata_enhanced(
+            &ctx.accounts.vault_ata_account.to_account_info(),
+            &ctx.accounts.bns_vault.key(),
+            &ctx.accounts.bns_mint_account.key(),
+            true,
+            true,
+        )?;
+    }
     invoke(
         &spl_token::instruction::transfer(
             ctx.accounts.token_program.key,

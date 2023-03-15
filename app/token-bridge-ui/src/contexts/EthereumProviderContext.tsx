@@ -79,7 +79,7 @@ export const EthereumProviderProvider = ({
     (async () => {
       const connections: Connection[] = [];
       try {
-        const detectedProvider = await detectEthereumProvider();
+        const detectedProvider = await detectEthereumProvider({ mustBeMetaMask: true });
         if (detectedProvider) {
           connections.push({
             connectType: ConnectType.METAMASK,
@@ -127,7 +127,7 @@ export const EthereumProviderProvider = ({
     (connectType: ConnectType) => {
       setConnectType(connectType);
       if (connectType === ConnectType.METAMASK) {
-        detectEthereumProvider()
+        detectEthereumProvider({ mustBeMetaMask: true })
           .then((detectedProvider) => {
             if (detectedProvider) {
               setEthereumProvider(detectedProvider);

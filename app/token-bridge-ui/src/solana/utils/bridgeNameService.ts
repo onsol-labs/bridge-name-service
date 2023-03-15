@@ -168,22 +168,16 @@ export class NameRecordHeaderRaw {
     res.data = nameAccountAccountInfo.data?.subarray(this.byteSize);
     return res;
   }
+}
 
-  // /**
-  //  * Returns a readable version of {@link NameRecordHeader} properties
-  //  * and can be used to convert to JSON and/or logging
-  //  */
-  // pretty() {
-  //   const indexOf0 = this.data?.indexOf(0x00);
-  //   return {
-  //     parentName: this.parentName.toBase58(),
-  //     owner: this.owner?.toBase58(),
-  //     nclass: this.nclass.toBase58(),
-  //     expiresAt: this.expiresAt,
-  //     isValid: this.isValid,
-  //     data: this.isValid
-  //       ? this.data?.subarray(0, indexOf0).toString()
-  //       : undefined,
-  //   };
-  // }
+export async function getNftOwner(connection: Connection, nftMint: PublicKey) {
+  const largestAccounts = await connection.getTokenLargestAccounts(nftMint);
+
+  const largestAccountInfo = await connection.getParsedAccountInfo(
+    largestAccounts.value[0].address
+  );
+  // @ts-ignore
+  console.log(largestAccountInfo?.value?.data.parsed.info.owner);
+  // @ts-ignore
+  return largestAccountInfo?.value?.data.parsed.info.owner
 }
