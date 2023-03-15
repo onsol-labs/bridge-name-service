@@ -4,8 +4,8 @@
 wormhole solana (mainnet): \
 program_name = from code | in book \
 wormhole = worm2ZoG2kUd4vFXhvjh93UUH596ayRfgQ2MgjNMTth \
-bridge_program = Bridge1p5gheXUvJ6jGWGeCsgPKgnE3YgdGKRVCMY9o | wormDTUJ6AWPNvk59vGQbDvGJmqbDTdgWgAqcLBCgUb \
-nft_bridge_program = NFTWqJR8YnRVqPDvTJrYuLrQDitTG5AScqbeghi4zSA | WnFt12ZrnzZrFZkt2xsNsaNWoQribnuQ5B5FrDbwDhD 
+bridge_program = wormDTUJ6AWPNvk59vGQbDvGJmqbDTdgWgAqcLBCgUb \
+nft_bridge_program = WnFt12ZrnzZrFZkt2xsNsaNWoQribnuQ5B5FrDbwDhD 
 
 wormhole solana (devnet): \
 program_name = in book\

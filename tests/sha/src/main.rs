@@ -39,7 +39,7 @@ fn main() {
     // let nft_bridge = Pubkey::from_str("2rHhojZ7hpu1zA91nvZmT8TqWWvMcKmmNBCr2mKTtMq4").unwrap();
     // let chain_id = 2_u16;
     let token_address =
-        hex::decode("0000000000000000000000002b2E2629C8Ae7C991E0c3cEcB48b8ab4dc7299f3").unwrap();
+        hex::decode("00000000000000000000000001b0cc6460f553e91c7ec3b75c0088e2ee42d332").unwrap();
     // let token_address = vec![
     //     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 238, 250, 83, 161, 77, 61, 143, 93, 162, 83, 240, 224,
     //     203, 207, 107, 102, 224, 127, 3, 253,
