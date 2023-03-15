@@ -62,6 +62,7 @@ import { signSendAndConfirm } from "../utils/solana";
 import useNFTTargetAddressHex from "./useNFTTargetAddress";
 import { unwrapDomain } from "../solana/handleInstructions";
 import { redeemRenewableNft } from "../solana/utils/name_house";
+import { getNftOwner, getWormholeMintAccount } from "../solana/utils/bridgeNameService";
 
 export async function transferFromEth(
   nftBridgeAddress: string,
@@ -185,19 +186,24 @@ async function solana(
     const originAddress = originAddressStr
       ? zeroPad(hexToUint8Array(originAddressStr), 32)
       : undefined;
-    const payerPubkey = new PublicKey(payerAddress)
-    const computeUnitsIx = ComputeBudgetProgram.setComputeUnitLimit({
-      units: 600000
-    })
-    const unwrapANStoBNSIX = await unwrapDomain(connection, nftName!, payerPubkey) 
-    const redeemRenewable = await redeemRenewableNft(connection, payerPubkey, nftName!)
-    const txnRedeem = new Transaction().add(computeUnitsIx, redeemRenewable!, unwrapANStoBNSIX);
+    console.log(mintAddress)
+    console.log(fromAddress)
+    const [bnsMint] = getWormholeMintAccount(nftName!);
+    const bnsNftOwner = await getNftOwner(connection, bnsMint);
+    if (bnsNftOwner.toBase58() !== payerAddress) {
+      const payerPubkey = new PublicKey(payerAddress)
+      const computeUnitsIx = ComputeBudgetProgram.setComputeUnitLimit({
+        units: 600000
+      })
+      const unwrapANStoBNSIX = await unwrapDomain(connection, nftName!, payerPubkey)
+      const redeemRenewable = await redeemRenewableNft(connection, payerPubkey, nftName!)
+      const txnRedeem = new Transaction().add(computeUnitsIx, redeemRenewable!, unwrapANStoBNSIX);
 
-    const { blockhash: newBlockhash } = await connection.getLatestBlockhash('finalized');
-    txnRedeem.recentBlockhash = newBlockhash;
-    txnRedeem.feePayer = payerPubkey
-
-    await signSendAndConfirm(wallet, connection, txnRedeem);
+      const { blockhash: newBlockhash } = await connection.getLatestBlockhash('finalized');
+      txnRedeem.recentBlockhash = newBlockhash;
+      txnRedeem.feePayer = payerPubkey
+      await signSendAndConfirm(wallet, connection, txnRedeem);
+    }
     // this expectes a BNS NFT in ETH
     const transaction = await transferFromSolana(
       connection,
@@ -205,7 +211,7 @@ async function solana(
       SOL_NFT_BRIDGE_ADDRESS,
       payerAddress,
       fromAddress,
-      mintAddress,
+      bnsMint.toBase58(),
       targetAddress,
       targetChain,
       originAddress,
