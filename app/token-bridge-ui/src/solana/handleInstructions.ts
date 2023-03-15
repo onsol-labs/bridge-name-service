@@ -96,11 +96,11 @@ export async function wrapDomain(
         isSigner: false,
         isWritable: true,
       }, 
-      // {
-      //   pubkey: new PublicKey(config.TLD_HOUSE_TREASURY),
-      //   isSigner: false,
-      //   isWritable: true,
-      // },
+      {
+        pubkey: new PublicKey(config.TLD_HOUSE_TREASURY),
+        isSigner: false,
+        isWritable: true,
+      },
       // {
       //   pubkey: new PublicKey(config.TLD_HOUSE_TREASURY),
       //   isSigner: false,
