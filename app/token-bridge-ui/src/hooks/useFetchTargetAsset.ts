@@ -140,7 +140,9 @@ function useFetchTargetAsset(nft?: boolean) {
         originAsset
       ) {
         dispatch(setTargetAsset(fetchDataWrapper()));
-        originAsset = getWormholeMintAccount(mintMetadata?.name!)[0].toString();
+        if (mintMetadata) {
+          originAsset = getWormholeMintAccount(mintMetadata?.name!)[0].toString();
+        }
         try {
           const asset = await (nft
             ? getForeignAssetEthNFT(
