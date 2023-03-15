@@ -26,7 +26,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useEthereumProvider } from "../contexts/EthereumProviderContext";
 import { useSolanaWallet } from "../contexts/SolanaWalletContext";
 import { setIsRedeeming, setRedeemTx } from "../store/nftSlice";
-import { selectNFTIsRedeeming, selectNFTTargetChain, selectNFTOriginTokenId } from "../store/selectors";
+import { selectNFTIsRedeeming, selectNFTTargetChain } from "../store/selectors";
 import {
   getNFTBridgeAddressForChain,
   MAX_VAA_UPLOAD_RETRIES_SOLANA,
@@ -126,7 +126,6 @@ async function solana(
       const { originChain, originAddress, tokenId } = parseNFTPayload(
         Buffer.from(new Uint8Array(parsedVAA.payload))
       );
-      // console.log(originChain, originAddress, tokenId)
       const mintAddress = await getForeignAssetSol(
         SOL_NFT_BRIDGE_ADDRESS,
         originChain as ChainId,
@@ -182,19 +181,13 @@ export function useHandleNFTRedeem() {
   const solPK = solanaWallet?.publicKey;
   const { signer } = useEthereumProvider();
   const signedVAA = useNFTSignedVAA();
-  let originTokenId = useSelector(selectNFTOriginTokenId);
-  if (originTokenId === undefined && signedVAA) {
-    const parsedVAA = parseVaa(signedVAA);
-    const parsedNFTPayload = parseNFTPayload(
-      Buffer.from(new Uint8Array(parsedVAA.payload))
-    );
-    // @ts-ignore
-    originTokenId = parsedNFTPayload.tokenId;
-  }
   const isRedeeming = useSelector(selectNFTIsRedeeming);
   const handleRedeemClick = useCallback(() => {
     if (isEVMChain(targetChain) && !!signer && signedVAA) {
-      evm(dispatch, enqueueSnackbar, signer, signedVAA, targetChain, originTokenId!);
+      const originTokenId = parseNFTPayload(
+        Buffer.from(new Uint8Array(parseVaa(signedVAA).payload))
+      ).tokenId;
+      evm(dispatch, enqueueSnackbar, signer, signedVAA, targetChain, originTokenId);
     } else if (
       targetChain === CHAIN_ID_SOLANA &&
       !!solanaWallet &&

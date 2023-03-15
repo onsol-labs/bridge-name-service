@@ -116,8 +116,6 @@ async function evm(
 ) {
   dispatch(setIsSending(true));
   try {
-    // Klaytn requires specifying gasPrice
-    // Klaytn has been removed from the so no need to override.
     const overrides = {}
 
     const receipt = await transferFromEth(
@@ -186,11 +184,7 @@ async function solana(
     const originAddress = originAddressStr
       ? zeroPad(hexToUint8Array(originAddressStr), 32)
       : undefined;
-    console.log('mintAddress', mintAddress)
-    console.log('fromAddress', fromAddress)
     const [bnsMint] = getWormholeMintAccount(nftName!);
-    console.log('bnsMint', bnsMint.toBase58())
-    console.log('ata', getAtaForMint(bnsMint, new PublicKey(payerAddress))[0].toBase58())
     const bnsNftOwner = await getNftOwner(connection, bnsMint);
     if (bnsNftOwner !== payerAddress) {
       const payerPubkey = new PublicKey(payerAddress)
