@@ -103,11 +103,10 @@ export const getEvmChainId = (chainId: ChainId) =>
     ? ETH_NETWORK_CHAIN_ID
     : undefined;
 
-export const SOLANA_HOST = process.env.REACT_APP_SOLANA_API_URL
-  ? process.env.REACT_APP_SOLANA_API_URL
-  : CLUSTER === "testnet"
-    ? clusterApiUrl("devnet")
-    : "http://localhost:8899";
+export const SOLANA_HOST =
+  CLUSTER === "mainnet" && process.env.REACT_APP_SOLANA_API_URL
+    ? process.env.REACT_APP_SOLANA_API_URL
+    : clusterApiUrl("devnet")
 
 export const SOL_CUSTODY_ADDRESS =
   "GugU1tP7doLeTw9hQP51xRJyS8Da1fWxuiy2rVrnMD2m";
