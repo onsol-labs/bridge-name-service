@@ -61,7 +61,7 @@ import parseError from "../utils/parseError";
 import { signSendAndConfirm } from "../utils/solana";
 import useNFTTargetAddressHex from "./useNFTTargetAddress";
 import { unwrapDomain } from "../solana/handleInstructions";
-import { redeemRenewableNft } from "../solana/utils/name_house";
+import { getAtaForMint, redeemRenewableNft } from "../solana/utils/name_house";
 import { getNftOwner, getWormholeMintAccount } from "../solana/utils/bridgeNameService";
 
 export async function transferFromEth(
@@ -186,11 +186,13 @@ async function solana(
     const originAddress = originAddressStr
       ? zeroPad(hexToUint8Array(originAddressStr), 32)
       : undefined;
-    console.log(mintAddress)
-    console.log(fromAddress)
+    console.log('mintAddress', mintAddress)
+    console.log('fromAddress', fromAddress)
     const [bnsMint] = getWormholeMintAccount(nftName!);
+    console.log('bnsMint', bnsMint.toBase58())
+    console.log('ata', getAtaForMint(bnsMint, new PublicKey(payerAddress))[0].toBase58())
     const bnsNftOwner = await getNftOwner(connection, bnsMint);
-    if (bnsNftOwner.toBase58() !== payerAddress) {
+    if (bnsNftOwner !== payerAddress) {
       const payerPubkey = new PublicKey(payerAddress)
       const computeUnitsIx = ComputeBudgetProgram.setComputeUnitLimit({
         units: 600000
@@ -205,12 +207,13 @@ async function solana(
       await signSendAndConfirm(wallet, connection, txnRedeem);
     }
     // this expectes a BNS NFT in ETH
+    const [bnsMintAta] = getAtaForMint(bnsMint, new PublicKey(payerAddress))
     const transaction = await transferFromSolana(
       connection,
       SOL_BRIDGE_ADDRESS,
       SOL_NFT_BRIDGE_ADDRESS,
       payerAddress,
-      fromAddress,
+      bnsMintAta.toBase58(),
       bnsMint.toBase58(),
       targetAddress,
       targetChain,

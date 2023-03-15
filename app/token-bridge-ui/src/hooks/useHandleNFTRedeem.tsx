@@ -19,7 +19,7 @@ import { arrayify } from "@ethersproject/bytes";
 import { Alert } from "@mui/material";
 import { WalletContextState } from "@solana/wallet-adapter-react";
 import { Connection, Transaction, PublicKey } from "@solana/web3.js";
-import { Signer } from "ethers";
+import { BigNumberish, Signer } from "ethers";
 import { useSnackbar } from "notistack";
 import { useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -48,7 +48,7 @@ async function evm(
   signer: Signer,
   signedVAA: Uint8Array,
   chainId: ChainId,
-  tokenID: string
+  tokenID: BigNumberish
 ) {
   dispatch(setIsRedeeming(true));
   try {
@@ -182,9 +182,15 @@ export function useHandleNFTRedeem() {
   const solPK = solanaWallet?.publicKey;
   const { signer } = useEthereumProvider();
   const signedVAA = useNFTSignedVAA();
-  const originTokenId = useSelector(selectNFTOriginTokenId);
-  // console.log(originTokenId?.toString())
-
+  let originTokenId = useSelector(selectNFTOriginTokenId);
+  if (originTokenId === undefined && signedVAA) {
+    const parsedVAA = parseVaa(signedVAA);
+    const parsedNFTPayload = parseNFTPayload(
+      Buffer.from(new Uint8Array(parsedVAA.payload))
+    );
+    // @ts-ignore
+    originTokenId = parsedNFTPayload.tokenId;
+  }
   const isRedeeming = useSelector(selectNFTIsRedeeming);
   const handleRedeemClick = useCallback(() => {
     if (isEVMChain(targetChain) && !!signer && signedVAA) {
