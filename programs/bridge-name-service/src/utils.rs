@@ -15,13 +15,18 @@ pub fn check_wormhole_mint_account(domain: &str, bns_mint_key: &Pubkey) -> Resul
     let u256_result = hex_encoded.parse::<U256>().unwrap();
     let chain_id = 2_u16;
 
+    //Devnet (Goerli)
     // BNS in ETH
     // let token_address =
     //     hex::decode("0000000000000000000000002b2E2629C8Ae7C991E0c3cEcB48b8ab4dc7299f3").unwrap();
-    let token_address = vec![
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 43, 46, 38, 41, 200, 174, 124, 153, 30, 12, 60, 236,
-        180, 139, 138, 180, 220, 114, 153, 243,
-    ];
+    // let token_address = vec![0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 43, 46, 38, 41, 200, 174, 124, 153, 30, 12, 60, 236, 180, 139, 138, 180, 220, 114, 153, 243];
+
+    //Mainnet
+    // BNS in ETH
+    // let token_address =
+    //     hex::decode("00000000000000000000000001b0cc6460f553e91c7ec3b75c0088e2ee42d332").unwrap();
+    let token_address = vec![0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 176, 204, 100, 96, 245, 83, 233, 28, 126, 195, 183, 92, 0, 136, 226, 238, 66, 211, 50];
+
     let mut token_id = vec![0u8; 32];
     u256_result.to_big_endian(&mut token_id);
 
@@ -33,7 +38,13 @@ pub fn check_wormhole_mint_account(domain: &str, bns_mint_key: &Pubkey) -> Resul
     ];
     let s: Vec<&[u8]> = seeds.iter().map(|item| item.as_slice()).collect();
     let seed_slice = s.as_slice();
-    let nft_bridge = pubkey!("2rHhojZ7hpu1zA91nvZmT8TqWWvMcKmmNBCr2mKTtMq4");
+    
+    //Wormhole devnet/testnet bridge
+    //let nft_bridge = pubkey!("2rHhojZ7hpu1zA91nvZmT8TqWWvMcKmmNBCr2mKTtMq4");
+
+    //Wormhole mainnet bridge
+    let nft_bridge = pubkey!("WnFt12ZrnzZrFZkt2xsNsaNWoQribnuQ5B5FrDbwDhD");
+
     let (bns_mint_computed, _) = Pubkey::find_program_address(&seed_slice, &nft_bridge);
 
     assert_keys_equal(bns_mint_computed, *bns_mint_key)?;

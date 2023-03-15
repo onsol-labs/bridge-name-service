@@ -43,12 +43,6 @@ export const CONNECTION = new Connection(MAINNET);
 //   SOLANA_ENVIRONMENT == "mainnet-beta" ? MAINNET : DEVNET,
 // );
 
-export const AWS_IAM_KEY_ID = process.env.AWS_IAM_KEY_ID || "";
-export const AWS_IAM_SECRET = process.env.AWS_IAM_SECRET || "";
-export const AWS_SECRET_ID = "Uploader";
-
-export const AWS_REGION = "eu-west-1";
-
 
 export const TLD_HOUSE_AUTHORITY = new PublicKey(
   process.env.TLD_HOUSE_AUTHORITY ||

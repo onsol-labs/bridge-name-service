@@ -164,6 +164,7 @@ pub fn handle_domain_wrapping<'info>(
     };
 
     let remaining_accounts = ctx.remaining_accounts.to_vec().clone();
+    let remaining_accounts_double_cloned = remaining_accounts.clone();
     // create name account cpi
     let tld_clone = tld.as_str().clone();
     let hashed_name_clone = hashed_name.as_slice().clone();
@@ -199,6 +200,7 @@ pub fn handle_domain_wrapping<'info>(
         accounts: create_name_accounts_with_remaining,
         data: create_new_name_account_data,
     };
+    let tld_state_pubkey = remaining_accounts_double_cloned.last().unwrap();
 
     invoke(
         &create_name_account_ix,
@@ -218,6 +220,7 @@ pub fn handle_domain_wrapping<'info>(
             ctx.accounts.token_program.to_account_info(),
             ctx.accounts.alt_name_service_program.to_account_info(),
             ctx.accounts.instruction_sysvar_account.to_account_info(),
+            tld_state_pubkey.to_account_info(),
         ],
     )?;
 

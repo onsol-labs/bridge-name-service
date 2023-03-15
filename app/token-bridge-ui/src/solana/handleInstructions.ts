@@ -4,7 +4,8 @@ import { findNameHouse, findRenewableMintAddress, findTldHouse, findTldState, fi
 import * as config from "./config";
 import { Connection, PublicKey, ComputeBudgetProgram, TransactionInstruction } from '@solana/web3.js';
 import { ANS_PROGRAM_ID, ENS_ON_ETH, SOLANA_NATIVE_MINT, TLD_HOUSE_PROGRAM_ID } from './constants';
-import { findBNSVault, getWormholeMintAccountFromTokenId, NameRecordHeaderRaw } from './utils/bridgeNameService';
+import { findBNSVault, getWormholeMintAccount, getWormholeMintAccountFromTokenId, NameRecordHeaderRaw } from './utils/bridgeNameService';
+import { RedeemNftInstructionArgs, RedeemNftInstructionAccounts, createRedeemNftInstruction } from './bridge-name-service/generated';
 
 
 export interface PreparedInstructionWrapDomain {
@@ -94,7 +95,17 @@ export async function wrapDomain(
         pubkey: new PublicKey(config.TLD_HOUSE_AUTHORITY),
         isSigner: false,
         isWritable: true,
-      }
+      }, 
+      // {
+      //   pubkey: new PublicKey(config.TLD_HOUSE_TREASURY),
+      //   isSigner: false,
+      //   isWritable: true,
+      // },
+      // {
+      //   pubkey: new PublicKey(config.TLD_HOUSE_TREASURY),
+      //   isSigner: false,
+      //   isWritable: true,
+      // }
     ]
   }
 
@@ -135,4 +146,68 @@ export async function createNftAns(connection: Connection, domainName: string, p
     units: 1200000,
   }), ...mintNftIxs)
   return instructions
+}
+
+export async function unwrapDomain(
+  connection: Connection,
+  domainName: string,
+  payerAddress: PublicKey,
+): Promise<TransactionInstruction> {
+  const [tldState] = await findTldState();
+  const [tldHouse, thBump] = findTldHouse(config.TLD);
+  const [nameHouseAccount] = findNameHouse(tldHouse);
+
+  const [bnsVault] = findBNSVault();
+  const [bnsMint] = getWormholeMintAccount(domainName)
+  const [parentNameKey] = await getParentNameKeyWithBump(config.TLD);
+  const hashedDomainName = await getHashedName(domainName);
+  const [nameAccount] = await getNameAccountKey(
+    hashedDomainName,
+    undefined,
+    parentNameKey,
+  );
+
+  let redeemNftInstructionArgs: RedeemNftInstructionArgs = {
+    tld: config.TLD,
+    hashedName: hashedDomainName,
+    name: domainName,
+    thBump
+  }
+
+  const nameAccountCreated = await NameRecordHeaderRaw.fromAccountAddress(connection, nameAccount)
+  // console.log(nameAccountCreated?.expiresAt)
+  const [mintAccountCreated] = findRenewableMintAddress(
+    nameAccount,
+    nameHouseAccount,
+    nameAccountCreated?.expiresAtBuffer!,
+  );
+
+  let redeemNftInstructionAccounts: RedeemNftInstructionAccounts = {
+    owner: payerAddress,
+    bnsVault: bnsVault,
+    vaultAtaAccount: getAtaForMint(
+      bnsMint,
+      bnsVault,
+    )[0],
+    tldState: tldState,
+    tldHouse: tldHouse,
+    nameAccount: nameAccount,
+    bnsMintAccount: bnsMint,
+    bnsMintAtaAccount: getAtaForMint(
+      bnsMint,
+      payerAddress,
+    )[0],
+    // BELOW IS NOT NEEDED
+    ansMintAccount: mintAccountCreated,
+    nameClassAccount: PublicKey.default,
+    nameParentAccount: parentNameKey,
+    tldHouseProgram: TLD_HOUSE_PROGRAM_ID,
+    altNameServiceProgram: ANS_PROGRAM_ID,
+  }
+
+  const unwrapANStoBNSIX = createRedeemNftInstruction(
+    redeemNftInstructionAccounts,
+    redeemNftInstructionArgs,
+  );
+  return unwrapANStoBNSIX
 }

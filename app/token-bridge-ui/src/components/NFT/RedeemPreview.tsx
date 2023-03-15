@@ -15,7 +15,7 @@ export default function RedeemPreview() {
   }, [dispatch]);
 
   const explainerString =
-    "Success! The redeem transaction was submitted. The NFT will become available once the transaction confirms.";
+    "Success! The redeem transaction was submitted. The Domain will become available once the transaction confirms.";
 
   return (
     <>

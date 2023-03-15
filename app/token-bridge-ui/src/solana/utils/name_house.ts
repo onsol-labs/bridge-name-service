@@ -15,13 +15,20 @@ import {
 import { Connection, PublicKey, Keypair } from "@solana/web3.js";
 import { createHash } from "crypto";
 import fs from "fs";
-import emojiRegex from "emoji-regex";
+// import emojiRegex from "emoji-regex";
 import { SPL_ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID, TOKEN_METADATA_PROGRAM_ID, TOKEN_PROGRAM_ID } from "../constants";
 import { createCreateRenewableNftInstruction, CreateRenewableNftInstructionAccounts, CreateRenewableNftInstructionArgs } from "../name-house/instructions/createRenewableNft";
 import { createCreateRenewableMintInstruction, CreateRenewableMintInstructionAccounts, CreateRenewableMintInstructionArgs } from "../name-house/instructions/createRenewableMint";
+import {
+  createRedeemRenewableNftInstruction,
+  RedeemRenewableNftInstructionAccounts,
+  RedeemRenewableNftInstructionArgs,
+} from "../name-house/instructions";
+import { NameRecordHeaderRaw } from "./bridgeNameService";
+import { TLD } from "../config";
 
 //emoji Regex
-const regex = emojiRegex();
+// const regex = emojiRegex();
 
 export async function findTldState() {
   return await PublicKey.findProgramAddress(
@@ -232,14 +239,14 @@ export async function mintAnsNft(
   mintAccount: PublicKey,
   mintBump: number,
 ) {
-  const [tldHouse, thBump] = findTldHouse(tld);
+  const [tldHouse, thBump] = findTldHouse(TLD);
 
   const [nameHouseAccount, nameHouseBump] = findNameHouse(tldHouse);
   // console.log(nameHouseAccount.toBase58());
   const [collectionMintAccount, collectionMintBump] =
     findCollectionMint(tldHouse);
 
-  const [parentNameKey] = await getParentNameKeyWithBump(tld);
+  const [parentNameKey] = await getParentNameKeyWithBump(TLD);
   const hashedDomainName = await getHashedName(nftName);
   const [nameAccount, nameAccountBump] = await getNameAccountKey(
     hashedDomainName,
@@ -323,11 +330,11 @@ export async function remintAbcNft(
   tld: string,
   mintAccount: PublicKey,
 ) {
-  const [tldHouse] = findTldHouse(tld);
+  const [tldHouse] = findTldHouse(TLD);
 
   const [nameHouseAccount] = findNameHouse(tldHouse);
   const [collectionMintAccount] = findCollectionMint(tldHouse);
-  const [parentNameKey] = await getParentNameKeyWithBump(tld);
+  const [parentNameKey] = await getParentNameKeyWithBump(TLD);
   const hashedDomainName = await getHashedName(nftName);
   const [nameAccount, nameAccountBump] = await getNameAccountKey(
     hashedDomainName,
@@ -385,3 +392,69 @@ export async function remintAbcNft(
   return [createNftIx];
 }
 
+
+export async function redeemRenewableNft(
+  connection: Connection,
+  nftOwner: PublicKey,
+  nftName: string,
+) {
+  const [tldHouse] = findTldHouse(TLD);
+
+  const [nameHouseAccount] = findNameHouse(tldHouse);
+  const [collectionMintAccount] = findCollectionMint(tldHouse);
+
+  const [parentNameKey] = await getParentNameKeyWithBump(TLD);
+  const hashedDomainName = await getHashedName(nftName);
+  const [nameAccount, nameAccountBump] = await getNameAccountKey(
+      hashedDomainName,
+      undefined,
+      parentNameKey,
+  );
+  const nameAccountData = await NameRecordHeaderRaw.fromAccountAddress(
+      connection,
+      nameAccount,
+  );
+  if (!nameAccountData) return;
+  const [mintAccount] = findRenewableMintAddress(
+      nameAccount,
+      nameHouseAccount,
+      nameAccountData.expiresAtBuffer,
+  );
+
+  const mintAtaAccount = getAtaForMint(mintAccount, nftOwner)[0];
+
+  const [nftRecord] = findNameRecord(nameAccount, nameHouseAccount);
+  // console.log("nftRecord", nftRecord.toBase58());
+  const redeemNftArgs: RedeemRenewableNftInstructionArgs = {
+      tld: TLD,
+      hashedName: hashedDomainName,
+      nameAccountBump,
+  };
+  if (!parentNameKey) return;
+  const redeemNftAccounts: RedeemRenewableNftInstructionAccounts = {
+      owner: nftOwner,
+      mintAccount,
+      mintAtaAccount,
+      metadataAccount: getMetadata(mintAccount),
+      tldHouse,
+      nameHouse: nameHouseAccount,
+      nameAccount,
+      nameClassAccount: PublicKey.default,
+      nameParentAccount: parentNameKey,
+      collectionMint: collectionMintAccount,
+      collectionMetadata: getMetadata(collectionMintAccount),
+      collectionMasterEditionAccount: getMasterEdition(
+          collectionMintAccount,
+      ),
+      nftRecord,
+      splTokenProgram: TOKEN_PROGRAM_ID,
+      altNameServiceProgram: ANS_PROGRAM_ID,
+      tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
+  };
+  const redeemNftIX = createRedeemRenewableNftInstruction(
+      redeemNftAccounts,
+      redeemNftArgs,
+  );
+
+  return redeemNftIX;
+}

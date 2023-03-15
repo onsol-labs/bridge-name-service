@@ -21,7 +21,7 @@ import {
 } from "@certusone/wormhole-sdk/lib/esm/nft_bridge";
 import { Alert } from "@mui/material";
 import { WalletContextState } from "@solana/wallet-adapter-react";
-import { Connection } from "@solana/web3.js";
+import { ComputeBudgetProgram, Connection, PublicKey, Transaction } from "@solana/web3.js";
 import { BigNumber, BigNumberish, ContractReceipt, Overrides, Signer } from "ethers";
 import { arrayify, zeroPad } from "ethers/lib/utils";
 import { useSnackbar } from "notistack";
@@ -60,6 +60,8 @@ import {
 import parseError from "../utils/parseError";
 import { signSendAndConfirm } from "../utils/solana";
 import useNFTTargetAddressHex from "./useNFTTargetAddress";
+import { unwrapDomain } from "../solana/handleInstructions";
+import { redeemRenewableNft } from "../solana/utils/name_house";
 
 export async function transferFromEth(
   nftBridgeAddress: string,
@@ -174,7 +176,8 @@ async function solana(
   targetAddress: Uint8Array,
   originAddressStr?: string,
   originChain?: ChainId,
-  originTokenId?: string
+  originTokenId?: string,
+  nftName?: string,
 ) {
   dispatch(setIsSending(true));
   try {
@@ -182,6 +185,20 @@ async function solana(
     const originAddress = originAddressStr
       ? zeroPad(hexToUint8Array(originAddressStr), 32)
       : undefined;
+    const payerPubkey = new PublicKey(payerAddress)
+    const computeUnitsIx = ComputeBudgetProgram.setComputeUnitLimit({
+      units: 600000
+    })
+    const unwrapANStoBNSIX = await unwrapDomain(connection, nftName!, payerPubkey) 
+    const redeemRenewable = await redeemRenewableNft(connection, payerPubkey, nftName!)
+    const txnRedeem = new Transaction().add(computeUnitsIx, redeemRenewable!, unwrapANStoBNSIX);
+
+    const { blockhash: newBlockhash } = await connection.getLatestBlockhash('finalized');
+    txnRedeem.recentBlockhash = newBlockhash;
+    txnRedeem.feePayer = payerPubkey
+
+    await signSendAndConfirm(wallet, connection, txnRedeem);
+    // this expectes a BNS NFT in ETH
     const transaction = await transferFromSolana(
       connection,
       SOL_BRIDGE_ADDRESS,
@@ -297,7 +314,8 @@ export function useHandleNFTTransfer() {
         targetAddress,
         originAsset,
         originChain,
-        originTokenId
+        originTokenId,
+        nftSourceParsedTokenAccount?.name
       );
     } else {
     }
