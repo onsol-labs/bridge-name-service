@@ -9,10 +9,6 @@
     Bridging .eth domains to Solana
   </p>
   <p>
-    using ANS Protocol and Wormhole
-  </p>
-
-  <p>
     <a href="https://github.com/onsol-labs/bridge-name-service"><img alt="Tutorials" src="https://img.shields.io/badge/docs-tutorials-blueviolet" /></a>
     <a href="https://discord.gg/Rcrqhs7Bja"><img alt="Discord Chat" src="https://img.shields.io/badge/chat-discord-blueviolet" /></a>
   </p>
