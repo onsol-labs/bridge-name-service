@@ -37,13 +37,16 @@ function App() {
       {
         <AppBar position="static" elevation={0} style={{ marginBottom: 40 }}>
           <Toolbar variant="dense">
+
             <Button component={Link} to="/">
               Bridge
             </Button>
             <Button component={Link} to="/redeem">
               Redeem
             </Button>
+
             <Box sx={{ flexGrow: 1 }} />
+
             <Select
               value={CLUSTER}
               onChange={handleClusterChange}
@@ -53,6 +56,7 @@ function App() {
               <MenuItem value="mainnet">Mainnet</MenuItem>
               <MenuItem value="testnet">Devnet</MenuItem>
             </Select>
+
           </Toolbar>
         </AppBar>
       }
@@ -63,20 +67,20 @@ function App() {
             subtitle={
               <>
                 <Typography>
-                  This is an experimental ENS domain bridge that transfers
-                  ENS domains across Solana and Ethereum.
+                  This is an experimental domain bridge that transfers
+                  ENS (.eth) domains across Solana and Ethereum.
                 </Typography>
-                <Typography sx={{ marginTop: 0.5}}>
-                - powered by ANS Protocol and Wormhole -
-              </Typography>
+                <Typography sx={{ marginTop: 0.5 }}>
+                  - powered by ANS Protocol and Wormhole -
+                </Typography>
               </>
             }
           >
-      .bridge
-    </HeaderText>
+            .bridge
+          </HeaderText>
         </Container >
       ) : null
-}
+      }
       <Switch>
         <Route exact path="/">
           <NFT />

@@ -24,14 +24,14 @@ import {
   CircularProgress,
   Container,
   Divider,
-  MenuItem,
+  // MenuItem,
   TextField,
-  Typography,
+  // Typography,
 } from "@mui/material";
 import { ExpandMore } from "@mui/icons-material";
 import { Alert } from "@mui/material";
 import { Connection } from "@solana/web3.js";
-import axios from "axios";
+// import axios from "axios";
 import { ethers } from "ethers";
 import { useSnackbar } from "notistack";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -39,7 +39,7 @@ import { useDispatch } from "react-redux";
 import { useHistory, useLocation } from "react-router";
 import { useEthereumProvider } from "../contexts/EthereumProviderContext";
 import useIsWalletReady from "../hooks/useIsWalletReady";
-import useRelayersAvailable, { Relayer } from "../hooks/useRelayersAvailable";
+// import useRelayersAvailable, { Relayer } from "../hooks/useRelayersAvailable";
 import { setRecoveryVaa as setRecoveryNFTVaa } from "../store/nftSlice";
 import {
   CHAINS,
@@ -48,7 +48,7 @@ import {
   getBridgeAddressForChain,
   getNFTBridgeAddressForChain,
   getTokenBridgeAddressForChain,
-  RELAY_URL_EXTENSION,
+  // RELAY_URL_EXTENSION,
   SOLANA_HOST,
   SOL_NFT_BRIDGE_ADDRESS,
   SOL_TOKEN_BRIDGE_ADDRESS,
@@ -59,7 +59,7 @@ import parseError from "../utils/parseError";
 import ButtonWithLoader from "./ButtonWithLoader";
 import ChainSelect from "./ChainSelect";
 import KeyAndBalance from "./KeyAndBalance";
-import RelaySelector from "./RelaySelector";
+// import RelaySelector from "./RelaySelector";
 import PendingVAAWarning from "./Transfer/PendingVAAWarning";
 
 async function fetchSignedVAA(
@@ -129,106 +129,106 @@ async function solana(tx: string, enqueueSnackbar: any, nft: boolean) {
   }
 }
 
-function RelayerRecovery({
-  parsedPayload,
-  signedVaa,
-  onClick,
-}: {
-  parsedPayload: any;
-  signedVaa: string;
-  onClick: () => void;
-}) {
-  const relayerInfo = useRelayersAvailable(true);
-  const [selectedRelayer, setSelectedRelayer] = useState<Relayer | null>(null);
-  const [isAttemptingToSchedule, setIsAttemptingToSchedule] = useState(false);
-  const { enqueueSnackbar } = useSnackbar();
+// function RelayerRecovery({
+//   parsedPayload,
+//   signedVaa,
+//   onClick,
+// }: {
+//   parsedPayload: any;
+//   signedVaa: string;
+//   onClick: () => void;
+// }) {
+//   const relayerInfo = useRelayersAvailable(true);
+//   const [selectedRelayer, setSelectedRelayer] = useState<Relayer | null>(null);
+//   const [isAttemptingToSchedule, setIsAttemptingToSchedule] = useState(false);
+//   const { enqueueSnackbar } = useSnackbar();
 
-  console.log(parsedPayload, relayerInfo, "in recovery relayer");
+//   console.log(parsedPayload, relayerInfo, "in recovery relayer");
 
-  const fee =
-    (parsedPayload && parsedPayload.fee && parseInt(parsedPayload.fee)) || null;
-  //This check is probably more sophisticated in the future. Possibly a net call.
-  const isEligible =
-    fee &&
-    fee > 0 &&
-    relayerInfo?.data?.relayers?.length &&
-    relayerInfo?.data?.relayers?.length > 0;
+//   const fee =
+//     (parsedPayload && parsedPayload.fee && parseInt(parsedPayload.fee)) || null;
+//   //This check is probably more sophisticated in the future. Possibly a net call.
+//   const isEligible =
+//     fee &&
+//     fee > 0 &&
+//     relayerInfo?.data?.relayers?.length &&
+//     relayerInfo?.data?.relayers?.length > 0;
 
-  const handleRelayerChange = useCallback(
-    (relayer: Relayer | null) => {
-      setSelectedRelayer(relayer);
-    },
-    [setSelectedRelayer]
-  );
+//   const handleRelayerChange = useCallback(
+//     (relayer: Relayer | null) => {
+//       setSelectedRelayer(relayer);
+//     },
+//     [setSelectedRelayer]
+//   );
 
-  const handleGo = useCallback(async () => {
-    console.log("handle go", selectedRelayer, parsedPayload);
-    if (!(selectedRelayer && selectedRelayer.url)) {
-      return;
-    }
+//   const handleGo = useCallback(async () => {
+//     console.log("handle go", selectedRelayer, parsedPayload);
+//     if (!(selectedRelayer && selectedRelayer.url)) {
+//       return;
+//     }
 
-    setIsAttemptingToSchedule(true);
-    axios
-      .get(
-        selectedRelayer.url +
-        RELAY_URL_EXTENSION +
-        encodeURIComponent(
-          Buffer.from(hexToUint8Array(signedVaa)).toString("base64")
-        )
-      )
-      .then(
-        () => {
-          setIsAttemptingToSchedule(false);
-          onClick();
-        },
-        (error) => {
-          setIsAttemptingToSchedule(false);
-          enqueueSnackbar(null, {
-            content: (
-              <Alert severity="error">
-                {"Relay request rejected. Error: " + error.message}
-              </Alert>
-            ),
-          });
-        }
-      );
-  }, [selectedRelayer, enqueueSnackbar, onClick, signedVaa, parsedPayload]);
+//     setIsAttemptingToSchedule(true);
+//     axios
+//       .get(
+//         selectedRelayer.url +
+//         RELAY_URL_EXTENSION +
+//         encodeURIComponent(
+//           Buffer.from(hexToUint8Array(signedVaa)).toString("base64")
+//         )
+//       )
+//       .then(
+//         () => {
+//           setIsAttemptingToSchedule(false);
+//           onClick();
+//         },
+//         (error) => {
+//           setIsAttemptingToSchedule(false);
+//           enqueueSnackbar(null, {
+//             content: (
+//               <Alert severity="error">
+//                 {"Relay request rejected. Error: " + error.message}
+//               </Alert>
+//             ),
+//           });
+//         }
+//       );
+//   }, [selectedRelayer, enqueueSnackbar, onClick, signedVaa, parsedPayload]);
 
-  if (!isEligible) {
-    return null;
-  }
+//   if (!isEligible) {
+//     return null;
+//   }
 
-  return (
-    <Alert variant="outlined" severity="info" sx={(theme) => ({
-      marginTop: theme.spacing(2),
-      marginBottom: theme.spacing(2),
-      "& > .MuiAlert-message": {
-        width: "100%",
-      },
-    })}>
-      <Typography>{"This transaction is eligible to be relayed"}</Typography>
-      <RelaySelector
-        selectedValue={selectedRelayer}
-        onChange={handleRelayerChange}
-      />
-      <ButtonWithLoader
-        disabled={!selectedRelayer}
-        onClick={handleGo}
-        showLoader={isAttemptingToSchedule}
-      >
-        Request Relay
-      </ButtonWithLoader>
-    </Alert>
-  );
-}
+//   return (
+//     <Alert variant="outlined" severity="info" sx={(theme) => ({
+//       marginTop: theme.spacing(2),
+//       marginBottom: theme.spacing(2),
+//       "& > .MuiAlert-message": {
+//         width: "100%",
+//       },
+//     })}>
+//       <Typography>{"This transaction is eligible to be relayed"}</Typography>
+//       <RelaySelector
+//         selectedValue={selectedRelayer}
+//         onChange={handleRelayerChange}
+//       />
+//       <ButtonWithLoader
+//         disabled={!selectedRelayer}
+//         onClick={handleGo}
+//         showLoader={isAttemptingToSchedule}
+//       >
+//         Request Relay
+//       </ButtonWithLoader>
+//     </Alert>
+//   );
+// }
 
 export default function Recovery() {
   const { push } = useHistory();
   const { enqueueSnackbar } = useSnackbar();
   const dispatch = useDispatch();
   const { provider } = useEthereumProvider();
-  const [type, setType] = useState("NFT");
-  const isNFT = type === "NFT";
+  // const [type, setType] = useState("NFT");
+  const isNFT = true;
   const [recoverySourceChain, setRecoverySourceChain] =
     useState<ChainId>(CHAIN_ID_ETH);
   const [recoverySourceTx, setRecoverySourceTx] = useState("");
@@ -238,7 +238,7 @@ export default function Recovery() {
   const [recoverySignedVAA, setRecoverySignedVAA] = useState("");
   const [recoveryParsedVAA, setRecoveryParsedVAA] = useState<any>(null);
   const [isVAAPending, setIsVAAPending] = useState(false);
-  const [tokenId, setTokenId] = useState("");
+  // const [tokenId, setTokenId] = useState("");
   const { isReady, statusMessage } = useIsWalletReady(recoverySourceChain);
   const walletConnectError =
     isEVMChain(recoverySourceChain) && !isReady ? statusMessage : "";
@@ -351,15 +351,15 @@ export default function Recovery() {
     isNFT,
     isReady,
   ]);
-  const handleTypeChange = useCallback((event: any) => {
-    setRecoverySourceChain((prevChain) =>
-      event.target.value === "NFT" &&
-        !CHAINS_WITH_NFT_SUPPORT.find((chain) => chain.id === prevChain)
-        ? CHAIN_ID_SOLANA
-        : prevChain
-    );
-    setType(event.target.value);
-  }, []);
+  // const handleTypeChange = useCallback((event: any) => {
+  //   setRecoverySourceChain((prevChain) =>
+  //     event.target.value === "NFT" &&
+  //       !CHAINS_WITH_NFT_SUPPORT.find((chain) => chain.id === prevChain)
+  //       ? CHAIN_ID_SOLANA
+  //       : prevChain
+  //   );
+  //   setType(event.target.value);
+  // }, []);
   const handleSourceChainChange = useCallback((event: any) => {
     setRecoverySourceTx("");
     setRecoverySourceChain(event.target.value);
@@ -429,18 +429,18 @@ export default function Recovery() {
     handleRecoverClickBase(false);
   }, [handleRecoverClickBase]);
 
-  const handleRecoverWithRelayerClick = useCallback(() => {
-    handleRecoverClickBase(true);
-  }, [handleRecoverClickBase]);
+  // const handleRecoverWithRelayerClick = useCallback(() => {
+  //   handleRecoverClickBase(true);
+  // }, [handleRecoverClickBase]);
 
   return (
     <Container maxWidth="md">
-      <Card sx={{ padding: "32px 32px 16px" }}>
+      <Card sx={{ padding: "32px" }}>
         <Alert severity="info" variant="outlined">
           If you have sent your domain but have not redeemed it, you may paste
           in the Source Transaction ID (from Step 3) to resume your transfer.
         </Alert>
-        <TextField
+        {/* <TextField
           select
           variant="outlined"
           label="Type"
@@ -450,9 +450,9 @@ export default function Recovery() {
           fullWidth
           margin="normal"
         >
-          {/* <MenuItem value="Token">Token</MenuItem> */}
+          <MenuItem value="Token">Token</MenuItem> 
           <MenuItem value="NFT">Domain</MenuItem>
-        </TextField>
+        </TextField> */}
         <ChainSelect
           select
           variant="outlined"

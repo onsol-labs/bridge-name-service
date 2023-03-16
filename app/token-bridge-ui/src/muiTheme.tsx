@@ -90,7 +90,7 @@ export const theme = responsiveFontSizes(
           vertical: {
             backgroundColor: "rgba(255,255,255,.07)",
             backdropFilter: "blur(4px)",
-            padding: "32px 32px 16px",
+            padding: "32px",
           },
         }
       },

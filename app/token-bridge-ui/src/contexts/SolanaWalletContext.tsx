@@ -1,4 +1,4 @@
-import { Adapter, WalletAdapterNetwork } from "@solana/wallet-adapter-base";
+import { Adapter } from "@solana/wallet-adapter-base";
 import {
   ConnectionProvider,
   WalletProvider,
@@ -7,20 +7,11 @@ import {
 import {
   PhantomWalletAdapter,
   SolflareWalletAdapter,
-  SolletWalletAdapter,
-  CloverWalletAdapter,
-  Coin98WalletAdapter,
-  SlopeWalletAdapter,
-  SolongWalletAdapter,
-  TorusWalletAdapter,
-  SolletExtensionWalletAdapter,
-  ExodusWalletAdapter,
   BackpackWalletAdapter,
   NightlyWalletAdapter,
-  BloctoWalletAdapter,
 } from "@solana/wallet-adapter-wallets";
 import { FC, useMemo } from "react";
-import { CLUSTER, SOLANA_HOST } from "../utils/consts";
+import { SOLANA_HOST } from "../utils/consts";
 
 interface SolanaWalletProps {
   children?: React.ReactNode;
@@ -33,20 +24,7 @@ export const SolanaWalletProvider: FC<SolanaWalletProps> = (props) => {
       new SolflareWalletAdapter(),
       new BackpackWalletAdapter(),
       new NightlyWalletAdapter(),
-      new SolletWalletAdapter(),
-      new SolletExtensionWalletAdapter(),
-      new CloverWalletAdapter(),
-      new Coin98WalletAdapter(),
-      new SlopeWalletAdapter(),
-      new SolongWalletAdapter(),
-      new TorusWalletAdapter(),
-      new ExodusWalletAdapter(),
     ];
-    if (CLUSTER === "testnet") {
-      wallets.push(
-        new BloctoWalletAdapter({ network: WalletAdapterNetwork.Devnet })
-      );
-    }
     return wallets;
   }, []);
 

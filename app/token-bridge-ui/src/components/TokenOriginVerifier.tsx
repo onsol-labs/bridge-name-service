@@ -336,7 +336,7 @@ export default function TokenOriginVerifier() {
         <HeaderText white>Token Origin Verifier</HeaderText>
       </Container>
       <Container maxWidth="sm">
-        <Card sx={{ padding: "32px 32px 16px" }}>{primaryContent}</Card>
+        <Card sx={{ padding: "32px" }}>{primaryContent}</Card>
         {secondaryContent ? (
           <>
             <Box sx={{ textAlign: "center" }}>
@@ -345,7 +345,7 @@ export default function TokenOriginVerifier() {
                 fontSize: "70px",
               }} />
             </Box>
-            <Card sx={{ padding: "32px 32px 16px" }}>{secondaryContent}</Card>
+            <Card sx={{ padding: "32px" }}>{secondaryContent}</Card>
           </>
         ) : null}
       </Container>
