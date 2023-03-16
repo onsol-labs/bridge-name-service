@@ -56,7 +56,7 @@ function Attest() {
           disabled={preventNavigation || isCreateComplete}
         >
           <StepButton onClick={() => dispatch(setStep(0))} icon={null}>
-            1. Source
+            Source
           </StepButton>
           <StepContent>
             {activeStep === 0 ? <Source /> : <SourcePreview />}
@@ -67,7 +67,7 @@ function Attest() {
           disabled={preventNavigation || isCreateComplete}
         >
           <StepButton onClick={() => dispatch(setStep(1))} icon={null}>
-            2. Target
+            Target
           </StepButton>
           <StepContent>
             {activeStep === 1 ? <Target /> : <TargetPreview />}
@@ -75,7 +75,7 @@ function Attest() {
         </Step>
         <Step expanded={activeStep >= 2} disabled={isSendComplete}>
           <StepButton onClick={() => dispatch(setStep(2))} icon={null}>
-            3. Send attestation
+            Send attestation
           </StepButton>
           <StepContent>
             {activeStep === 2 ? <Send /> : <SendPreview />}
@@ -87,7 +87,7 @@ function Attest() {
             disabled={!isSendComplete}
             icon={null}
           >
-            4. Create wrapped token
+            Create wrapped token
           </StepButton>
           <StepContent>
             {isCreateComplete ? <CreatePreview /> : <Create />}
