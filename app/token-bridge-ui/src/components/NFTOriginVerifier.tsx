@@ -196,7 +196,7 @@ export default function NFTOriginVerifier() {
       </Container>
       <Container maxWidth="sm">
         <Card sx={{
-          padding: "32px 32px 16px",
+          padding: "32px",
         }}>
           <Alert severity="info" variant="outlined">
             This page allows you to find where a Wormhole-bridged NFT was

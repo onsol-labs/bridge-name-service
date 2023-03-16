@@ -435,7 +435,7 @@ export default function Recovery() {
 
   return (
     <Container maxWidth="md">
-      <Card sx={{ padding: "32px 32px 16px" }}>
+      <Card sx={{ padding: "32px" }}>
         <Alert severity="info" variant="outlined">
           If you have sent your domain but have not redeemed it, you may paste
           in the Source Transaction ID (from Step 3) to resume your transfer.
