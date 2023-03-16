@@ -182,6 +182,7 @@ export function useHandleNFTRedeem() {
   const { signer } = useEthereumProvider();
   const signedVAA = useNFTSignedVAA();
   const isRedeeming = useSelector(selectNFTIsRedeeming);
+
   const handleRedeemClick = useCallback(() => {
     if (isEVMChain(targetChain) && !!signer && signedVAA) {
       const originTokenId = parseNFTPayload(
