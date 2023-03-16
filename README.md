@@ -1,6 +1,6 @@
 <div align="center">
 
-  <h1 style="font-size: 48px; margin-bottom: 0px">.bridge</p>
+  <h1>.bridge</h1>
 
   <p>
     <strong>by onsol labs</strong>
