@@ -17,6 +17,9 @@ import NFT from "./components/NFT";
 import NFTOriginVerifier from "./components/NFTOriginVerifier";
 import Recovery from "./components/Recovery";
 import { CLUSTER } from "./utils/consts";
+import FormControl from '@mui/material/FormControl';
+
+import { FaDiscord, FaTwitter, FaGithub } from "react-icons/fa";
 
 function App() {
   const { pathname } = useLocation();
@@ -47,15 +50,56 @@ function App() {
 
             <Box sx={{ flexGrow: 1 }} />
 
-            <Select
-              value={CLUSTER}
-              onChange={handleClusterChange}
-              variant="outlined"
-              margin="dense"
+            <Button
+              href="https://twitter.com/ANSProtocol"
+              target="_blank"
+              rel="noopener noreferrer"
+              color="inherit"
+              sx={{
+                fontSize: '1.5em'
+              }}
             >
-              <MenuItem value="mainnet">Mainnet</MenuItem>
-              <MenuItem value="testnet">Devnet</MenuItem>
-            </Select>
+              <FaTwitter />
+            </Button>
+
+            <Button
+              href="https://discord.gg/AJK53MMd7K"
+              target="_blank"
+              rel="noopener noreferrer"
+              color="inherit"
+              sx={{
+                fontSize: '1.5em'
+              }}
+            >
+              <FaDiscord />
+            </Button>
+
+            <Button
+              href="https://github.com/onsol-labs/bridge-name-service/"
+              target="_blank"
+              rel="noopener noreferrer"
+              color="inherit"
+              sx={{
+                fontSize: '1.5em'
+              }}
+            >
+              <FaGithub />
+            </Button>
+
+
+
+
+            <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+              <Select
+                value={CLUSTER}
+                onChange={handleClusterChange}
+                variant="outlined"
+                margin="dense"
+              >
+                <MenuItem value="mainnet">Mainnet</MenuItem>
+                <MenuItem value="testnet">Devnet</MenuItem>
+              </Select>
+            </FormControl>
 
           </Toolbar>
         </AppBar>
