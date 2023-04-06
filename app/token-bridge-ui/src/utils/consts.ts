@@ -142,7 +142,7 @@ export const GET_TOKENS_URL = (
   noNftMetadata?: boolean
 ) => {
   if (cluster === "mainnet") {
-    return `https://eth-mainnet.g.alchemy.com/v2/p3abkrkSOlaL_jtCvKMjDNcyuA02l5L2/getNFTs/?owner=${walletAddress}`
+    return `https://eth-mainnet.g.alchemy.com/v2/nA_sf-7jeAlqtbShBrqV039oVxaPVfZB/getNFTs/?owner=${walletAddress}`
   } else if (cluster === "testnet") {
     return `https://eth-goerli.g.alchemy.com/v2/_vPNUynh4wlTeGt7siQNWFrWWZpdQucj/getNFTs/?owner=${walletAddress}`;
   } else {
